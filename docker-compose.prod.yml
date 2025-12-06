@@ -1,0 +1,23 @@
+volumes:
+  postgres_app_data:
+    external:
+      # si tu as créé le volume sans préfixe, mets le même nom :
+      name: postgres_app_data
+  dolibarr_db_data:
+    external:
+      name: dolibarr_db_data
+  keycloak_db_data:
+    external:
+      name: keycloak_db_data
+  redis_data:
+    external:
+      name: redis_data
+  mimio_images:
+    external:
+      name: mimio_images
+
+# NOTE:
+# - Si tu as créé des volumes avec un préfixe (ex. komkom_postgres_app_data),
+#   remplace `name: postgres_app_data` par `name: komkom_postgres_app_data`.
+# - Les volumes non listés ici (ex. dolibarr_html, dolibarr_docs) continueront
+#   à être gérés par docker-compose.yml si tu ne les déclare pas ici.
