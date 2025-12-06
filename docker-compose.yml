@@ -63,7 +63,7 @@ services:
       - backend_net
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.custom.rule=Host(`${ADDRESS_HOST}`) && PathPrefix(`/custom/api`)"
+      - "traefik.http.routers.custom.rule=Host(`${ADDRESS_HOST}`) && PathPrefix(`/custom`)"
       - "traefik.http.routers.custom.entrypoints=websecure"
       - "traefik.http.routers.custom.tls=true"
 
