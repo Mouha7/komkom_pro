@@ -62,34 +62,43 @@ class Settings(BaseSettings):
     SMTP_PORT: int = Field(default=25, description="Port SMTP")
     SMTP_USER: str = Field(default="", description="Utilisateur SMTP")
     SMTP_PASS: str = Field(default="", description="Mot de passe SMTP")
-    SMTP_TLS: int = Field(
-        default=60, description="Durée de vie du lien de réinitialisation en minutes"
+    SMTP_TLS: bool = Field(
+        default=True, description="Durée de vie du lien de réinitialisation en minutes"
     )
-    SMTP_SSL: int = Field(
-        default=0, description="Durée de vie du lien de réinitialisation en minutes"
+    SMTP_SSL: bool = Field(
+        default=False, description="Durée de vie du lien de réinitialisation en minutes"
     )
     MAIL_FROM: str = Field(default="", description="Adresse email de l'expéditeur")
-    
+
     # Configuration réinitialisation mot de passe
     RESET_SALT: str = Field(
-        default="", description="Sel utilisé pour le hachage des codes de réinitialisation"
+        default="",
+        description="Sel utilisé pour le hachage des codes de réinitialisation",
     )
     RESET_TOKEN_SECRET: str = Field(
         default="", description="Clé secrète pour les tokens de réinitialisation"
     )
     RESET_CODE_TTL_SECONDS: int = Field(
-        default=900, description="Durée de validité des codes de réinitialisation en secondes"
+        default=900,
+        description="Durée de validité des codes de réinitialisation en secondes",
     )
     RESET_TOKEN_EXP_SECONDS: int = Field(
-        default=900, description="Durée de validité des tokens de réinitialisation en secondes"
+        default=900,
+        description="Durée de validité des tokens de réinitialisation en secondes",
     )
     RESET_REQUEST_BLOCK_TTL: int = Field(
-        default=30, description="Durée de blocage des demandes après dépassement du quota en minutes"
+        default=30,
+        description="Durée de blocage des demandes après dépassement du quota en minutes",
     )
     RESET_REQUEST_LIMIT: int = Field(
         default=5, description="Nombre maximal de tentatives de génération de code"
     )
 
+    # Configuration Token interne pour appels inter-services
+    CUSTOM_SERVICE_INTERNAL_TOKEN: str = Field(
+        default="", description="Token interne pour appels entre services"
+    )
+
 
 settings = Settings()
-DATABASE_URL = f"postgresql://${settings.POSTGRES_APP_USER}:${settings.POSTGRES_APP_PASSWORD}@postgres_app:5432/${settings.POSTGRES_APP_DB}"
+DATABASE_URL = f"postgresql://{settings.POSTGRES_APP_USER}:{settings.POSTGRES_APP_PASSWORD}@postgres_app:5432/{settings.POSTGRES_APP_DB}"

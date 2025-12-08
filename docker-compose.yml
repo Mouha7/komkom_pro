@@ -5,6 +5,7 @@ services:
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
+      - "--api=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
@@ -51,8 +52,12 @@ services:
     restart: unless-stopped
 
   custom_service:
-    build: ./custom_service
+    build: 
+      context: ./custom_service
+      dockerfile: Dockerfile
     container_name: custom_service
+    env_file:
+      - ./custom_service/.env
     depends_on:
       - postgres_app
     environment:
@@ -104,13 +109,17 @@ services:
       - "8080:80"
 
   dolibarr_service:
-    build: ./dolibarr_service
+    build: 
+      context: ./dolibarr_service
+      dockerfile: Dockerfile
     container_name: dolibarr_service
     depends_on:
       - dolibarr
+    env_file:
+      - ./dolibarr_service/.env
     environment:
-      - DOLIBARR_API_URL=http://dolibarr:80/api/index.php
-      - DOLIBARR_API_KEY=${DOLI_API_KEY}
+      - DOLI_API_URL={DOLI_API_URL}
+      - DOLI_API_KEY=${DOLI_API_KEY}
     expose:
       - "8002"
     networks:
@@ -172,7 +181,7 @@ services:
     container_name: mimio_storage
     command: ["tail", "-f", "/dev/null"]  # conteneur vide pour héberger les volumes
     volumes:
-      - mimio_images:/mimio_images
+      - mimio_images_data:/mimio_images
     networks:
       - backend_net
     restart: unless-stopped
@@ -182,6 +191,8 @@ networks:
     driver: bridge
 
 volumes:
+  dolibarr_service:
+  custom_service:
   postgres_app_data:
   dolibarr_db_data:
   dolibarr_html:

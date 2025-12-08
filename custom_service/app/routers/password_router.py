@@ -1,7 +1,7 @@
 # Utilitaire d'erreurs centralisé
 from app.core import ErrorCode, raise_http_error
 from app.schemas import ForgotPasswordIn, ResetPasswordIn, VerifyCodeIn
-from app.services.password_service import (
+from app.services import (
     perform_password_reset,
     request_password_reset,
     verify_reset_code,

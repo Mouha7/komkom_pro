@@ -1,4 +1,9 @@
-from app.core import ErrorCode, raise_http_error
+from typing import Optional
+
+from fastapi import APIRouter, Body, Depends, Header
+from sqlalchemy.orm import Session
+
+from app.core import ErrorCode, raise_http_error, settings
 from app.db.postgres import get_postgres_db
 from app.models import User
 from app.schemas import (
@@ -11,18 +16,17 @@ from app.schemas import (
     OAuthLoginRequest,
     RefreshRequest,
     RefreshResponse,
-    RegisterResponse
+    RegisterResponse,
 )
-from app.services import get_token as get_token_from_kc  # si besoin
 from app.services import (
+    get_token,
     is_email_taken,
     logout_user,
     oauth_login_user,
     refresh_tokens,
     register_user,
+    verify_token,
 )
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
 
 user_router = APIRouter()
 
@@ -51,7 +55,7 @@ def register(user_data: CreateUserRequest, db: Session = Depends(get_postgres_db
     description="Authentifie l'utilisateur via Keycloak et retourne le token + données.",
 )
 def login(credentials: LoginRequest, db: Session = Depends(get_postgres_db)):
-    token = get_token_from_kc(credentials.email, credentials.password)
+    token = get_token(credentials.email, credentials.password)
     if not token:
         # Renvoie structuré : le frontend peut mapper `invalid_credentials` vers un message localisé
         raise_http_error(
@@ -120,3 +124,116 @@ def check_email(payload: EmailCheckRequest, db: Session = Depends(get_postgres_d
     except Exception:
         # Si erreur côté DB on renvoie 500 avec code structuré (éviter string libre)
         raise_http_error(500, ErrorCode.DB_ERROR.value, "Error checking email")
+
+
+def _extract_bearer_token(authorization: Optional[str]) -> Optional[str]:
+    if not authorization:
+        return None
+    parts = authorization.split()
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        return None
+    return parts[1]
+
+
+@user_router.post("/validate-token", summary="Valider un token et récupérer l'utilisateur lié")
+def validate_token_endpoint(
+    authorization: Optional[str] = Header(None),
+    x_internal_token: Optional[str] = Header(None, alias="X-Internal-Token"),
+    token_in: Optional[str] = Body(None, embed=True),
+    db: Session = Depends(get_postgres_db),
+):
+    """
+    Valide un token utilisateur.
+
+    Deux modes d'appel :
+    1) Appel externe (client public) : envoyer header "Authorization: Bearer <user_token>".
+       Le endpoint valide le token via verify_token(token).
+    2) Appel interne (service -> service) : envoyer header "X-Internal-Token: <secret>"
+       et body JSON { "token": "<user_token>" } — le service vérifie le secret et valide le token.
+    """
+    # Vérifier si appel interne (secret présent et correct)
+    internal_secret = settings.CUSTOM_SERVICE_INTERNAL_TOKEN
+    token: Optional[str] = None
+    if x_internal_token and internal_secret and x_internal_token == internal_secret:
+        # appel interne : attendre token dans le body
+        if not token_in:
+            raise_http_error(400, ErrorCode.INVALID_TOKEN.value, "Missing token in request body for internal call")
+        token = token_in
+    else:
+        # appel externe : lire Authorization header
+        token = _extract_bearer_token(authorization)
+        if not token:
+            raise_http_error(401, ErrorCode.INVALID_TOKEN.value, "Missing or invalid Authorization header")
+            return
+
+    if not token:
+        raise_http_error(401, ErrorCode.INVALID_TOKEN.value, "Missing or invalid token")
+        return
+
+    payload = verify_token(token)
+    if payload is None:
+        raise_http_error(401, ErrorCode.INVALID_TOKEN.value, "Invalid token")
+        return
+
+    # Récupérer l'email depuis les claims
+    email = payload.get("email")
+    user_dict = None
+    if email:
+        user: Optional[User] = None
+        try:
+            user = db.query(User).filter(User.email.ilike(email)).first()
+        except Exception:
+            raise_http_error(500, ErrorCode.DB_ERROR.value, "Database error")
+        if user:
+            user_dict = user.dict()
+
+    return {"valid": True, "user": user_dict}
+
+
+@user_router.get("/userinfo", summary="Récupérer les informations utilisateur via token")
+def userinfo_endpoint(
+    authorization: Optional[str] = Header(None),
+    x_internal_token: Optional[str] = Header(None, alias="X-Internal-Token"),
+    email: Optional[str] = None,  # utile pour appel interne : ?email=foo@bar
+    db: Session = Depends(get_postgres_db),
+):
+    """
+    Retourne les informations de l'utilisateur.
+    - Appel externe : header Authorization: Bearer <token> (on extrait email depuis le token).
+    - Appel interne : header X-Internal-Token: <secret> et param ?email=<email> pour lookup direct.
+    """
+    internal_secret = settings.CUSTOM_SERVICE_INTERNAL_TOKEN
+    if x_internal_token and internal_secret and x_internal_token == internal_secret:
+        # Appel interne : email doit être fourni
+        if not email:
+            raise_http_error(400, ErrorCode.VALIDATION_ERROR.value, "Missing email parameter for internal call")
+            return
+            
+        user: Optional[User] = None
+        try:
+            user = db.query(User).filter(User.email.ilike(email)).first()
+        except Exception:
+            raise_http_error(500, ErrorCode.DB_ERROR.value, "Database error")
+        return {"user": user.dict() if user else None}
+    else:
+        # Appel externe : vérifier Authorization header et décoder token
+        token = _extract_bearer_token(authorization)
+        if not token:
+            raise_http_error(401, ErrorCode.INVALID_TOKEN.value, "Missing or invalid Authorization header")
+            return
+
+        payload = verify_token(token)
+        if not payload:
+            raise_http_error(401, ErrorCode.INVALID_TOKEN.value, "Invalid token")
+            return
+
+        email = payload.get("email")
+        if not email:
+            return {"user": None}
+            
+        try:
+            user = db.query(User).filter(User.email.ilike(email)).first()
+        except Exception:
+            raise_http_error(500, ErrorCode.DB_ERROR.value, "Database error")
+            return
+        return {"user": user.dict() if user else None}

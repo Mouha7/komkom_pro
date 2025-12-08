@@ -1,23 +1,28 @@
 volumes:
   postgres_app_data:
-    external:
-      # si tu as créé le volume sans préfixe, mets le même nom :
-      name: postgres_app_data
-  dolibarr_db_data:
-    external:
-      name: dolibarr_db_data
-  keycloak_db_data:
-    external:
-      name: keycloak_db_data
-  redis_data:
-    external:
-      name: redis_data
-  mimio_images:
-    external:
-      name: mimio_images
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /srv/komkom/postgres_app_data
 
-# NOTE:
-# - Si tu as créé des volumes avec un préfixe (ex. komkom_postgres_app_data),
-#   remplace `name: postgres_app_data` par `name: komkom_postgres_app_data`.
-# - Les volumes non listés ici (ex. dolibarr_html, dolibarr_docs) continueront
-#   à être gérés par docker-compose.yml si tu ne les déclare pas ici.
+  dolibarr_db_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /srv/komkom/dolibarr_db_data
+
+  redis_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /srv/komkom/redis_data
+
+  mimio_images:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /srv/komkom/mimio_images
