@@ -42,7 +42,7 @@ services:
       - start-dev
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.keycloak.rule=Host(`keycloak.localhost`)"
+      - "traefik.http.routers.keycloak.rule=Host(`${DOMAIN_KEYCLOAK}`)"
       - "traefik.http.routers.keycloak.entrypoints=web"
     networks:
       - traefik-public
@@ -126,7 +126,7 @@ services:
   # Celery worker (shared worker image for tasks: invoice, notifications, uploads)
   celery_worker:
     build:
-      context: ./workers/celery_worker
+      context: ../../workers/celery_worker
       dockerfile: Dockerfile
     container_name: komkom_celery_worker
     environment:
@@ -145,8 +145,8 @@ services:
   # Products service (FastAPI)
   products_service:
     build:
-      context: ./services/products_catalog_service
-      dockerfile: Dockerfile
+      context: ../../services/products_catalog_service
+      dockerfile: app/Dockerfile
     container_name: products_service
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
@@ -156,7 +156,7 @@ services:
       - SERVICE_NAME=products
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.products.rule=Host(`products.localhost`)"
+      - "traefik.http.routers.products.rule=Host(`${DOMAIN_PRODUCTS}`)"
       - "traefik.http.routers.products.entrypoints=web"
       - "traefik.http.services.products.loadbalancer.server.port=8000"
     depends_on:
@@ -171,8 +171,8 @@ services:
   # Cart service (FastAPI) - Redis-backed cart
   cart_service:
     build:
-      context: ./services/cart_service
-      dockerfile: Dockerfile
+      context: ../../services/cart_service
+      dockerfile: app/Dockerfile
     container_name: cart_service
     environment:
       - REDIS_URL=redis://redis:6379/1
@@ -181,7 +181,7 @@ services:
       - SERVICE_NAME=cart
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.cart.rule=Host(`cart.localhost`)"
+      - "traefik.http.routers.cart.rule=Host(`${DOMAIN_CART}`)"
       - "traefik.http.routers.cart.entrypoints=web"
       - "traefik.http.services.cart.loadbalancer.server.port=8000"
     depends_on:
@@ -195,8 +195,8 @@ services:
   # Orders service (FastAPI)
   orders_service:
     build:
-      context: ./services/orders_service
-      dockerfile: Dockerfile
+      context: ../../services/orders_service
+      dockerfile: app/Dockerfile
     container_name: orders_service
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
@@ -206,7 +206,7 @@ services:
       - SERVICE_NAME=orders
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.orders.rule=Host(`orders.localhost`)"
+      - "traefik.http.routers.orders.rule=Host(`${DOMAIN_ORDERS}`)"
       - "traefik.http.routers.orders.entrypoints=web"
       - "traefik.http.services.orders.loadbalancer.server.port=8000"
     depends_on:
@@ -230,7 +230,7 @@ services:
 
   # Optional: pgadmin (dev)
   pgadmin:
-    image: dpage/pgadmin4:7
+    image: dpage/pgadmin4:8
     container_name: pgadmin
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL:-pgadmin@local}

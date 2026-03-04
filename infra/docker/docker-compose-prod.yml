@@ -1,0 +1,417 @@
+# docker-compose-prod.yml
+# KomKom - Production docker-compose (HTTPS-enabled, scaled, hardened)
+# USE: docker-compose -f infra/docker/docker-compose-prod.yml --env-file .env.prod up -d
+# NOTE: Copy .env to .env.prod and update DOMAIN_* variables for your production domain
+
+services:
+  traefik:
+    image: traefik:v3.1
+    container_name: traefik-prod
+    command:
+      - --api.insecure=false                          # Disable insecure dashboard in prod
+      - --api.dashboard=false                         # Disable dashboard entirely
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --log.level=WARN                               # Less verbose logging in prod
+      - --accesslog=true
+      - --accesslog.filepath=/var/log/traefik/access.log
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./infra/docker/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./infra/docker/traefik/acme.json:/acme.json
+      - ./infra/docker/traefik/configurations:/etc/traefik/configurations:ro
+      - traefik-logs:/var/log/traefik
+    networks:
+      - traefik-public
+      - internal
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.6
+    container_name: keycloak-prod
+    environment:
+      # Production database backend (PostgreSQL instead of dev-mem)
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak
+      - KC_DB_USERNAME=${POSTGRES_USER:-komkom}
+      - KC_DB_PASSWORD=${POSTGRES_PASSWORD:-komkom}
+      - KC_HTTP_ENABLED=true
+      - KC_PROXY=edge                                  # Inform KC of reverse proxy
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-admin}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
+    command:
+      - start                                          # Production mode (not start-dev)
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.keycloak.rule=Host(`${DOMAIN_KEYCLOAK}`)"
+      - "traefik.http.routers.keycloak.entrypoints=websecure"
+      - "traefik.http.routers.keycloak.tls.certresolver=letsencrypt"
+    networks:
+      - traefik-public
+      - internal
+    depends_on:
+      - postgres
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1024M
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: komkom-postgres-prod
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-komkom}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-komkom}
+      - POSTGRES_DB=${POSTGRES_DB:-komkom}
+      - POSTGRES_INITDB_ARGS=-c max_connections=200 -c shared_buffers=256MB
+    volumes:
+      - pgdata-prod:/var/lib/postgresql/data
+      - ./infra/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - internal
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1024M
+        reservations:
+          cpus: "1"
+          memory: 512M
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: komkom-redis-prod
+    command: ["redis-server", "--save", "60", "1", "--appendonly", "yes", "--appendfsync", "everysec", "--maxmemory", "512mb", "--maxmemory-policy", "allkeys-lru"]
+    volumes:
+      - redisdata-prod:/data
+    networks:
+      - internal
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+
+  rabbitmq:
+    image: rabbitmq:3.11-management-alpine
+    container_name: komkom-rabbitmq-prod
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-rabbit}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-rabbit}
+      - RABBITMQ_DEFAULT_VHOST=/
+    volumes:
+      - rabbitmqdata-prod:/var/lib/rabbitmq
+      - ./infra/docker/rabbitmq/init.sh:/usr/local/bin/init-rabbitmq.sh:ro
+    networks:
+      - internal
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+
+  minio:
+    image: minio/minio:latest
+    container_name: komkom-minio-prod
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-minioadmin}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin}
+    command: server /data --console-address ":9001" --address ":9000"
+    volumes:
+      - miniodata-prod:/data
+    networks:
+      - internal
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1024M
+        reservations:
+          cpus: "1"
+          memory: 512M
+
+  # Celery worker (scaled to 2 replicas for production)
+  celery_worker:
+    build:
+      context: ./workers/celery_worker
+      dockerfile: Dockerfile
+    container_name: komkom-celery-worker-prod
+    environment:
+      - CELERY_BROKER_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+    depends_on:
+      - rabbitmq
+      - redis
+      - postgres
+      - minio
+    networks:
+      - internal
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+
+  # Products service (FastAPI) - scaled to 2 replicas
+  products_service:
+    build:
+      context: ./services/products_catalog_service
+      dockerfile: app/Dockerfile
+    container_name: products-service-prod
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://redis:6379/0
+      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672//
+      - KEYCLOAK_JWKS_URL=https://${DOMAIN_KEYCLOAK}/realms/master/protocol/openid-connect/certs
+      - SERVICE_NAME=products
+      - LOG_LEVEL=INFO
+      - DEBUG=false
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.products.rule=Host(`${DOMAIN_PRODUCTS}`)"
+      - "traefik.http.routers.products.entrypoints=websecure"
+      - "traefik.http.routers.products.tls.certresolver=letsencrypt"
+      - "traefik.http.services.products.loadbalancer.server.port=8000"
+      - "traefik.http.services.products.loadbalancer.healthcheck.path=/health"
+      - "traefik.http.services.products.loadbalancer.healthcheck.interval=30s"
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    networks:
+      - traefik-public
+      - internal
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Cart service (FastAPI) - scaled to 2 replicas
+  cart_service:
+    build:
+      context: ./services/cart_service
+      dockerfile: app/Dockerfile
+    container_name: cart-service-prod
+    environment:
+      - REDIS_URL=redis://redis:6379/1
+      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672//
+      - KEYCLOAK_JWKS_URL=https://${DOMAIN_KEYCLOAK}/realms/master/protocol/openid-connect/certs
+      - SERVICE_NAME=cart
+      - LOG_LEVEL=INFO
+      - DEBUG=false
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cart.rule=Host(`${DOMAIN_CART}`)"
+      - "traefik.http.routers.cart.entrypoints=websecure"
+      - "traefik.http.routers.cart.tls.certresolver=letsencrypt"
+      - "traefik.http.services.cart.loadbalancer.server.port=8000"
+      - "traefik.http.services.cart.loadbalancer.healthcheck.path=/health"
+      - "traefik.http.services.cart.loadbalancer.healthcheck.interval=30s"
+    depends_on:
+      - redis
+      - rabbitmq
+    networks:
+      - traefik-public
+      - internal
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Orders service (FastAPI) - scaled to 2 replicas
+  orders_service:
+    build:
+      context: ./services/orders_service
+      dockerfile: app/Dockerfile
+    container_name: orders-service-prod
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://redis:6379/2
+      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672//
+      - KEYCLOAK_JWKS_URL=https://${DOMAIN_KEYCLOAK}/realms/master/protocol/openid-connect/certs
+      - SERVICE_NAME=orders
+      - LOG_LEVEL=INFO
+      - DEBUG=false
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.orders.rule=Host(`${DOMAIN_ORDERS}`)"
+      - "traefik.http.routers.orders.entrypoints=websecure"
+      - "traefik.http.routers.orders.tls.certresolver=letsencrypt"
+      - "traefik.http.services.orders.loadbalancer.server.port=8000"
+      - "traefik.http.services.orders.loadbalancer.healthcheck.path=/health"
+      - "traefik.http.services.orders.loadbalancer.healthcheck.interval=30s"
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    networks:
+      - traefik-public
+      - internal
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  pgdata-prod:
+    driver: local
+  redisdata-prod:
+    driver: local
+  rabbitmqdata-prod:
+    driver: local
+  miniodata-prod:
+    driver: local
+  traefik-logs:
+    driver: local
+
+networks:
+  traefik-public:
+    driver: bridge
+  internal:
+    driver: bridge

@@ -10,15 +10,17 @@ global:
 entryPoints:
   web:
     address: :80
-    # Redirect HTTP to HTTPS in prod (uncomment for production)
-    # http:
-    #   redirections:
-    #     entrypoint:
-    #       to: websecure
-    #       scheme: https
+    http:
+      redirections:
+        entrypoint:
+          to: websecure
+          scheme: https
 
   websecure:
     address: :443
+    http:
+      tls:
+        certResolver: letsencrypt
 
 # Providers
 providers:
@@ -43,11 +45,11 @@ log:
 
 accessLog: true
 
-# Certificate resolvers (disabled for dev; enable on prod)
-# certificatesResolvers:
-#   letsencrypt:
-#     acme:
-#       email: admin@komkom.io
-#       storage: acme.json
-#       httpChallenge:
-#         entryPoint: web
+# Certificate resolvers for Let's Encrypt automatic HTTPS
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: ${ACME_EMAIL:-admin@komkom.io}
+      storage: acme.json
+      httpChallenge:
+        entryPoint: web

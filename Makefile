@@ -19,6 +19,14 @@ help:
 	@echo "  make clean             - Remove stopped containers and volumes"
 	@echo "  make build             - Build all Docker images"
 	@echo ""
+	@echo "🌍 PRODUCTION DEPLOYMENT:"
+	@echo "  make env-prod          - Create .env.prod from .env (update domains)"
+	@echo "  make up-prod           - Start production services (requires .env.prod)"
+	@echo "  make down-prod         - Stop production services"
+	@echo "  make logs-prod         - Tail logs from production services"
+	@echo "  make ps-prod           - Show running production containers"
+	@echo "  make build-prod        - Build production Docker images"
+	@echo ""
 	@echo "📦 DEVELOPMENT:"
 	@echo "  make install           - Install Python dependencies for development"
 	@echo "  make test              - Run test suite for all services"
@@ -84,6 +92,48 @@ clean:
 ps:
 	@echo "📊 Running containers:"
 	$(COMPOSE_CMD) ps
+
+# ================================
+# Production Deployment
+# ================================
+
+env-prod:
+	@if [ ! -f .env.prod ]; then \
+		cp .env .env.prod; \
+		sed -i '' 's/DOMAIN=localhost/DOMAIN=example.com/g' .env.prod; \
+		sed -i '' 's/DOMAIN_KEYCLOAK=keycloak.localhost/DOMAIN_KEYCLOAK=keycloak.example.com/g' .env.prod; \
+		sed -i '' 's/DOMAIN_PRODUCTS=products.localhost/DOMAIN_PRODUCTS=products.example.com/g' .env.prod; \
+		sed -i '' 's/DOMAIN_CART=cart.localhost/DOMAIN_CART=cart.example.com/g' .env.prod; \
+		sed -i '' 's/DOMAIN_ORDERS=orders.localhost/DOMAIN_ORDERS=orders.example.com/g' .env.prod; \
+		sed -i '' 's/PROTOCOL=http/PROTOCOL=https/g' .env.prod; \
+		sed -i '' 's/ACME_EMAIL=admin@komkom.io/ACME_EMAIL=your-email@example.com/g' .env.prod; \
+		echo "✅ Created .env.prod (update domains and email before deploying)"; \
+	else \
+		echo "⚠️  .env.prod already exists"; \
+	fi
+
+up-prod:
+	@echo "🚀 Starting production services..."
+	docker-compose -f infra/docker/docker-compose-prod.yml --env-file .env.prod up -d
+	@echo "✅ Production services started"
+	@echo "📊 Verify with: make ps-prod"
+
+down-prod:
+	@echo "🛑 Stopping production services..."
+	docker-compose -f infra/docker/docker-compose-prod.yml --env-file .env.prod down
+	@echo "✅ Production services stopped"
+
+logs-prod:
+	docker-compose -f infra/docker/docker-compose-prod.yml --env-file .env.prod logs -f
+
+ps-prod:
+	@echo "📊 Production running containers:"
+	docker-compose -f infra/docker/docker-compose-prod.yml --env-file .env.prod ps
+
+build-prod:
+	@echo "🔨 Building production Docker images..."
+	docker-compose -f infra/docker/docker-compose-prod.yml build --no-cache
+	@echo "✅ Production build complete"
 
 # ================================
 # Service Shells
