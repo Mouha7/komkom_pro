@@ -1,0 +1,254 @@
+# docker-compose.yml
+# KomKom - Development docker-compose (Traefik, Keycloak, Postgres, Redis, RabbitMQ, MinIO, Celery, FastAPI services)
+# NOTE: Fill sensitive values in a .env file and never commit secrets.
+
+services:
+  traefik:
+    image: traefik:v3.1
+    container_name: traefik
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --log.level=INFO
+      - --accesslog=true
+      # For dev: disable automatic Let's Encrypt; enable in prod with proper config
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080" # Traefik dashboard (dev only)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./infra/docker/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./infra/docker/traefik/acme.json:/acme.json
+      - ./infra/docker/traefik/configurations:/etc/traefik/configurations:ro
+    networks:
+      - traefik-public
+      - internal
+    restart: unless-stopped
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.6
+    container_name: keycloak
+    environment:
+      # Bootstrap admin credentials for dev only; override in prod and remove bootstrap envs
+      - KC_DB=dev-mem
+      - KC_HTTP_ENABLED=true
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-admin}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
+    command:
+      - start-dev
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.keycloak.rule=Host(`keycloak.localhost`)"
+      - "traefik.http.routers.keycloak.entrypoints=web"
+    networks:
+      - traefik-public
+      - internal
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: komkom_postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-komkom}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-komkom}
+      - POSTGRES_DB=${POSTGRES_DB:-komkom}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: komkom_redis
+    command: ["redis-server", "--save", "60", "1", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: komkom_rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-rabbit}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-rabbit}
+    ports:
+      - "15672:15672" # management UI (dev)
+      - "5672:5672"
+    volumes:
+      - rabbitmqdata:/var/lib/rabbitmq
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    container_name: komkom_minio
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-minioadmin}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin}
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001" # console
+    volumes:
+      - miniodata:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "mc alias set local http://localhost:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Celery worker (shared worker image for tasks: invoice, notifications, uploads)
+  celery_worker:
+    build:
+      context: ./workers/celery_worker
+      dockerfile: Dockerfile
+    container_name: komkom_celery_worker
+    environment:
+      - CELERY_BROKER_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - rabbitmq
+      - redis
+      - postgres
+      - minio
+    networks:
+      - internal
+    restart: unless-stopped
+
+  # Products service (FastAPI)
+  products_service:
+    build:
+      context: ./services/products_catalog_service
+      dockerfile: Dockerfile
+    container_name: products_service
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://redis:6379/0
+      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672//
+      - KEYCLOAK_JWKS_URL=http://keycloak:8080/realms/master/protocol/openid-connect/certs
+      - SERVICE_NAME=products
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.products.rule=Host(`products.localhost`)"
+      - "traefik.http.routers.products.entrypoints=web"
+      - "traefik.http.services.products.loadbalancer.server.port=8000"
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    networks:
+      - traefik-public
+      - internal
+    restart: unless-stopped
+
+  # Cart service (FastAPI) - Redis-backed cart
+  cart_service:
+    build:
+      context: ./services/cart_service
+      dockerfile: Dockerfile
+    container_name: cart_service
+    environment:
+      - REDIS_URL=redis://redis:6379/1
+      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672//
+      - KEYCLOAK_JWKS_URL=http://keycloak:8080/realms/master/protocol/openid-connect/certs
+      - SERVICE_NAME=cart
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cart.rule=Host(`cart.localhost`)"
+      - "traefik.http.routers.cart.entrypoints=web"
+      - "traefik.http.services.cart.loadbalancer.server.port=8000"
+    depends_on:
+      - redis
+      - rabbitmq
+    networks:
+      - traefik-public
+      - internal
+    restart: unless-stopped
+
+  # Orders service (FastAPI)
+  orders_service:
+    build:
+      context: ./services/orders_service
+      dockerfile: Dockerfile
+    container_name: orders_service
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://redis:6379/2
+      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672//
+      - KEYCLOAK_JWKS_URL=http://keycloak:8080/realms/master/protocol/openid-connect/certs
+      - SERVICE_NAME=orders
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.orders.rule=Host(`orders.localhost`)"
+      - "traefik.http.routers.orders.entrypoints=web"
+      - "traefik.http.services.orders.loadbalancer.server.port=8000"
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    networks:
+      - traefik-public
+      - internal
+    restart: unless-stopped
+
+  # Optional: Adminer for quick DB inspection (dev only)
+  adminer:
+    image: adminer:latest
+    container_name: adminer
+    ports:
+      - "8081:8080"
+    networks:
+      - internal
+    restart: unless-stopped
+
+  # Optional: pgadmin (dev)
+  pgadmin:
+    image: dpage/pgadmin4:7
+    container_name: pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL:-pgadmin@local}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD:-pgadmin}
+    ports:
+      - "5050:80"
+    networks:
+      - internal
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
+  rabbitmqdata:
+  miniodata:
+
+networks:
+  traefik-public:
+    driver: bridge
+  internal:
+    driver: bridge

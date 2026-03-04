@@ -1,0 +1,53 @@
+# Traefik static configuration
+# For development environment only. Update for production with proper TLS.
+
+# Global options
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+# Entrypoints
+entryPoints:
+  web:
+    address: :80
+    # Redirect HTTP to HTTPS in prod (uncomment for production)
+    # http:
+    #   redirections:
+    #     entrypoint:
+    #       to: websecure
+    #       scheme: https
+
+  websecure:
+    address: :443
+
+# Providers
+providers:
+  docker:
+    endpoint: unix:///var/run/docker.sock
+    exposedByDefault: false
+    network: traefik-public
+  
+  # For advanced routing configs (optional)
+  file:
+    directory: /etc/traefik/configurations
+    watch: true
+
+# API Dashboard (dev only)
+api:
+  insecure: true
+  dashboard: true
+
+# Logging
+log:
+  level: INFO
+
+accessLog: true
+
+# Certificate resolvers (disabled for dev; enable on prod)
+# certificatesResolvers:
+#   letsencrypt:
+#     acme:
+#       email: admin@komkom.io
+#       storage: acme.json
+#       httpChallenge:
+#         entryPoint: web

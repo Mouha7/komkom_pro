@@ -1,0 +1,2 @@
+# This directory holds advanced Traefik routing configurations.
+# Example: middlewares.yml, routers.yml, services.yml
