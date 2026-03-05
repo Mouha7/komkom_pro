@@ -1,250 +1,166 @@
 # 📦 Products Catalog Service
 
-Service FastAPI responsable de la gestion des produits, du catalogue et de la mise en cache avec Redis.
 
-## 🏗️ Structure
+### Vue d’ensemble
+
+Service **products_catalog_service** responsable du catalogue produit, recherche, cache, gestion des catégories et publication d’événements d’inventaire. API REST `/api/v1/products` pour lecture et opérations admin CRUD. Stock principal Postgres, cache Redis, stockage images MinIO, events via RabbitMQ. Les noms techniques et routes restent en **anglais**.
+
+---
+
+### Endpoints à développer
+
+| **Méthode** | **Route**                                | **Description**                                                                          |
+| -----------------: | ---------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+|                GET | `/api/v1/products`                           | Lister produits avec filtres `category_id`, `search`, `page`, `page_size`, `sort_by` |
+|                GET | `/api/v1/products/{productId}`               | Récupérer détail produit                                                                    |
+|                GET | `/api/v1/products/sku/{sku}`                 | Récupérer produit par SKU                                                                    |
+|                GET | `/api/v1/products/bulk`                      | Récupérer plusieurs produits par `ids` query param                                         |
+|               POST | `/api/v1/products`                           | Créer produit admin only                                                                      |
+|              PATCH | `/api/v1/products/{productId}`               | Mettre à jour produit admin only                                                              |
+|             DELETE | `/api/v1/products/{productId}`               | Supprimer produit admin only                                                                   |
+|                GET | `/api/v1/categories`                         | Lister catégories                                                                             |
+|               POST | `/api/v1/categories`                         | Créer catégorie admin only                                                                   |
+|              PATCH | `/api/v1/categories/{categoryId}`            | Mettre à jour catégorie admin only                                                           |
+|             DELETE | `/api/v1/categories/{categoryId}`            | Supprimer catégorie admin only                                                                |
+|               POST | `/api/v1/products/{productId}/stock/reserve` | Endpoint sync pour réserver stock localement ou forward to inventory service                  |
+|               POST | `/api/v1/products/{productId}/stock/release` | Libérer réservation stock                                                                    |
+|                GET | `/api/v1/products/{productId}/availability`  | Vérifier disponibilité et lead time                                                          |
+|               POST | `/api/v1/products/import`                    | Import CSV/JSON bulk admin only                                                                |
+|                GET | `/api/v1/products/health`                    | Healthcheck service DB + Redis + MinIO                                                         |
+|                GET | `/api/v1/products/search/suggestions`        | Autocomplete suggestions pour search bar                                                       |
+|                GET | `/api/v1/products/images/presign`            | Générer presigned URL pour upload image (admin only)                                         |
+
+---
+
+### Arborescence recommandée et rôle des dossiers
 
 ```
 products_catalog_service/
 ├── app/
-│   ├── __init__.py
-│   └── src/
-│       ├── __init__.py
-│       ├── main.py               # FastAPI app initialization
-│       ├── config.py             # Configuration (Pydantic settings)
-│       ├── api/
-│       │   ├── __init__.py
-│       │   └── v1/               # API v1 routes
-│       │       ├── __init__.py
-│       │       └── products.py    # Product endpoints
-│       ├── models/
-│       │   ├── __init__.py
-│       │   └── product.py        # SQLAlchemy ORM models
-│       ├── schemas/
-│       │   ├── __init__.py
-│       │   └── product.py        # Pydantic DTOs (request/response)
-│       ├── crud/
-│       │   ├── __init__.py
-│       │   └── product.py        # Database operations
-│       ├── cache/
-│       │   ├── __init__.py
-│       │   └── redis_cache.py    # Redis helpers
-│       └── events/
-│           ├── __init__.py
-│           └── publisher.py      # Event publishing to RabbitMQ
+│   ├── src/
+│   │   ├── api/
+│   │   │   ├── v1/
+│   │   │   │   ├── routes/
+│   │   │   │   │   ├── products.py
+│   │   │   │   │   ├── categories.py
+│   │   │   │   │   └── health.py
+│   │   │   │   └── dependencies.py
+│   │   │   └── middleware/
+│   │   │       └── auth_middleware.py
+│   │   ├── models/
+│   │   │   ├── product.py
+│   │   │   ├── category.py
+│   │   │   └── product_image.py
+│   │   ├── schemas/
+│   │   │   ├── product.py
+│   │   │   ├── category.py
+│   │   │   └── responses.py
+│   │   ├── crud/
+│   │   │   ├── product_crud.py
+│   │   │   └── category_crud.py
+│   │   ├── cache/
+│   │   │   ├── redis_client.py
+│   │   │   └── product_cache.py
+│   │   ├── events/
+│   │   │   ├── publisher.py
+│   │   │   └── consumers/
+│   │   │       └── inventory_consumer.py
+│   │   ├── services/
+│   │   │   ├── product_service.py
+│   │   │   ├── image_service.py
+│   │   │   └── search_service.py
+│   │   ├── db/
+│   │   │   ├── base.py
+│   │   │   └── session.py
+│   │   ├── config.py
+│   │   ├── main.py
+│   │   └── logging_config.py
+│   ├── tests/
+│   │   ├── unit/
+│   │   └── integration/
+│   └── Dockerfile
 ├── alembic/
-│   ├── env.py                   # Alembic config
-│   ├── versions/
-│   │   └── .gitkeep
-│   └── alembic.ini
-├── tests/
-│   ├── __init__.py
-│   ├── test_api.py              # API tests
-│   ├── test_cache.py            # Cache tests
-│   └── conftest.py              # Pytest fixtures
-├── Dockerfile
-├── requirements.txt
-├── .env.example
 └── README.md
 ```
 
-## 🚀 Key Features
+---
 
-- **Product Listing**: GET `/api/v1/products` with pagination & filters
-- **Product Details**: GET `/api/v1/products/{id}` with cache
-- **Create Product**: POST `/api/v1/products` (admin only)
-- **Cache Integration**: Redis caching for product data (TTL: 1 hour)
-- **Event Publishing**: Publishes `product.created`, `product.updated` to RabbitMQ
+### Description détaillée des dossiers et fichiers
 
-## 🔌 API Endpoints
-
-### List Products
-```http
-GET /api/v1/products?skip=0&limit=10&category=electronics
-```
-
-### Get Product
-```http
-GET /api/v1/products/123
-```
-
-### Create Product (Admin)
-```http
-POST /api/v1/products
-Authorization: Bearer <token>
-
-{
-  "name": "Laptop",
-  "category": "electronics",
-  "price": 999.99,
-  "stock": 50
-}
-```
-
-### Search Products
-```http
-GET /api/v1/products/search?q=laptop
-```
-
-## 🗄️ Database Schema
-
-```sql
-CREATE TABLE products (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name VARCHAR(255) NOT NULL,
-  description TEXT,
-  category VARCHAR(50),
-  price DECIMAL(10, 2) NOT NULL,
-  stock INT DEFAULT 0,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE INDEX idx_products_category ON products(category);
-CREATE INDEX idx_products_name ON products(name);
-```
-
-## 🔄 Event Schema
-
-### product.created
-```json
-{
-  "event_type": "product.created",
-  "product_id": "123e4567-e89b-12d3-a456-426614174000",
-  "name": "Product Name",
-  "category": "electronics",
-  "price": 999.99,
-  "timestamp": "2026-03-04T10:30:00Z"
-}
-```
-
-## ⚙️ Configuration
-
-All config via `config.py` (Pydantic BaseSettings):
-
-```python
-class Settings(BaseSettings):
-    DATABASE_URL: str
-    REDIS_URL: str
-    RABBITMQ_URL: str
-    KEYCLOAK_JWKS_URL: str
-    LOG_LEVEL: str = "INFO"
-    API_TITLE: str = "Products Catalog Service"
-```
-
-Load from `.env`:
-```bash
-DATABASE_URL=postgresql://user:pass@host:5432/db
-REDIS_URL=redis://localhost:6379/0
-```
-
-## 📝 Development
-
-### Install Dependencies
-```bash
-cd services/products_catalog_service
-pip install -r requirements.txt
-```
-
-### Run Locally
-```bash
-# From service directory
-python -m pip install -r requirements.txt
-uvicorn app.src.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-### Run Tests
-```bash
-pytest tests/ -v
-```
-
-### Database Migrations
-```bash
-# Generate migration
-alembic revision --autogenerate -m "Add products table"
-
-# Apply migration
-alembic upgrade head
-```
-
-## 🐳 Docker
-
-```bash
-# Build
-docker build -t komkom/products-service:latest .
-
-# Run (dev)
-docker run -p 8000:8000 \
-  -e DATABASE_URL=postgresql://... \
-  -e REDIS_URL=redis://... \
-  komkom/products-service:latest
-```
-
-## 📚 Dependencies
-
-- **fastapi**: Web framework
-- **sqlalchemy**: ORM
-- **psycopg2**: PostgreSQL adapter
-- **redis**: Cache client
-- **pydantic**: Data validation
-- **pydantic-settings**: Config management
-- **python-jose**: JWT tokens
-- **python-multipart**: Form parsing
-- **httpx**: HTTP client
-- **alembic**: Database migrations
-
-See `requirements.txt` for full list.
-
-## 🔐 Security
-
-- JWT authentication via Keycloak
-- CORS enabled only for trusted origins
-- Input validation via Pydantic
-- SQL injection prevention via SQLAlchemy ORM
-- Rate limiting (planned)
-
-## 🚨 Error Handling
-
-All endpoints return consistent error responses:
-
-```json
-{
-  "detail": "Resource not found",
-  "status": 404,
-  "timestamp": "2026-03-04T10:30:00Z"
-}
-```
-
-## 📊 Health Check
-
-```http
-GET /health
-```
-
-Response:
-```json
-{
-  "status": "healthy",
-  "timestamp": "2026-03-04T10:30:00Z",
-  "services": {
-    "database": "ok",
-    "redis": "ok"
-  }
-}
-```
-
-## 🤝 Dependencies Between Services
-
-- ← **Consumed by**: Cart Service (product info), Orders Service (inventory)
-- → **Publishes to**: `product.created`, `product.updated`
-
-## ?️ Support
-
-For issues, check:
-- Logs: `docker logs products_service`
-- API Docs: http://localhost:8000/docs
-- Error details in stack trace
+- **api/v1/routes/products.py**Déclare routes publiques et admin pour produits. Valide requêtes, applique pagination, appelle `product_service` pour logique métier. Retourne réponses paginées et codes standardisés.
+- **api/v1/routes/categories.py**Routes CRUD catégories. Utilise `category_crud` et `product_service` pour cohérence.
+- **api/v1/routes/health.py**Endpoint `/health` vérifiant Postgres, Redis, MinIO et éventuellement RabbitMQ.
+- **api/v1/dependencies.py**Dépendances FastAPI partagées `get_db`, `get_redis`, `get_current_user`, `require_admin`.
+- **middleware/auth_middleware.py**Middleware pour valider JWT via `common_libs/auth/jwt_validator.py` et injecter claims.
+- **models/**SQLAlchemy models `Product`, `Category`, `ProductImage`. Inclure contraintes uniques, index sur `sku`, `name`, `categoryId`.
+- **schemas/**Pydantic DTOs `ProductCreate`, `ProductUpdate`, `ProductResponse`, `CategoryDTO`, `PaginatedResponse`. Config `orm_mode`.
+- **crud/**Fonctions d’accès DB encapsulées `create_product`, `update_product`, `get_product_by_id`, `list_products` avec filtres et transactions.
+- **cache/redis_client.py**Wrapper connexion Redis pool, gestion TTL, retry.
+- **cache/product_cache.py**Logique de cache produit: cache key patterns `product:{id}`, `product:list:{filters_hash}`; invalidation on update/delete.
+- **events/publisher.py**Publie événements RabbitMQ `product.created`, `product.updated`, `inventory.change`. Standardise envelope `correlationId`, `timestamp`.
+- **events/consumers/inventory_consumer.py**Consomme réponses d’inventaire `inventory.reserve.request/response` si nécessaire pour sync stock.
+- **services/product_service.py**Logique métier: validation, composition DTO, gestion image presign via `image_service`, invalidation cache, publication events.
+- **services/image_service.py**Intégration MinIO: presigned upload URLs, image transformations recommendations, storage path conventions.
+- **services/search_service.py**Search layer: simple DB full text search or integration with search engine (Elasticsearch) for suggestions and autocomplete.
+- **db/session.py** et **db/base.py**Engine SQLAlchemy, session factory, Base declarative, helper `get_db` dependency.
+- **config.py**`pydantic.BaseSettings` pour `DATABASE_URL`, `REDIS_URL`, `MINIO_URL`, `RABBITMQ_URL`, image bucket, cache TTL, pagination defaults.
+- **main.py**FastAPI app creation, include routers, startup/shutdown events to connect DB, Redis, RabbitMQ, MinIO.
+- **logging_config.py**Logging structuré JSON, propagation `X-Request-Id`.
+- **alembic/**Migrations SQL pour modèles.
+- **tests/**Unit tests pour CRUD, cache, services. Integration tests avec Postgres and Redis containers.
+- **Dockerfile**
+  Multi-stage build, non-root user, healthcheck, expose port 8000.
 
 ---
 
-**Last Updated**: 2026-03-04
+### Contenu recommandé dans common_libs pour réutilisation
+
+```
+common_libs/
+├── auth/
+│   ├── keycloak.py
+│   ├── jwt_validator.py
+│   └── roles.py
+├── dto/
+│   ├── product.py
+│   ├── category.py
+│   └── base.py
+└── utils/
+    ├── http_client.py
+    ├── time.py
+    ├── logging.py
+    └── cache_keys.py
+```
+
+- **auth/jwt_validator.py**Récupère JWKS depuis `KEYCLOAK_JWKS_URL`, valide signature et claims `exp`, `aud`, `iss`. Fournit `get_current_user_from_token`.
+- **dto/product.py**Pydantic models partagés `ProductDTO`, `ProductListDTO`, `StockDTO` pour échanges inter-services.
+- **utils/http_client.py**Wrapper `httpx.AsyncClient` avec retry/backoff et propagation `X-Request-Id` pour appels vers autres services.
+- **utils/cache_keys.py**
+  Fonctions utilitaires pour générer clés Redis cohérentes `product:{id}`, `product:list:{hash}`.
+
+---
+
+### Bonnes pratiques et recommandations d’implémentation
+
+- **Cache first read** pour product detail: check Redis then DB fallback. Invalidation immédiate après update/delete.
+- **Batch endpoints** pour réduire roundtrips `GET /products/bulk` et `GET /products/list` avec `ids`.
+- **Presigned URLs** pour upload images vers MinIO, éviter upload via service. Limiter taille et valider MIME types.
+- **Indexation** : indexer `sku`, `name`, `categoryId`, `price` pour requêtes performantes. Utiliser full text search pour `search`.
+- **Events** : publier `product.created`, `product.updated`, `product.deleted` pour synchronisation inventory and caches. Messages persistants, include `correlationId`.
+- **Pagination** : standardiser `page` and `page_size` with `meta` in response.
+- **Rate limiting** : apply at Traefik for public endpoints.
+- **Security** : admin endpoints require `role=admin`. Validate inputs via Pydantic. Sanitize text fields.
+- **Observabilité** : expose `/metrics` for Prometheus counters `product_cache_hit`, `product_requests_total`, `product_create_total`. Propagate `X-Request-Id` and `correlation_id`.
+
+---
+
+### Checklist de livraison minimale
+
+- [ ] Endpoints listés implémentés et documentés OpenAPI.
+- [ ] Modèles SQLAlchemy et migrations Alembic.
+- [ ] Cache Redis avec invalidation sur update/delete.
+- [ ] Presigned image upload via MinIO.
+- [ ] Events publisher RabbitMQ pour product lifecycle.
+- [ ] Tests unitaires et d’intégration.
+- [ ] Dockerfile et `docker-compose.override.yml` pour dev.
+- [ ] README avec variables d’environnement et exemples curl.
