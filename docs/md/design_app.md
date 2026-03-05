@@ -39,7 +39,7 @@ Générer en une seule passe un fichier Figma esthétique, cohérent et prêt à
 
 **Typographie & spacing**
 
-* Police principale sans‑serif moderne (ex. Inter / SF Pro) ;  **H1 20–24** , H2 16–18, Body 14, Small 12.
+* Police principale sans‑serif moderne (Inter) ;  **H1 20–24** , H2 16–18, Body 14, Small 12.
 * System spacing scale : 4 / 8 / 12 / 16 / 24 / 32.
 * Boutons tappables ≥44px.
 
