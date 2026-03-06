@@ -1,0 +1,162 @@
+# 📱 Frontend Mobile — Documentation des écrans, menus et gestion des rôles
+
+Ce document décrit en détail la structure du projet **frontend/mobile** (React Native/Expo), les écrans à implémenter, les menus de navigation, ainsi que la gestion des rôles utilisateurs (admin, buyer, employee). Il inclut également la représentation des fichiers et dossiers attendus dans chaque partie du projet.
+
+---
+
+## 🌳 Structure des fichiers
+
+```
+.
+├── .gitignore
+├── App.tsx                     # Point d’entrée de l’application
+├── Dockerfile                  # Build CI/CD pour mobile
+├── app.json                    # Configuration Expo
+├── assets/                     # Icônes, splash, fonts
+│   ├── android-icon-background.png
+│   ├── android-icon-foreground.png
+│   ├── android-icon-monochrome.png
+│   ├── favicon.png
+│   ├── icon.png
+│   └── splash-icon.png
+├── index.ts                    # Bootstrap Expo
+├── package-lock.json
+├── package.json
+├── src/
+│   ├── api/                    # Clients HTTP vers backend
+│   │   ├── cart.ts
+│   │   ├── orders.ts
+│   │   └── products.ts
+│   ├── components/             # UI réutilisable
+│   │   ├── atoms/              # Boutons, Inputs, Text
+│   │   ├── molecules/          # ProductCard, CartItem
+│   │   └── organisms/          # CartList, OrderList
+│   ├── config/                 # Variables d’environnement, endpoints
+│   │   └── index.ts
+│   ├── context/                # Contexts globaux
+│   │   ├── AuthContext.tsx
+│   │   ├── CartContext.tsx
+│   │   └── OrdersContext.tsx
+│   ├── hooks/                  # Hooks custom
+│   │   ├── useAuth.ts
+│   │   ├── useCart.ts
+│   │   └── useOrders.ts
+│   ├── navigation/             # Configuration navigation
+│   │   ├── AppNavigator.tsx
+│   │   ├── AuthNavigator.tsx
+│   │   ├── BottomTabNavigator.tsx
+│   │   └── AdminTabNavigator.tsx
+│   ├── screens/                # Écrans principaux
+│   │   ├── Auth/
+│   │   │   ├── LoginScreen.tsx
+│   │   │   ├── SignupScreen.tsx
+│   │   │   └── SplashScreen.tsx
+│   │   ├── Catalog/
+│   │   │   ├── HomeScreen.tsx
+│   │   │   └── ProductDetailScreen.tsx
+│   │   ├── Cart/
+│   │   │   ├── CartScreen.tsx
+│   │   │   └── CheckoutScreen.tsx
+│   │   ├── Orders/
+│   │   │   ├── OrdersScreen.tsx
+│   │   │   └── OrderDetailScreen.tsx
+│   │   ├── Profile/
+│   │   │   ├── ProfileScreen.tsx
+│   │   │   └── SettingsScreen.tsx
+│   │   └── Admin/
+│   │       ├── AdminDashboardScreen.tsx
+│   │       ├── AdminProductsScreen.tsx
+│   │       ├── AdminOrdersScreen.tsx
+│   │       └── AdminStoresScreen.tsx
+│   ├── styles/                 # Design tokens, thèmes
+│   │   ├── colors.ts
+│   │   ├── spacing.ts
+│   │   └── typography.ts
+│   └── utils/                  # Helpers
+│       ├── formatPrice.ts
+│       ├── dateUtils.ts
+│       └── storageUtils.ts
+└── tsconfig.json
+```
+
+---
+
+## 🖼️ Écrans à implémenter
+
+### Authentification
+
+- **LoginScreen.tsx** : connexion via Keycloak (OIDC PKCE flow).
+- **SignupScreen.tsx** : inscription (création de store).
+- **SplashScreen.tsx** : écran de chargement initial (vérifie token).
+
+### Catalogue produits
+
+- **HomeScreen.tsx** : liste des produits (appel `products_catalog_service`).
+- **ProductDetailScreen.tsx** : détail produit, ajout au panier.
+
+### Panier
+
+- **CartScreen.tsx** : affichage du panier (appel `cart_service`).
+- **CheckoutScreen.tsx** : validation commande, choix livraison/paiement.
+
+### Commandes
+
+- **OrdersScreen.tsx** : historique des commandes (appel `orders_service`).
+- **OrderDetailScreen.tsx** : détail d’une commande, suivi statut.
+
+### Profil
+
+- **ProfileScreen.tsx** : informations utilisateur, logout.
+- **SettingsScreen.tsx** : préférences, langue, thème.
+
+### Administration (role=admin)
+
+- **AdminDashboardScreen.tsx** : vue globale (stores, commandes).
+- **AdminProductsScreen.tsx** : gestion produits (CRUD).
+- **AdminOrdersScreen.tsx** : gestion commandes (update status, assign delivery).
+- **AdminStoresScreen.tsx** : gestion des magasins et employés.
+
+---
+
+## 🧭 Menus de navigation
+
+- **BottomTabNavigator** (buyer/employee) :
+
+  - Home
+  - Cart
+  - Orders
+  - Profile
+- **AdminTabNavigator** (admin) :
+
+  - Dashboard
+  - Products
+  - Orders
+  - Stores
+- **StackNavigator** :
+
+  - Auth flow (Splash → Login → Signup)
+  - Main flow (Tabs)
+  - Détails (ProductDetail, OrderDetail)
+
+---
+
+## 👥 Gestion des rôles
+
+- **buyer** : accès aux écrans Home, ProductDetail, Cart, Checkout, Orders, Profile.
+- **employee** : mêmes accès que buyer, mais liés au store de l’employeur.
+- **admin** : accès aux écrans d’administration (Dashboard, Products, Orders, Stores).
+- **middleware auth** : vérifie JWT via Keycloak, extrait rôle, injecte dans `AuthContext`.
+
+---
+
+## ✅ Tâches prioritaires
+
+1. Configurer navigation (stack + tabs).
+2. Implémenter `AuthContext` avec Keycloak OIDC.
+3. Créer clients API (`cart.ts`, `orders.ts`, `products.ts`).
+4. Développer écrans principaux (Home, ProductDetail, Cart, Checkout, Orders, Profile).
+5. Ajouter écrans admin (Dashboard, Products, Orders, Stores).
+6. Intégrer design system (styles, components).
+7. Tester flows complets (login → browse → add to cart → checkout → orders).
+8. Ajouter tests unitaires (Jest) et e2e (Detox).
+9. Configurer CI/CD (Dockerfile + Expo EAS build).
