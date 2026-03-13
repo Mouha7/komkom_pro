@@ -42,3 +42,14 @@ def bulk_export(
 ) -> DataResponse:
 	job = order_service.request_bulk_export(payload)
 	return DataResponse(data=job.model_dump(mode="json", by_alias=True), meta={})
+
+
+@router.post("/{order_id}/invoice/generate", response_model=DataResponse)
+def generate_invoice(
+	order_id: str,
+	_: dict = Depends(require_admin),
+	request_id: str = Depends(get_request_id),
+	order_service: OrderService = Depends(get_order_service),
+) -> DataResponse:
+	job = order_service.request_invoice_generation(order_id, request_id)
+	return DataResponse(data=job, meta={})

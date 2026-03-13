@@ -12,7 +12,6 @@ COPY services/orders_service/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy shared libraries and orders source
-COPY services/__init__.py /app/services/__init__.py
 COPY services/common_libs /app/services/common_libs
 COPY services/orders_service/app/src /app/src
 COPY services/orders_service/app/tests /app/tests

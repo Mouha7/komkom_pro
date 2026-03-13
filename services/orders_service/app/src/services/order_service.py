@@ -28,7 +28,7 @@ from src.schemas import (
 from src.services.delivery_service import DeliveryService
 from src.services.pricing_validator import PricingValidator
 from src.services.saga_manager import SagaManager
-from src.tasks.tasks import bulk_export as bulk_export_task
+from src.tasks.celery_app import celery_app
 
 
 class OrderService:
@@ -256,11 +256,30 @@ class OrderService:
 
 	def request_bulk_export(self, payload: BulkExportRequest) -> BulkExportResponse:
 		try:
-			async_result = bulk_export_task.delay(payload.model_dump(mode="json", by_alias=True))
+			job_id = str(uuid.uuid4())
+			async_result = celery_app.send_task(
+				"workers.export_data",
+				kwargs={
+					"job_id": job_id,
+					"params": payload.model_dump(mode="json", by_alias=True),
+				},
+			)
 			return BulkExportResponse(jobId=str(async_result.id), status="queued", exportUrl=None)
 		except Exception:
 			job_id = str(uuid.uuid4())
 			return BulkExportResponse(jobId=job_id, status="queued", exportUrl=None)
+
+	def request_invoice_generation(self, order_id: str, correlation_id: str) -> dict[str, str]:
+		self._require_order(order_id)
+		async_result = celery_app.send_task(
+			"workers.generate_invoice",
+			kwargs={
+				"order_id": order_id,
+				"correlation_id": correlation_id,
+				"request_id": correlation_id,
+			},
+		)
+		return {"orderId": order_id, "taskId": str(async_result.id), "status": "queued"}
 
 	def search_orders(self, query: str, page: int, page_size: int) -> tuple[list[OrderSummaryResponse], int]:
 		statement = select(Order).where(
