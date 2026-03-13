@@ -22,9 +22,9 @@ services:
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./infra/docker/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
-      - ./infra/docker/traefik/acme.json:/acme.json
-      - ./infra/docker/traefik/configurations:/etc/traefik/configurations:ro
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/acme.json:/acme.json
+      - ./traefik/configurations:/etc/traefik/configurations:ro
       - traefik-logs:/var/log/traefik
     networks:
       - traefik-public
