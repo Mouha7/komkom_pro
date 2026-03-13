@@ -1,8 +1,12 @@
 from .cache_keys import (
 	cart_lock_key,
+	categories_key,
 	idempotency_key,
 	order_idempotency_key,
 	order_lock_key,
+	product_key,
+	product_list_key,
+	product_sku_key,
 	session_cart_key,
 	user_cart_key,
 )
@@ -23,5 +27,9 @@ __all__ = [
 	"idempotency_key",
 	"order_lock_key",
 	"order_idempotency_key",
+	"product_key",
+	"product_sku_key",
+	"product_list_key",
+	"categories_key",
 ]
 

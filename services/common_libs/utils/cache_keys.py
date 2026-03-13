@@ -21,3 +21,19 @@ def order_lock_key(order_id: str) -> str:
 def order_idempotency_key(key: str) -> str:
 	return f"order:idempotency:{key}"
 
+
+def product_key(product_id: str) -> str:
+	return f"product:{product_id}"
+
+
+def product_sku_key(sku: str) -> str:
+	return f"product:sku:{sku}"
+
+
+def product_list_key(filters_hash: str) -> str:
+	return f"product:list:{filters_hash}"
+
+
+def categories_key() -> str:
+	return "categories:all"
+
