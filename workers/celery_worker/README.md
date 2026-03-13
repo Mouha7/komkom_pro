@@ -135,11 +135,57 @@ workers/
 
 ### Checklist de livraison pour workers
 
-- [ ] `celery_app.py` configuré avec broker, backend, routes et beat schedule.
-- [ ] Tasks implémentées : `invoice_task`, `notification_task`, `upload_task`, `export_task`.
-- [ ] Idempotence et checks d’existence pour tasks critiques.
-- [ ] DLQ et retry policy configurés.
-- [ ] Healthcheck et metrics exposés.
-- [ ] Dockerfile multi‑stage et `requirements.txt` documentés.
-- [ ] Tests unitaires et integration pour tasks.
-- [ ] README avec runbook pour incidents (comment vider DLQ, relancer tasks, inspect logs).
+- [x] `celery_app.py` configuré avec broker/backend, routes et beat schedule.
+- [x] Tasks implémentées : `workers.generate_invoice`, `workers.send_notification`, `workers.upload_to_minio`, `workers.export_data`.
+- [x] Idempotence sur `generate_invoice` et `upload_to_minio`.
+- [x] Retry policy avec backoff exponentiel sur tasks critiques.
+- [x] Healthcheck Celery et métriques Prometheus (`celery_tasks_total`, `celery_tasks_failed_total`, `celery_task_duration_seconds`).
+- [x] Dockerfile durci (user non-root) et dépendances worker documentées.
+- [ ] Tests unitaires/integration dédiés workers (à compléter).
+- [x] README avec runbook basique de vérification.
+
+---
+
+### Implémentation active (mars 2026)
+
+- Queues consommées: `invoices.high`, `notifications.default`, `uploads.low`, `exports.default`.
+- Exchange direct: `komkom.tasks`.
+- Tasks enregistrées:
+  - `workers.generate_invoice`
+  - `workers.send_notification`
+  - `workers.upload_to_minio`
+  - `workers.export_data`
+  - `workers.retry_failed_orders`
+  - `workers.purge_temp_files`
+- Intégration orders:
+  - Endpoint admin ajouté: `POST /api/v1/orders/{order_id}/invoice/generate`
+  - `POST /api/v1/orders/bulk-export` publie maintenant `workers.export_data`
+
+### Variables d’environnement utilisées
+
+- `RABBITMQ_URL` (ou `CELERY_BROKER_URL`)
+- `REDIS_URL` (ou `CELERY_RESULT_BACKEND`)
+- `DATABASE_URL`
+- `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET_NAME`, `MINIO_SECURE`
+- `ORDERS_SERVICE_URL`
+- `QUEUE_INVOICES`, `QUEUE_NOTIFICATIONS`, `QUEUE_UPLOADS`, `QUEUE_EXPORTS`
+
+### Runbook rapide
+
+```bash
+# Build et démarrage
+docker-compose -f infra/docker/docker-compose.yml build celery_worker orders_service
+docker-compose -f infra/docker/docker-compose.yml up -d celery_worker orders_service rabbitmq redis postgres minio
+
+# Vérifier le worker
+docker-compose -f infra/docker/docker-compose.yml exec -T celery_worker celery -A tasks inspect ping
+docker-compose -f infra/docker/docker-compose.yml logs --tail=100 celery_worker
+
+# Déclencher génération de facture (admin route)
+curl -X POST http://orders.localhost/api/v1/orders/<order_id>/invoice/generate
+
+# Déclencher export (admin route)
+curl -X POST http://orders.localhost/api/v1/orders/bulk-export \
+  -H "Content-Type: application/json" \
+  -d '{"format":"csv"}'
+```

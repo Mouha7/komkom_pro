@@ -21,9 +21,9 @@ services:
       - "8080:8080" # Traefik dashboard (dev only)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./infra/docker/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
-      - ./infra/docker/traefik/acme.json:/acme.json
-      - ./infra/docker/traefik/configurations:/etc/traefik/configurations:ro
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/acme.json:/acme.json
+      - ./traefik/configurations:/etc/traefik/configurations:ro
     networks:
       - traefik-public
       - internal
@@ -42,8 +42,8 @@ services:
       - start-dev
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.keycloak.rule=Host(`${DOMAIN_KEYCLOAK}`)"
-      - "traefik.http.routers.keycloak.entrypoints=web"
+      - "traefik.http.routers.keycloak.rule=Host(`${DOMAIN_KEYCLOAK:-keycloak.localhost}`)"
+      - "traefik.http.routers.keycloak.entrypoints=web,websecure"
     networks:
       - traefik-public
       - internal
@@ -61,7 +61,7 @@ services:
     networks:
       - internal
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-komkom}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -117,7 +117,7 @@ services:
     networks:
       - internal
     healthcheck:
-      test: ["CMD-SHELL", "mc alias set local http://localhost:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} >/dev/null 2>&1 || exit 1"]
+      test: ["CMD-SHELL", "mc alias set local http://localhost:9000 ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin} >/dev/null 2>&1 || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -126,12 +126,18 @@ services:
   # Celery worker (shared worker image for tasks: invoice, notifications, uploads)
   celery_worker:
     build:
-      context: ../../workers/celery_worker
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: workers/celery_worker/Dockerfile
     container_name: komkom_celery_worker
     environment:
-      - CELERY_BROKER_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672//
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER:-rabbit}:${RABBITMQ_DEFAULT_PASS:-rabbit}@rabbitmq:5672//
+      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-komkom}:${POSTGRES_PASSWORD:-komkom}@postgres:5432/${POSTGRES_DB:-komkom}
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER:-minioadmin}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD:-minioadmin}
+      - MINIO_BUCKET_NAME=invoices
+      - ORDERS_SERVICE_URL=http://orders_service:8000
       - PYTHONUNBUFFERED=1
     depends_on:
       - rabbitmq
@@ -149,15 +155,15 @@ services:
       dockerfile: app/Dockerfile
     container_name: products_service
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-komkom}:${POSTGRES_PASSWORD:-komkom}@postgres:5432/${POSTGRES_DB:-komkom}
       - REDIS_URL=redis://redis:6379/0
-      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672//
+      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER:-rabbit}:${RABBITMQ_DEFAULT_PASS:-rabbit}@rabbitmq:5672//
       - KEYCLOAK_JWKS_URL=http://keycloak:8080/realms/master/protocol/openid-connect/certs
       - SERVICE_NAME=products
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.products.rule=Host(`${DOMAIN_PRODUCTS}`)"
-      - "traefik.http.routers.products.entrypoints=web"
+      - "traefik.http.routers.products.rule=Host(`${DOMAIN_PRODUCTS:-products.localhost}`)"
+      - "traefik.http.routers.products.entrypoints=web,websecure"
       - "traefik.http.services.products.loadbalancer.server.port=8000"
     depends_on:
       - postgres
@@ -171,18 +177,18 @@ services:
   # Cart service (FastAPI) - Redis-backed cart
   cart_service:
     build:
-      context: ../../services/cart_service
-      dockerfile: app/Dockerfile
+      context: ../..
+      dockerfile: services/cart_service/app/Dockerfile
     container_name: cart_service
     environment:
       - REDIS_URL=redis://redis:6379/1
-      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672//
+      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER:-rabbit}:${RABBITMQ_DEFAULT_PASS:-rabbit}@rabbitmq:5672//
       - KEYCLOAK_JWKS_URL=http://keycloak:8080/realms/master/protocol/openid-connect/certs
       - SERVICE_NAME=cart
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.cart.rule=Host(`${DOMAIN_CART}`)"
-      - "traefik.http.routers.cart.entrypoints=web"
+      - "traefik.http.routers.cart.rule=Host(`${DOMAIN_CART:-cart.localhost}`)"
+      - "traefik.http.routers.cart.entrypoints=web,websecure"
       - "traefik.http.services.cart.loadbalancer.server.port=8000"
     depends_on:
       - redis
@@ -195,19 +201,19 @@ services:
   # Orders service (FastAPI)
   orders_service:
     build:
-      context: ../../services/orders_service
-      dockerfile: app/Dockerfile
+      context: ../..
+      dockerfile: services/orders_service/app/Dockerfile
     container_name: orders_service
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-komkom}:${POSTGRES_PASSWORD:-komkom}@postgres:5432/${POSTGRES_DB:-komkom}
       - REDIS_URL=redis://redis:6379/2
-      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672//
+      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER:-rabbit}:${RABBITMQ_DEFAULT_PASS:-rabbit}@rabbitmq:5672//
       - KEYCLOAK_JWKS_URL=http://keycloak:8080/realms/master/protocol/openid-connect/certs
       - SERVICE_NAME=orders
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.orders.rule=Host(`${DOMAIN_ORDERS}`)"
-      - "traefik.http.routers.orders.entrypoints=web"
+      - "traefik.http.routers.orders.rule=Host(`${DOMAIN_ORDERS:-orders.localhost}`)"
+      - "traefik.http.routers.orders.entrypoints=web,websecure"
       - "traefik.http.services.orders.loadbalancer.server.port=8000"
     depends_on:
       - postgres
@@ -233,7 +239,7 @@ services:
     image: dpage/pgadmin4:8
     container_name: pgadmin
     environment:
-      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL:-pgadmin@local}
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL:-pgadmin@local.test}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD:-pgadmin}
     ports:
       - "5050:80"
