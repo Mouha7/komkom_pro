@@ -61,7 +61,7 @@ services:
     networks:
       - internal
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-komkom}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -130,7 +130,7 @@ services:
       dockerfile: Dockerfile
     container_name: komkom_celery_worker
     environment:
-      - CELERY_BROKER_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672//
+      - CELERY_BROKER_URL=amqp://${RABBITMQ_DEFAULT_USER:-rabbit}:${RABBITMQ_DEFAULT_PASS:-rabbit}@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - PYTHONUNBUFFERED=1
     depends_on:
@@ -149,9 +149,9 @@ services:
       dockerfile: app/Dockerfile
     container_name: products_service
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-komkom}:${POSTGRES_PASSWORD:-komkom}@postgres:5432/${POSTGRES_DB:-komkom}
       - REDIS_URL=redis://redis:6379/0
-      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672//
+      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER:-rabbit}:${RABBITMQ_DEFAULT_PASS:-rabbit}@rabbitmq:5672//
       - KEYCLOAK_JWKS_URL=http://keycloak:8080/realms/master/protocol/openid-connect/certs
       - SERVICE_NAME=products
     labels:
@@ -171,12 +171,12 @@ services:
   # Cart service (FastAPI) - Redis-backed cart
   cart_service:
     build:
-      context: ../../services/cart_service
-      dockerfile: app/Dockerfile
+      context: ../..
+      dockerfile: services/cart_service/app/Dockerfile
     container_name: cart_service
     environment:
       - REDIS_URL=redis://redis:6379/1
-      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672//
+      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER:-rabbit}:${RABBITMQ_DEFAULT_PASS:-rabbit}@rabbitmq:5672//
       - KEYCLOAK_JWKS_URL=http://keycloak:8080/realms/master/protocol/openid-connect/certs
       - SERVICE_NAME=cart
     labels:
@@ -199,9 +199,9 @@ services:
       dockerfile: app/Dockerfile
     container_name: orders_service
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-komkom}:${POSTGRES_PASSWORD:-komkom}@postgres:5432/${POSTGRES_DB:-komkom}
       - REDIS_URL=redis://redis:6379/2
-      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672//
+      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER:-rabbit}:${RABBITMQ_DEFAULT_PASS:-rabbit}@rabbitmq:5672//
       - KEYCLOAK_JWKS_URL=http://keycloak:8080/realms/master/protocol/openid-connect/certs
       - SERVICE_NAME=orders
     labels:
