@@ -65,3 +65,21 @@ class AsyncHttpClient:
 	) -> httpx.Response:
 		return await self.request("POST", url, headers=headers, json=json)
 
+	async def put(
+		self,
+		url: str,
+		*,
+		headers: dict[str, str] | None = None,
+		json: dict[str, Any] | None = None,
+	) -> httpx.Response:
+		return await self.request("PUT", url, headers=headers, json=json)
+
+	async def patch(
+		self,
+		url: str,
+		*,
+		headers: dict[str, str] | None = None,
+		json: dict[str, Any] | None = None,
+	) -> httpx.Response:
+		return await self.request("PATCH", url, headers=headers, json=json)
+

@@ -195,8 +195,8 @@ services:
   # Orders service (FastAPI)
   orders_service:
     build:
-      context: ../../services/orders_service
-      dockerfile: app/Dockerfile
+      context: ../..
+      dockerfile: services/orders_service/app/Dockerfile
     container_name: orders_service
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-komkom}:${POSTGRES_PASSWORD:-komkom}@postgres:5432/${POSTGRES_DB:-komkom}

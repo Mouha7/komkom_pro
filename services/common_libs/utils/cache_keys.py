@@ -13,3 +13,11 @@ def cart_lock_key(cart_id: str) -> str:
 def idempotency_key(key: str) -> str:
 	return f"idempotency:{key}"
 
+
+def order_lock_key(order_id: str) -> str:
+	return f"order_lock:{order_id}"
+
+
+def order_idempotency_key(key: str) -> str:
+	return f"order:idempotency:{key}"
+

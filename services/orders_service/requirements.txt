@@ -9,3 +9,9 @@ aio-pika==9.6.1
 python-jose[cryptography]==3.3.0
 httpx==0.25.2
 python-multipart==0.0.6
+celery==5.3.4
+kombu==5.3.4
+minio==7.2.0
+reportlab==4.0.7
+pytest==7.4.3
+pytest-asyncio==0.21.1

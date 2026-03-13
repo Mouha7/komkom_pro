@@ -1,6 +1,5 @@
 # 📋 Orders Service
 
-
 ### Orders Service — Endpoints, structure et spécifications
 
 ---
@@ -95,8 +94,8 @@ orders_service/
 - **app/src/main.py**Point d’entrée FastAPI : inclut routers (`api.v1.routes`), configure middleware (auth, error handlers), startup/shutdown hooks (DB pool, RabbitMQ connection, Celery).
 - **app/src/config.py** `pydantic.BaseSettings` : `DATABASE_URL`, `REDIS_URL`, `RABBITMQ_URL`, `MINIO_URL`, `ORDERS_SERVICE_SETTINGS` (timeouts, retry), `IDEMPOTENCY_STORE` config.
 - **app/src/db/session.py** & **base.py**SQLAlchemy engine, session factory, base declarative model, helper `get_db` dependency.
-- **app/src/models/**ORM models SQLAlchemy : `Order`, `OrderItem`, `OrderStatusHistory`, `Invoice`, `IdempotencyKey` (unique constraint), `DeliveryAssignment`. Inclure indexes (storeId, createdAt).
-- **app/src/schemas/**Pydantic schemas (request/response): `OrderCreate`, `OrderSummary`, `OrderDetail`, `OrderStatusUpdate`, `InvoiceDTO`, `ExportJobDTO`.
+- **app/src/models/** ORM models SQLAlchemy : `Order`, `OrderItem`, `OrderStatusHistory`, `Invoice`, `IdempotencyKey` (unique constraint), `DeliveryAssignment`. Inclure indexes (storeId, createdAt).
+- **app/src/schemas/** Pydantic schemas (request/response): `OrderCreate`, `OrderSummary`, `OrderDetail`, `OrderStatusUpdate`, `InvoiceDTO`, `ExportJobDTO`.
 - **app/src/services/order_service.py**Logique métier : create_order (transactional), update_status, compute_totals, persist idempotency token, compensation logic on failure. Utilise `pricing_validator` et `saga_manager`.
 - **app/src/services/saga_manager.py**Orchestration chorégraphique ou orchestrée : publie `inventory.reserve.request`, attend `inventory.reserve.response` (via events consumer) ; gère timeouts, retries, compensation (release inventory) ; updates order status accordingly.
 - **app/src/services/pricing_validator.py**Revalide prix & availability via `products_client` (HTTP) or Redis cache; returns diffs for `422` responses.
@@ -113,7 +112,7 @@ orders_service/
 - **app/src/api/v1/dependencies.py** `get_current_user`, `require_role('admin')`, `get_db`, `get_request_id`.
 - **app/src/middleware/auth_middleware.py**Valide JWT via `common_libs/auth/jwt_validator.py`, injecte claims.
 - **app/src/tasks/celery_app.py** & **tasks**Tasks idempotentes, `acks_late=True`, retry/backoff, DLQ handling.
-- **app/src/alembic/**Migrations SQL (versions) pour modèles.
+- **app/src/alembic/** Migrations SQL (versions) pour modèles.
 - **app/src/tests/**
 
   - `unit/` : tests services, saga logic, pricing validator.
