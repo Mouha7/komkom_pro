@@ -32,14 +32,23 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:25.0.6
     container_name: keycloak
+    volumes:
+      - ./keycloak/komkom-realm.json:/opt/keycloak/data/import/komkom-realm.json:ro
     environment:
-      # Bootstrap admin credentials for dev only; override in prod and remove bootstrap envs
-      - KC_DB=dev-mem
+      # Dev uses PostgreSQL for stable schema and to avoid transient in-memory H2 issues
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-komkom}
+      - KC_DB_USERNAME=${POSTGRES_USER:-komkom}
+      - KC_DB_PASSWORD=${POSTGRES_PASSWORD:-komkom}
       - KC_HTTP_ENABLED=true
+      - KC_PROXY=edge
+      - KC_HOSTNAME_STRICT=false
+      - KC_FEATURES=token-exchange
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-admin}
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
     command:
       - start-dev
+      - --import-realm
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.keycloak.rule=Host(`${DOMAIN_KEYCLOAK:-keycloak.localhost}`)"
@@ -47,6 +56,8 @@ services:
     networks:
       - traefik-public
       - internal
+    depends_on:
+      - postgres
     restart: unless-stopped
 
   postgres:

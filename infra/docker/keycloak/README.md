@@ -1,19 +1,25 @@
 # Keycloak configuration
+
 Identity & Access Management (IAM) for the platform
 
-## Default realm: master
-Admin console: http://keycloak:8080/
+## Default realm: komkom
+
+Admin console: http://keycloak.localhost/
 
 ## For development:
+
 - Admin user: KEYCLOAK_ADMIN (from .env)
 - Admin password: KEYCLOAK_ADMIN_PASSWORD (from .env)
 
-## For production setup, import a dedicated realm configuration:
-- Create realm export from Keycloak UI
-- Place in this directory as keycloak-realm.json
-- Update docker-compose to mount and import it
+## Realm import in this repository
+
+- Realm file: `infra/docker/keycloak/komkom-realm.json`
+- Imported automatically on startup with `--import-realm`
+- Includes roles: `buyer`, `employee`, `admin`
+- Enables self-registration, email verification, and forgot-password flow
 
 ## Example realm configuration would include:
+
 - Realm name: komkom
 - Users (roles: buyer, employee, admin)
 - Clients (products-service, cart-service, orders-service)
@@ -21,5 +27,6 @@ Admin console: http://keycloak:8080/
 - Mappers (JWT token claims)
 
 ## Resources:
+
 - Admin UI: http://keycloak.localhost
-- JWKS endpoint: http://keycloak:8080/realms/master/protocol/openid-connect/certs
+- JWKS endpoint: http://keycloak:8080/realms/komkom/protocol/openid-connect/certs

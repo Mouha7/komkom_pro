@@ -1,5 +1,5 @@
-# Traefik static configuration
-# For development environment only. Update for production with proper TLS.
+# Traefik static configuration (development)
+# Dev should not request Let's Encrypt certificates for localhost domains.
 
 # Global options
 global:
@@ -19,8 +19,7 @@ entryPoints:
   websecure:
     address: :443
     http:
-      tls:
-        certResolver: letsencrypt
+      tls: {}
 
 # Providers
 providers:
@@ -43,12 +42,3 @@ log:
   level: INFO
 
 accessLog: true
-
-# Certificate resolvers for Let's Encrypt automatic HTTPS
-certificatesResolvers:
-  letsencrypt:
-    acme:
-      email: ${ACME_EMAIL:-admin@komkom.io}
-      storage: acme.json
-      httpChallenge:
-        entryPoint: web
