@@ -39,28 +39,20 @@ src/components/
 
 **Remarques**
 
-* **Chaque composant**
-  vit dans son propre dossier.
-* **Fichiers standards**
-  : Component.tsx, Component.styles.ts, Component.types.ts, Component.test.tsx, Component.stories.tsx.
+* **Chaque composant** vit dans son propre dossier.
+* **Fichiers standards** : Component.tsx, Component.styles.ts, Component.types.ts, Component.test.tsx, Component.stories.tsx.
 * `index.ts` à la racine de `components` exporte les composants publics.
 
 ---
 
 ### **Règles de conception et nomenclature**
 
-* **Noms**
-  : PascalCase pour dossiers et fichiers composants (ProductCard, CartItem).
-* **Types**
-  : suffixe .types.ts pour interfaces/props. Exporter Props et types utilitaires.
-* **Styles**
-  : suffixe .styles.ts pour StyleSheet ou styled components. Ne pas mélanger styles inline et stylesheets sans raison.
-* **Tests**
-  : suffixe .test.tsx avec Jest + React Native Testing Library.
-* **Stories**
-  : suffixe .stories.tsx pour Storybook.
-* **Exports**
-  : fichier index.ts dans chaque dossier exporte le composant par défaut et types si nécessaire.
+* **Noms** : PascalCase pour dossiers et fichiers composants (ProductCard, CartItem).
+* **Types** : suffixe .types.ts pour interfaces/props. Exporter Props et types utilitaires.
+* **Styles** : suffixe .styles.ts pour StyleSheet ou styled components. Ne pas mélanger styles inline et stylesheets sans raison.
+* **Tests** : suffixe .test.tsx avec Jest + React Native Testing Library.
+* **Stories** : suffixe .stories.tsx pour Storybook.
+* **Exports** : fichier index.ts dans chaque dossier exporte le composant par défaut et types si nécessaire.
 
 ---
 
@@ -99,14 +91,10 @@ export const Button: React.FC<ButtonProps> = ({ title, onPress, variant='primary
 
 **Principes**
 
-* **Props minimalistes**
-  et typées.
-* **Aucune logique métier**
-  : pas d’appels API, pas de navigation.
-* **Accessibilité**
-  : accessibilityRole, accessible, accessibilityLabel si nécessaire.
-* **Theming**
-  : utiliser useTheme() ou tokens depuis src/styles.
+* **Props minimalistes** et typées.
+* **Aucune logique métier** : pas d’appels API, pas de navigation.
+* **Accessibilité** : accessibilityRole, accessible, accessibilityLabel si nécessaire.
+* **Theming** : utiliser useTheme() ou tokens depuis src/styles.
 
 ---
 
@@ -136,12 +124,9 @@ export type ProductCardProps = {
 
 **Principes**
 
-* **Stateless autant que possible**
-  ; si state local nécessaire, le limiter (ex. animation).
-* **Props explicites**
-  : éviter any.
-* **Tests**
-  : vérifier rendu, interactions (press add to cart), accessibilité.
+* **Stateless autant que possible**; si state local nécessaire, le limiter (ex. animation).
+* **Props explicites** : éviter any.
+* **Tests** : vérifier rendu, interactions (press add to cart), accessibilité.
 
 ---
 
@@ -170,25 +155,18 @@ export type CartListProps = {
 
 **Principes**
 
-* **Séparer logique métier**
-  : heavy logic (checkout orchestration) doit rester dans hooks ou context (useCart, CartContext).
-* **Performance**
-  : keyExtractor, memo, useCallback pour éviter rerenders.
-* **Responsabilité**
-  : organisms orchestrent UI, pas side effects réseau lourds.
+* **Séparer logique métier** : heavy logic (checkout orchestration) doit rester dans hooks ou context (useCart, CartContext).
+* **Performance** : keyExtractor, memo, useCallback pour éviter rerenders.
+* **Responsabilité** : organisms orchestrent UI, pas side effects réseau lourds.
 
 ---
 
 ### **Styles et theming**
 
-* **Utiliser tokens**
-  depuis src/styles (colors, spacing, typography).
-* **Fichier styles**
-  : Component.styles.ts exporte styles via StyleSheet.create.
-* **Dark mode**
-  : composants doivent consommer useTheme() et appliquer theme.colors.
-* **Ne pas**
-  hardcoder couleurs ou espacements.
+* **Utiliser tokens** depuis src/styles (colors, spacing, typography).
+* **Fichier styles** : Component.styles.ts exporte styles via StyleSheet.create.
+* **Dark mode** : composants doivent consommer useTheme() et appliquer theme.colors.
+* **Ne pas** hardcoder couleurs ou espacements.
 
 **Exemple styles**
 
@@ -208,38 +186,27 @@ export const styles = StyleSheet.create({
 
 ### **Accessibilité et internationalisation**
 
-* **Accessibilité**
-  : chaque composant interactif doit définir accessibilityRole, accessibilityLabel, accessible. Tester avec VoiceOver/TalkBack.
-* **Focus management**
-  : gérer focus pour inputs et modals.
-* **i18n**
-  : ne pas hardcoder textes ; utiliser i18n.t('key'). Fournir props testID pour tests.
+* **Accessibilité** : chaque composant interactif doit définir accessibilityRole, accessibilityLabel, accessible. Tester avec VoiceOver/TalkBack.
+* **Focus management** : gérer focus pour inputs et modals.
+* **i18n** : ne pas hardcoder textes ; utiliser i18n.t('key'). Fournir props testID pour tests.
 
 ---
 
 ### **Typage TypeScript et contrats**
 
-* **Props**
-  : définir interfaces claires dans Component.types.ts.
-* **DTOs**
-  : réutiliser common_libs/dto pour types partagés (ProductDTO, CartItemDTO).
-* **No any**
-  : éviter any. Utiliser unknown si nécessaire puis valider.
-* **Default props**
-  : définir valeurs par défaut et documenter.
+* **Props** : définir interfaces claires dans Component.types.ts.
+* **DTOs** : réutiliser common_libs/dto pour types partagés (ProductDTO, CartItemDTO).
+* **No any** : éviter any. Utiliser unknown si nécessaire puis valider.
+* **Default props** : définir valeurs par défaut et documenter.
 
 ---
 
 ### **Tests unitaires et e2e**
 
-* **Unit tests**
-  : Jest + React Native Testing Library. Tester rendu, interactions, snapshots si utile.
-* **Integration tests**
-  : tests de composants qui consomment context via providers mockés.
-* **E2E**
-  : Detox pour flows critiques (add to cart → checkout).
-* **Coverage**
-  : viser couverture raisonnable pour composants critiques.
+* **Unit tests** : Jest + React Native Testing Library. Tester rendu, interactions, snapshots si utile.
+* **Integration tests** : tests de composants qui consomment context via providers mockés.
+* **E2E** : Detox pour flows critiques (add to cart → checkout).
+* **Coverage** : viser couverture raisonnable pour composants critiques.
 
 **Exemple test**
 
@@ -260,19 +227,15 @@ test('renders and triggers onPress', () => {
 
 ### **Storybook et documentation visuelle**
 
-* **Stories**
-  : chaque composant a un fichier .stories.tsx couvrant variants, states (loading, disabled, error).
-* **Knobs / Controls**
-  : exposer props modifiables pour QA et designers.
-* **Snapshots visuels**
-  : utiliser Chromatic ou Percy pour regression visuelle.
+* **Stories** : chaque composant a un fichier .stories.tsx couvrant variants, states (loading, disabled, error).
+* **Knobs / Controls** : exposer props modifiables pour QA et designers.
+* **Snapshots visuels** : utiliser Chromatic ou Percy pour regression visuelle.
 
 ---
 
 ### **Exports et indexation**
 
-* **index.ts**
-  à la racine src/components exporte composants publics :
+* **index.ts** à la racine src/components exporte composants publics :
 
 ```ts
 export { Button } from './atoms/Button/Button';
@@ -281,19 +244,15 @@ export { ProductCard } from './molecules/ProductCard/ProductCard';
 export { CartList } from './organisms/CartList/CartList';
 ```
 
-* **Barrel files**
-  : optionnel index.ts dans chaque dossier pour exports locaux.
+* **Barrel files** : optionnel index.ts dans chaque dossier pour exports locaux.
 
 ---
 
 ### **Patterns d’intégration avec context et hooks**
 
-* **Hooks**
-  : useCart() expose addItem, removeItem, updateQty, checkout. Les composants appellent ces hooks, pas directement services HTTP.
-* **Context providers**
-  : AuthProvider, CartProvider wrap l’app dans App.tsx.
-* **Separation of concerns**
-  : composants UI restent découplés de la logique réseau.
+* **Hooks** : useCart() expose addItem, removeItem, updateQty, checkout. Les composants appellent ces hooks, pas directement services HTTP.
+* **Context providers** : AuthProvider, CartProvider wrap l’app dans App.tsx.
+* **Separation of concerns** : composants UI restent découplés de la logique réseau.
 
 ---
 
@@ -313,18 +272,12 @@ export { CartList } from './organisms/CartList/CartList';
 
 ### **Bonnes pratiques et pièges à éviter**
 
-* **Ne pas**
-  faire d’appels réseau dans atoms ou molecules.
-* **Éviter**
-  logique métier lourde dans organisms ; déléguer aux hooks/services.
-* **Favoriser**
-  composition plutôt que héritage.
-* **Optimiser**
-  performance : memo, useCallback, FlatList optimisé.
-* **Documenter**
-  chaque composant non trivial dans son README local.
-* **Respecter**
-  tokens de styles pour cohérence cross platform.
+* **Ne pas** faire d’appels réseau dans atoms ou molecules.
+* **Éviter** logique métier lourde dans organisms ; déléguer aux hooks/services.
+* **Favoriser** composition plutôt que héritage.
+* **Optimiser** performance : memo, useCallback, FlatList optimisé.
+* **Documenter** chaque composant non trivial dans son README local.
+* **Respecter** tokens de styles pour cohérence cross platform.
 
 ---
 
