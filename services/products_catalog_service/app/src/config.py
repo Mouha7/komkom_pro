@@ -19,11 +19,11 @@ class Settings(BaseModel):
 	minio_secure: bool = False
 	minio_presign_expiry_seconds: int = Field(default=3600, ge=60)
 	keycloak_jwks_url: str = Field(
-		default="http://keycloak:8080/realms/master/protocol/openid-connect/certs"
+		default="http://keycloak:8080/realms/komkom/protocol/openid-connect/certs"
 	)
 	keycloak_algorithms: list[str] = Field(default_factory=lambda: ["RS256"])
-	keycloak_audience: str | None = None
-	keycloak_issuer: str | None = None
+	keycloak_audience: str | None = Field(default="komkom-backend")
+	keycloak_issuer: str | None = Field(default="http://keycloak:8080/realms/komkom")
 	http_timeout_seconds: float = Field(default=3.0, gt=0)
 	http_max_retries: int = Field(default=2, ge=0)
 	pagination_default_page_size: int = Field(default=20, ge=1, le=100)
@@ -47,10 +47,10 @@ def get_settings() -> Settings:
 		minio_presign_expiry_seconds=int(os.getenv("MINIO_PRESIGN_EXPIRY_SECONDS", "3600")),
 		keycloak_jwks_url=os.getenv(
 			"KEYCLOAK_JWKS_URL",
-			"http://keycloak:8080/realms/master/protocol/openid-connect/certs",
+			"http://keycloak:8080/realms/komkom/protocol/openid-connect/certs",
 		),
-		keycloak_audience=os.getenv("KEYCLOAK_AUDIENCE"),
-		keycloak_issuer=os.getenv("KEYCLOAK_ISSUER"),
+		keycloak_audience=os.getenv("KEYCLOAK_AUDIENCE", "komkom-backend"),
+		keycloak_issuer=os.getenv("KEYCLOAK_ISSUER", "http://keycloak:8080/realms/komkom"),
 		http_timeout_seconds=float(os.getenv("HTTP_TIMEOUT", "3.0")),
 		http_max_retries=int(os.getenv("HTTP_MAX_RETRIES", "2")),
 		pagination_default_page_size=int(os.getenv("PAGINATION_DEFAULT_PAGE_SIZE", "20")),

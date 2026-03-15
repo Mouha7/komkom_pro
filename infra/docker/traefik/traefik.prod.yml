@@ -1,0 +1,52 @@
+# Traefik static configuration (production)
+
+# Global options
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+# Entrypoints
+entryPoints:
+  web:
+    address: :80
+    http:
+      redirections:
+        entrypoint:
+          to: websecure
+          scheme: https
+
+  websecure:
+    address: :443
+    http:
+      tls:
+        certResolver: letsencrypt
+
+# Providers
+providers:
+  docker:
+    endpoint: unix:///var/run/docker.sock
+    exposedByDefault: false
+
+  file:
+    directory: /etc/traefik/configurations
+    watch: true
+
+# API Dashboard (disabled in prod via compose command flags)
+api:
+  insecure: false
+  dashboard: false
+
+# Logging
+log:
+  level: WARN
+
+accessLog: true
+
+# Certificate resolver for Let's Encrypt
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: ${ACME_EMAIL:-admin@komkom.io}
+      storage: acme.json
+      httpChallenge:
+        entryPoint: web
