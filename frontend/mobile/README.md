@@ -2,6 +2,33 @@
 
 Ce document décrit en détail la structure du projet **frontend/mobile** (React Native/Expo), les écrans à implémenter, les menus de navigation, ainsi que la gestion des rôles utilisateurs (admin, buyer, employee). Il inclut également la représentation des fichiers et dossiers attendus dans chaque partie du projet.
 
+## Demarrage Expo Go (anti "Failed to download remote update")
+
+Utilise cette sequence dans `frontend/mobile`:
+
+1. `npm install`
+2. `npm run start:clear`
+3. Scanner le QR depuis l'app Expo Go (pas depuis l'app camera)
+
+Scripts disponibles:
+
+- `npm start` : demarrage LAN (par defaut)
+- `npm run start:clear` : LAN + cache Metro vide
+- `npm run start:lan` : reseau local explicite
+- `npm run start:tunnel` : tunnel ngrok, uniquement si le compte ngrok est verifie
+- `npm run start:tunnel:clear` : tunnel + cache Metro vide
+- `npm run start:localhost` : emulateur local uniquement
+
+Si l'erreur persiste:
+
+- Verifier que le Mac et le telephone sont sur le meme reseau Wi-Fi
+- Lancer Expo depuis `frontend/mobile`, pas depuis la racine du monorepo
+- Verifier que le telephone a internet (4G/5G ou Wi-Fi)
+- Mettre a jour Expo Go sur le telephone
+- Redemarrer Metro avec `npm run start:clear`
+- Si le QR vient d'un mode dev client, relancer en Expo Go standard avec `npm start`
+- Si `npm run start:tunnel` echoue avec `ERR_NGROK_4018`, verifier le compte ngrok et l'email sur ngrok.com avant de reutiliser le tunnel
+
 ---
 
 ## 🌳 Structure des fichiers

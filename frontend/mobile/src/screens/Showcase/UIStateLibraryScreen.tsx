@@ -1,0 +1,151 @@
+import React, { useMemo, useState } from 'react';
+import { Alert, SafeAreaView, ScrollView, View } from 'react-native';
+
+import {
+	ConfirmDialog,
+	EmptyState,
+	ErrorState,
+	NotificationToast,
+	SkeletonListItem,
+	Text,
+} from '../../components';
+import type { NotificationTone } from '../../components';
+import { styles } from './UIStateLibraryScreen.styles';
+
+type ToastItem = {
+	id: string;
+	tone: NotificationTone;
+	title: string;
+	message: string;
+};
+
+const initialToasts: ToastItem[] = [
+	{
+		id: 'success-order',
+		tone: 'success',
+		title: 'Commande confirmee',
+		message: 'Votre commande #CMD-1029 a ete enregistree avec succes.',
+	},
+	{
+		id: 'warning-stock',
+		tone: 'warning',
+		title: 'Stock limite',
+		message: 'Il ne reste que 2 articles pour le Ciment SOCOCIM en stock.',
+	},
+	{
+		id: 'danger-permission',
+		tone: 'danger',
+		title: 'Action impossible',
+		message: "Vous n'avez pas les droits necessaires pour modifier ce magasin.",
+	},
+	{
+		id: 'info-catalog',
+		tone: 'info',
+		title: 'Nouveau catalogue disponible',
+		message: 'Les prix ont ete mis a jour pour la categorie Electricite.',
+	},
+];
+
+export const UIStateLibraryScreen: React.FC = () => {
+	const [dialogOpen, setDialogOpen] = useState(false);
+	const [toasts, setToasts] = useState<ToastItem[]>(initialToasts);
+
+	const visibleToasts = useMemo(() => toasts, [toasts]);
+
+	const removeToast = (toastId: string): void => {
+		setToasts((current) => current.filter((toast) => toast.id !== toastId));
+	};
+
+	const onConfirmDelete = (): void => {
+		setDialogOpen(false);
+		Alert.alert('Suppression confirmee', "L'employe a ete supprime dans cette simulation UI.");
+	};
+
+	return (
+		<SafeAreaView style={styles.safeArea}>
+			<View style={styles.head}>
+				<Text variant="h2" color="secondary">
+					{'<'}
+				</Text>
+				<Text variant="h2" style={styles.headTitle}>
+					Composants & Etats UI
+				</Text>
+			</View>
+			<ScrollView contentContainerStyle={styles.content}>
+				<View style={styles.section}>
+					<Text variant="overline" color="secondary">
+						ETAT VIDE (EMPTY STATE)
+					</Text>
+					<EmptyState
+						title="Votre panier est vide"
+						description="Decouvrez notre catalogue pour ajouter des articles a votre panier."
+						actionLabel="Explorer le catalogue"
+						onActionPress={() => Alert.alert('Action', 'Ouverture du catalogue (simulation).')}
+					/>
+				</View>
+
+				<View style={styles.section}>
+					<Text variant="overline" color="secondary">
+						ETAT D'ERREUR (ERROR STATE)
+					</Text>
+					<ErrorState
+						title="Erreur reseau"
+						description="Impossible de joindre le serveur. Veuillez verifier votre connexion internet et reessayer."
+						actionLabel="Reessayer"
+						onActionPress={() => Alert.alert('Retry', 'Nouvelle tentative (simulation).')}
+					/>
+				</View>
+
+				<View style={styles.section}>
+					<Text variant="overline" color="secondary">
+						NOTIFICATIONS & TOASTS
+					</Text>
+					<View style={styles.toastsWrap}>
+						{visibleToasts.map((toast) => (
+							<NotificationToast
+								key={toast.id}
+								tone={toast.tone}
+								title={toast.title}
+								message={toast.message}
+								onClose={() => removeToast(toast.id)}
+							/>
+						))}
+					</View>
+				</View>
+
+				<View style={styles.section}>
+					<Text variant="overline" color="secondary">
+						FENETRE DE DIALOGUE (CONFIRM MODAL)
+					</Text>
+					<EmptyState
+						title="Action sensible"
+						description="Ouvrez la fenetre de confirmation pour visualiser le composant de dialogue."
+						actionLabel="Ouvrir la confirmation"
+						onActionPress={() => setDialogOpen(true)}
+					/>
+				</View>
+
+				<View style={styles.section}>
+					<Text variant="overline" color="secondary">
+						SKELETON LOADERS (LISTES)
+					</Text>
+					<View style={styles.skeletonWrap}>
+						<SkeletonListItem />
+						<SkeletonListItem lineWidths={[0.9, 0.62, 0.42]} />
+					</View>
+				</View>
+			</ScrollView>
+
+			<ConfirmDialog
+				visible={dialogOpen}
+				tone="danger"
+				title="Supprimer l'employe ?"
+				description="Etes-vous sur de vouloir revoquer l'acces de Moussa Diop ? Cette action est irreversible."
+				cancelLabel="Annuler"
+				confirmLabel="Supprimer"
+				onCancel={() => setDialogOpen(false)}
+				onConfirm={onConfirmDelete}
+			/>
+		</SafeAreaView>
+	);
+};
