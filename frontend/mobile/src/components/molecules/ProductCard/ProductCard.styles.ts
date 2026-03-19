@@ -16,11 +16,6 @@ export const styles = StyleSheet.create({
 		padding: spacing.s2,
 		rowGap: spacing.s2,
 	},
-	portraitHead: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'flex-start',
-	},
 	portraitImage: {
 		width: '100%',
 		height: 150,
@@ -60,7 +55,7 @@ export const styles = StyleSheet.create({
 	// LANDSCAPE VARIANT
 	landscapeTouchable: {
 		flexDirection: 'row',
-		columnGap: spacing.s2,
+		columnGap: spacing.s1,
 	},
 	landscapeImageWrap: {
 		position: 'relative',
