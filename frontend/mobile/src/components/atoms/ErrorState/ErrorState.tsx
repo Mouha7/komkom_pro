@@ -2,15 +2,13 @@ import React from 'react';
 import { View } from 'react-native';
 
 import { Button } from '../Button';
+import { Icon } from '../Icon';
 import { Text } from '../Text';
+import { colorTokens } from '../../../styles/colors';
 import { styles } from './ErrorState.styles';
 import type { ErrorStateProps } from './ErrorState.types';
 
-const defaultIcon = (
-	<Text variant="h1" color="danger">
-		X
-	</Text>
-);
+const defaultIcon = <Icon name="wifiOff" size={40} color={colorTokens.danger} />;
 
 export const ErrorState: React.FC<ErrorStateProps> = ({
 	title,

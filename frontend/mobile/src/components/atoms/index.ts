@@ -10,6 +10,9 @@ export type { ErrorStateProps } from './ErrorState';
 export { Input } from './Input';
 export type { InputProps } from './Input';
 
+export { Icon } from './Icon';
+export type { CommonIconName, IconProps } from './Icon';
+
 export { NotificationToast } from './NotificationToast';
 export type { NotificationToastProps, NotificationTone } from './NotificationToast';
 

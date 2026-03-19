@@ -31,6 +31,24 @@ export const styles = StyleSheet.create({
 	section: {
 		rowGap: spacing.s2,
 	},
+	iconGrid: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		columnGap: spacing.s2,
+		rowGap: spacing.s2,
+	},
+	iconCard: {
+		width: '30%',
+		minWidth: 88,
+		alignItems: 'center',
+		justifyContent: 'center',
+		rowGap: spacing.s1,
+		paddingVertical: spacing.s2,
+		borderRadius: 10,
+		borderWidth: 1,
+		borderColor: lightColors.border.default,
+		backgroundColor: lightColors.surface.default,
+	},
 	toastsWrap: {
 		rowGap: spacing.s2,
 	},

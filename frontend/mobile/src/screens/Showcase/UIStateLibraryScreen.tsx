@@ -5,11 +5,12 @@ import {
 	ConfirmDialog,
 	EmptyState,
 	ErrorState,
+	Icon,
 	NotificationToast,
 	SkeletonListItem,
 	Text,
 } from '../../components';
-import type { NotificationTone } from '../../components';
+import type { CommonIconName, NotificationTone } from '../../components';
 import { styles } from './UIStateLibraryScreen.styles';
 
 type ToastItem = {
@@ -46,6 +47,19 @@ const initialToasts: ToastItem[] = [
 	},
 ];
 
+const commonIcons: CommonIconName[] = [
+	'home',
+	'cart',
+	'package',
+	'user',
+	'settings',
+	'search',
+	'plus',
+	'minus',
+	'close',
+	'check',
+];
+
 export const UIStateLibraryScreen: React.FC = () => {
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [toasts, setToasts] = useState<ToastItem[]>(initialToasts);
@@ -72,6 +86,22 @@ export const UIStateLibraryScreen: React.FC = () => {
 				</Text>
 			</View>
 			<ScrollView contentContainerStyle={styles.content}>
+				<View style={styles.section}>
+					<Text variant="overline" color="secondary">
+						ICONES COMMUNES
+					</Text>
+					<View style={styles.iconGrid}>
+						{commonIcons.map((name) => (
+							<View key={name} style={styles.iconCard}>
+								<Icon name={name} size={24} color="#0F1724" accessibilityLabel={name} />
+								<Text variant="small" color="secondary">
+									{name}
+								</Text>
+							</View>
+						))}
+					</View>
+				</View>
+
 				<View style={styles.section}>
 					<Text variant="overline" color="secondary">
 						ETAT VIDE (EMPTY STATE)

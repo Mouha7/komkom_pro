@@ -6,6 +6,11 @@ import type { SkeletonListItemProps } from './Skeleton.types';
 
 const defaultLineWidths = [0.95, 0.62, 0.38];
 
+const toPercentWidth = (lineWidth: number): `${number}%` => {
+	const widthPercent = Math.min(1, Math.max(0.2, lineWidth)) * 100;
+	return `${widthPercent}%`;
+};
+
 export const SkeletonListItem: React.FC<SkeletonListItemProps> = ({
 	lineWidths = defaultLineWidths,
 	showAvatar = true,
@@ -19,7 +24,7 @@ export const SkeletonListItem: React.FC<SkeletonListItemProps> = ({
 				{lineWidths.map((lineWidth, index) => (
 					<View
 						key={'skeleton-line-' + String(index)}
-						style={[styles.line, { width: String(Math.min(1, Math.max(0.2, lineWidth)) * 100) + '%' }]}
+						style={[styles.line, { width: toPercentWidth(lineWidth) }]}
 					/>
 				))}
 			</View>

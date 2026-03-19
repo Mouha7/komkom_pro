@@ -2,15 +2,13 @@ import React from 'react';
 import { View } from 'react-native';
 
 import { Button } from '../Button';
+import { Icon } from '../Icon';
 import { Text } from '../Text';
+import { colorTokens } from '../../../styles/colors';
 import { styles } from './EmptyState.styles';
 import type { EmptyStateProps } from './EmptyState.types';
 
-const defaultIcon = (
-	<Text variant="h1" color="secondary">
-		[]
-	</Text>
-);
+const defaultIcon = <Icon name="cart" size={44} color={colorTokens.neutral700} />;
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
 	title,

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Modal, Pressable, View } from 'react-native';
 
-import { Button, Text } from '../../atoms';
+import { colorTokens } from '../../../styles/colors';
+import { Button, Icon, Text } from '../../atoms';
 import { styles } from './ConfirmDialog.styles';
 import type { ConfirmDialogProps } from './ConfirmDialog.types';
 
@@ -35,9 +36,11 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 							style={[styles.iconWrap, isDanger ? styles.iconWrapDanger : styles.iconWrapPrimary]}
 						>
 							{icon ?? (
-								<Text variant="h2" color={isDanger ? 'danger' : 'info'}>
-									{isDanger ? '!' : 'i'}
-								</Text>
+								<Icon
+									name={isDanger ? 'alert' : 'info'}
+									size={24}
+									color={isDanger ? colorTokens.danger : colorTokens.info}
+								/>
 							)}
 						</View>
 						<Text variant="h1">{title}</Text>

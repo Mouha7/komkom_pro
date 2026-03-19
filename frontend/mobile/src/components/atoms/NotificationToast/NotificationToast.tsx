@@ -1,7 +1,10 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
 
+import { colorTokens } from '../../../styles/colors';
+import { Icon } from '../Icon';
 import { Text } from '../Text';
+import type { CommonIconName } from '../Icon';
 import { styles } from './NotificationToast.styles';
 import type { NotificationToastProps, NotificationTone } from './NotificationToast.types';
 
@@ -19,18 +22,18 @@ const toneToIconWrapStyle = {
 	info: styles.iconInfo,
 } as const;
 
-const toneToIconText: Record<NotificationTone, string> = {
-	success: 'O',
-	warning: '!',
-	danger: 'X',
-	info: 'i',
+const toneToIconName: Record<NotificationTone, CommonIconName> = {
+	success: 'check',
+	warning: 'alert',
+	danger: 'close',
+	info: 'info',
 };
 
-const toneToTextColor: Record<NotificationTone, 'success' | 'warning' | 'danger' | 'info'> = {
-	success: 'success',
-	warning: 'warning',
-	danger: 'danger',
-	info: 'info',
+const toneToIconColor: Record<NotificationTone, string> = {
+	success: colorTokens.success,
+	warning: colorTokens.warning,
+	danger: colorTokens.danger,
+	info: colorTokens.info,
 };
 
 export const NotificationToast: React.FC<NotificationToastProps> = ({
@@ -38,7 +41,7 @@ export const NotificationToast: React.FC<NotificationToastProps> = ({
 	title,
 	message,
 	onClose,
-	closeLabel = 'X',
+	closeLabel = 'Fermer la notification',
 	containerStyle,
 	testID,
 }) => {
@@ -46,9 +49,7 @@ export const NotificationToast: React.FC<NotificationToastProps> = ({
 		<View style={[styles.container, containerStyle]} testID={testID}>
 			<View style={[styles.accent, toneToAccentStyle[tone]]} />
 			<View style={[styles.iconWrap, toneToIconWrapStyle[tone]]}>
-				<Text variant="small" style={styles.iconText} color={toneToTextColor[tone]}>
-					{toneToIconText[tone]}
-				</Text>
+				<Icon name={toneToIconName[tone]} size={14} color={toneToIconColor[tone]} />
 			</View>
 			<View style={styles.content}>
 				<View style={styles.titleRow}>
@@ -58,11 +59,9 @@ export const NotificationToast: React.FC<NotificationToastProps> = ({
 							onPress={onClose}
 							style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}
 							accessibilityRole="button"
-							accessibilityLabel="Fermer la notification"
+							accessibilityLabel={closeLabel}
 						>
-							<Text variant="h3" color="secondary">
-								{closeLabel}
-							</Text>
+							<Icon name="close" size={16} color={colorTokens.neutral700} />
 						</Pressable>
 					) : null}
 				</View>
