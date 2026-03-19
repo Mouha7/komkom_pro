@@ -11,4 +11,4 @@ export { ConfirmDialog } from './ConfirmDialog';
 export type { ConfirmDialogProps, ConfirmDialogTone } from './ConfirmDialog';
 
 export { ProductCard } from './ProductCard';
-export type { ProductCardProps } from './ProductCard';
+export type { ProductCardProps, ProductCardVariant } from './ProductCard';

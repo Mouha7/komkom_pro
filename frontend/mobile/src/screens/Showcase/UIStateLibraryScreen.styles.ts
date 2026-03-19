@@ -11,6 +11,7 @@ export const styles = StyleSheet.create({
 	content: {
 		paddingHorizontal: spacing.s3,
 		paddingVertical: spacing.s3,
+		paddingBottom: spacing.s6,
 		rowGap: spacing.s5,
 	},
 	section: {
@@ -39,5 +40,18 @@ export const styles = StyleSheet.create({
 	},
 	skeletonWrap: {
 		rowGap: spacing.s2,
+	},
+	listPreview: {
+		backgroundColor: lightColors.surface.default,
+		borderRadius: 12,
+		borderWidth: 1,
+		borderColor: lightColors.border.default,
+		padding: spacing.s2,
+	},
+	productCardPortrait: {
+		width: '50%',
+	},
+	productCardLandscape: {
+		width: '100%',
 	},
 });

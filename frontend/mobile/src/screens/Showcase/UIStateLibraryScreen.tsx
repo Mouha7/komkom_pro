@@ -4,15 +4,24 @@ import { Alert, ScrollView, View } from 'react-native';
 import {
 	AppBar,
 	BottomBar,
+	CartList,
 	ConfirmDialog,
 	EmptyState,
 	ErrorState,
 	Icon,
 	NotificationToast,
+	OrderList,
+	ProductCard,
 	SkeletonListItem,
 	Text,
 } from '../../components';
-import type { BottomBarAction, CommonIconName, NotificationTone } from '../../components';
+import type {
+	BottomBarAction,
+	CartItemData,
+	CommonIconName,
+	NotificationTone,
+	OrderSummaryItem,
+} from '../../components';
 import { styles } from './UIStateLibraryScreen.styles';
 
 type ToastItem = {
@@ -94,6 +103,74 @@ const buildBottomActions = (): BottomBarAction[] => [
 		onPress: () => Alert.alert('Navigation', 'Ouverture du Profil (MVP).'),
 	},
 ];
+
+const cartItemsPreview: CartItemData[] = [
+	{
+		productId: 'prod-ciment',
+		name: 'Ciment SOCOCIM 50kg',
+		price: 6850,
+		currency: 'FCFA',
+		quantity: 3,
+		description: 'Sac de ciment pour chantier.',
+		stockStatus: 'in_stock',
+	},
+	{
+		productId: 'prod-fer',
+		name: 'Fer a beton 10mm',
+		price: 2400,
+		currency: 'FCFA',
+		quantity: 6,
+		description: 'Barre de fer standard.',
+		stockStatus: 'low_stock',
+	},
+];
+
+const ordersPreview: OrderSummaryItem[] = [
+	{
+		id: 'cmd-1029',
+		reference: 'CMD-1029',
+		total: 34950,
+		currency: 'FCFA',
+		status: 'pending',
+		createdAt: '2026-03-12T10:00:00.000Z',
+	},
+	{
+		id: 'cmd-1030',
+		reference: 'CMD-1030',
+		total: 87200,
+		currency: 'FCFA',
+		status: 'confirmed',
+		createdAt: '2026-03-13T15:30:00.000Z',
+	},
+	{
+		id: 'cmd-1031',
+		reference: 'CMD-1031',
+		total: 19100,
+		currency: 'FCFA',
+		status: 'delivered',
+		createdAt: '2026-03-15T09:45:00.000Z',
+	},
+];
+
+const productPortrait = {
+	productId: 'prod-ciment',
+	name: 'Ciment Portland CPJ 35',
+	price: 4500,
+	currency: 'FCFA',
+	description: 'Sac de 50 kg',
+	imageUrl: 'https://via.placeholder.com/300x400?text=Ciment',
+	stockStatus: 'in_stock' as const,
+};
+
+const productLandscape = {
+	productId: 'prod-perceuse',
+	name: 'Perceuse Visseuse sans fil 18V',
+	price: 35000,
+	currency: 'FCFA',
+	description: 'Unité',
+	imageUrl: 'https://via.placeholder.com/400x300?text=Perceuse',
+	stockStatus: 'in_stock' as const,
+};
 
 export const UIStateLibraryScreen: React.FC = () => {
 	const [dialogOpen, setDialogOpen] = useState(false);
@@ -204,6 +281,60 @@ export const UIStateLibraryScreen: React.FC = () => {
 						<SkeletonListItem />
 						<SkeletonListItem lineWidths={[0.9, 0.62, 0.42]} />
 					</View>
+				</View>
+
+				{/* <View style={styles.section}>
+					<Text variant="overline" color="secondary">
+						CART LIST (ORGANISM)
+					</Text>
+					<CartList
+						items={cartItemsPreview}
+						containerStyle={styles.listPreview}
+						onIncreaseQty={(productId) =>
+							Alert.alert('Panier', `Augmenter quantite: ${productId}`)
+						}
+						onDecreaseQty={(productId) =>
+							Alert.alert('Panier', `Diminuer quantite: ${productId}`)
+						}
+						onRemoveItem={(productId) =>
+							Alert.alert('Panier', `Supprimer produit: ${productId}`)
+						}
+						onCheckout={() => Alert.alert('Panier', 'Passer la commande (MVP).')}
+					/>
+				</View> */}
+
+				<View style={styles.section}>
+					<Text variant="overline" color="secondary">
+						PRODUCT CARD - PORTRAIT
+					</Text>
+					<ProductCard
+						{...productPortrait}
+						onPress={(id) => Alert.alert('Navigation', `Ouvrir detail produit: ${id}`)}
+						onAddToCart={(id) => Alert.alert('Panier', `Ajouter au panier: ${id}`)}
+					/>
+				</View>
+
+				<View style={styles.section}>
+					<Text variant="overline" color="secondary">
+						PRODUCT CARD - LANDSCAPE
+					</Text>
+					<ProductCard
+						{...productLandscape}
+						variant="landscape"
+						onPress={(id) => Alert.alert('Navigation', `Ouvrir detail produit: ${id}`)}
+						onAddToCart={(id) => Alert.alert('Panier', `Ajouter au panier: ${id}`)}
+					/>
+				</View>
+
+				<View style={styles.section}>
+					<Text variant="overline" color="secondary">
+						ORDER LIST (ORGANISM)
+					</Text>
+					<OrderList
+						orders={ordersPreview}
+						containerStyle={styles.listPreview}
+						onPressOrder={(orderId) => Alert.alert('Commande', `Ouvrir detail: ${orderId}`)}
+					/>
 				</View>
 			</ScrollView>
 

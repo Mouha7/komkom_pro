@@ -10,6 +10,7 @@ export const Button: React.FC<ButtonProps> = ({
 	variant = 'primary',
 	disabled = false,
 	loading = false,
+	iconOnly = false,
 	leftIcon,
 	rightIcon,
 	testID,
@@ -18,6 +19,7 @@ export const Button: React.FC<ButtonProps> = ({
 	textStyle,
 }) => {
 	const effectiveDisabled = disabled || loading;
+	const shouldRenderLabel = Boolean(title) && !iconOnly;
 
 	const labelStyleByVariant =
 		variant === 'primary'
@@ -33,7 +35,7 @@ export const Button: React.FC<ButtonProps> = ({
 			disabled={effectiveDisabled}
 			activeOpacity={0.8}
 			accessibilityRole="button"
-			accessibilityLabel={accessibilityLabel ?? title}
+			accessibilityLabel={accessibilityLabel ?? title ?? 'button'}
 			testID={testID}
 		>
 			{loading ? (
@@ -41,7 +43,9 @@ export const Button: React.FC<ButtonProps> = ({
 			) : (
 				<>
 					{leftIcon ? <View>{leftIcon}</View> : null}
-					<Text style={[styles.labelBase, labelStyleByVariant, textStyle]}>{title}</Text>
+					{shouldRenderLabel ? (
+						<Text style={[styles.labelBase, labelStyleByVariant, textStyle]}>{title}</Text>
+					) : null}
 					{rightIcon ? <View>{rightIcon}</View> : null}
 				</>
 			)}

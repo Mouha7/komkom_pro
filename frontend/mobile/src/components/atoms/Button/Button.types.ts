@@ -4,11 +4,12 @@ import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 
 export type ButtonProps = {
-	title: string;
+	title?: string;
 	onPress?: () => void;
 	variant?: ButtonVariant;
 	disabled?: boolean;
 	loading?: boolean;
+	iconOnly?: boolean;
 	leftIcon?: ReactNode;
 	rightIcon?: ReactNode;
 	testID?: string;

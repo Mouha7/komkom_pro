@@ -2,6 +2,8 @@ import type { StyleProp, ViewStyle } from 'react-native';
 
 import type { StockStatus } from '../../atoms/StatusChip';
 
+export type ProductCardVariant = 'portrait' | 'landscape';
+
 export type ProductCardProps = {
 	productId: string;
 	name: string;
@@ -10,6 +12,7 @@ export type ProductCardProps = {
 	description?: string;
 	imageUrl?: string;
 	stockStatus?: StockStatus;
+	variant?: ProductCardVariant;
 	onAddToCart?: (productId: string) => void;
 	onPress?: (productId: string) => void;
 	disabled?: boolean;
