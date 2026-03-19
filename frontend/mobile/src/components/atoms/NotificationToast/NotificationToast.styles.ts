@@ -42,12 +42,12 @@ export const styles = StyleSheet.create({
 	},
 	accent: {
 		position: 'absolute',
-		left: 0,
+		left: -0.1,
 		top: 0,
 		bottom: 0,
-		width: 4,
-		borderTopLeftRadius: 12,
-		borderBottomLeftRadius: 12,
+		width: 5,
+		borderTopLeftRadius: 28,
+		borderBottomLeftRadius: 28,
 	},
 	toneSuccess: {
 		backgroundColor: lightColors.success,

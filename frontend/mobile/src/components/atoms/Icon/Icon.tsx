@@ -14,6 +14,8 @@ import {
 	User,
 	X,
     WifiOff,
+    ArrowLeft,
+    Trash2,
 } from 'lucide-react-native';
 
 import type { CommonIconName, IconProps } from './Icon.types';
@@ -32,6 +34,8 @@ const ICON_MAP: Record<CommonIconName, LucideIcon> = {
 	alert: CircleAlert,
 	info: Info,
 	wifiOff: WifiOff,
+    arrowLeft: ArrowLeft,
+    trash: Trash2,
 };
 
 export const Icon: React.FC<IconProps> = ({

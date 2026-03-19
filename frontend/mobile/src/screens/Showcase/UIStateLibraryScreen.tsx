@@ -1,7 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { Alert, SafeAreaView, ScrollView, View } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 
 import {
+	AppBar,
+	BottomBar,
 	ConfirmDialog,
 	EmptyState,
 	ErrorState,
@@ -10,7 +12,7 @@ import {
 	SkeletonListItem,
 	Text,
 } from '../../components';
-import type { CommonIconName, NotificationTone } from '../../components';
+import type { BottomBarAction, CommonIconName, NotificationTone } from '../../components';
 import { styles } from './UIStateLibraryScreen.styles';
 
 type ToastItem = {
@@ -58,6 +60,39 @@ const commonIcons: CommonIconName[] = [
 	'minus',
 	'close',
 	'check',
+	'alert',
+	'info',
+	'wifiOff',
+	'arrowLeft',
+	'trash',
+];
+
+const buildBottomActions = (): BottomBarAction[] => [
+	{
+		id: 'home',
+		label: 'Accueil',
+		iconName: 'home',
+		onPress: () => Alert.alert('Navigation', 'Ouverture de la page Accueil (MVP).'),
+	},
+	{
+		id: 'cart',
+		label: 'Panier',
+		iconName: 'cart',
+		badge: 2,
+		onPress: () => Alert.alert('Navigation', 'Ouverture du Panier (MVP).'),
+	},
+	{
+		id: 'orders',
+		label: 'Commandes',
+		iconName: 'package',
+		onPress: () => Alert.alert('Navigation', 'Ouverture des Commandes (MVP).'),
+	},
+	{
+		id: 'profile',
+		label: 'Profil',
+		iconName: 'user',
+		onPress: () => Alert.alert('Navigation', 'Ouverture du Profil (MVP).'),
+	},
 ];
 
 export const UIStateLibraryScreen: React.FC = () => {
@@ -65,6 +100,7 @@ export const UIStateLibraryScreen: React.FC = () => {
 	const [toasts, setToasts] = useState<ToastItem[]>(initialToasts);
 
 	const visibleToasts = useMemo(() => toasts, [toasts]);
+	const bottomActions = useMemo(() => buildBottomActions(), []);
 
 	const removeToast = (toastId: string): void => {
 		setToasts((current) => current.filter((toast) => toast.id !== toastId));
@@ -76,15 +112,20 @@ export const UIStateLibraryScreen: React.FC = () => {
 	};
 
 	return (
-		<SafeAreaView style={styles.safeArea}>
-			<View style={styles.head}>
-				<Text variant="h2" color="secondary">
-					{'<'}
-				</Text>
-				<Text variant="h2" style={styles.headTitle}>
-					Composants & Etats UI
-				</Text>
-			</View>
+		<View style={styles.safeArea}>
+			<AppBar
+				title="Composants & Etats UI"
+				leftIconName="arrowLeft"
+				onPressLeft={() => Alert.alert('Navigation', 'Retour (MVP).')}
+				rightActions={[
+					{
+						id: 'open-settings',
+						iconName: 'settings',
+						onPress: () => Alert.alert('Action', 'Ouverture des parametres (MVP).'),
+						accessibilityLabel: 'Ouvrir les parametres',
+					},
+				]}
+			/>
 			<ScrollView contentContainerStyle={styles.content}>
 				<View style={styles.section}>
 					<Text variant="overline" color="secondary">
@@ -166,9 +207,12 @@ export const UIStateLibraryScreen: React.FC = () => {
 				</View>
 			</ScrollView>
 
+			<BottomBar actions={bottomActions} activeActionId="home" />
+
 			<ConfirmDialog
 				visible={dialogOpen}
 				tone="danger"
+				icon={<Icon name="trash" size={24} color="#B91C1C" />}
 				title="Supprimer l'employe ?"
 				description="Etes-vous sur de vouloir revoquer l'acces de Moussa Diop ? Cette action est irreversible."
 				cancelLabel="Annuler"
@@ -176,6 +220,6 @@ export const UIStateLibraryScreen: React.FC = () => {
 				onCancel={() => setDialogOpen(false)}
 				onConfirm={onConfirmDelete}
 			/>
-		</SafeAreaView>
+		</View>
 	);
 };

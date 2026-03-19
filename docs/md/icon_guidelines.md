@@ -48,6 +48,18 @@ Noms systeme (etats UI):
   - Mobile: `accessibilityLabel`
 - Pour un bouton de fermeture, utiliser `name="close"` et un label explicite.
 
+## AppBar et BottomBar
+
+- AppBar reusable: frontend/mobile/src/components/molecules/AppBar/AppBar.tsx
+- BottomBar reusable: frontend/mobile/src/components/molecules/BottomBar/BottomBar.tsx
+- Les deux composants utilisent `useSafeAreaInsets()` (react-native-safe-area-context):
+  - AppBar applique l'inset top pour ne pas recouvrir la barre systeme haute.
+  - BottomBar applique l'inset bottom pour rester au-dessus de la zone geste/navigation.
+- Ne pas re-appliquer un `SafeAreaView` top/bottom sur un ecran qui utilise deja AppBar + BottomBar.
+- Taille recommandee des actions de navigation:
+  - Zone tactile minimale: 44x44
+  - Taille d'icone action: 22-24
+
 ## Exemples
 
 Web:
