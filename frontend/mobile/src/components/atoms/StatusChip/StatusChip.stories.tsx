@@ -1,11 +1,11 @@
-import React from 'react';
-import { View } from 'react-native';
+import React from "react";
+import { View } from "react-native";
 
-import { spacing } from '../../../styles/spacing';
-import { StatusBadge, StatusChip } from './StatusChip';
+import { spacing } from "../../../styles/spacing";
+import { StatusBadge, StatusChip } from "./StatusChip";
 
 const meta = {
-	title: 'Atoms/StatusChip',
+	title: "Atoms/StatusChip",
 	component: StatusChip,
 };
 

@@ -2,6 +2,7 @@
   "expo": {
     "name": "mobile",
     "slug": "mobile",
+    "scheme": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,9 +13,14 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "bundleIdentifier": "com.komkom.mobile",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
       "supportsTablet": true
     },
     "android": {
+      "package": "com.komkom.mobile",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -25,6 +31,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e31768db-cd4b-45f2-9675-af04e4f7ca39"
+      }
     }
   }
 }

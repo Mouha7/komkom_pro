@@ -1,11 +1,11 @@
-import React from 'react';
-import { View } from 'react-native';
+import React from "react";
+import { View } from "react-native";
 
-import { spacing } from '../../../styles/spacing';
-import { Text } from './Text';
+import { spacing } from "../../../styles/spacing";
+import { Text } from "./Text";
 
 const meta = {
-	title: 'Atoms/Text',
+	title: "Atoms/Text",
 	component: Text,
 };
 
