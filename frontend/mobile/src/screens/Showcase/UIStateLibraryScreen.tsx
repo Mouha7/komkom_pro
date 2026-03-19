@@ -12,6 +12,7 @@ import {
 	NotificationToast,
 	OrderList,
 	ProductCard,
+	ProductCardSkeleton,
 	SkeletonListItem,
 	Text,
 } from '../../components';
@@ -280,6 +281,13 @@ export const UIStateLibraryScreen: React.FC = () => {
 					<View style={styles.skeletonWrap}>
 						<SkeletonListItem />
 						<SkeletonListItem lineWidths={[0.9, 0.62, 0.42]} />
+					</View>
+					<Text variant="overline" color="secondary">
+						SKELETON LOADERS (PRODUCT CARD)
+					</Text>
+					<View style={styles.skeletonWrap}>
+						<ProductCardSkeleton variant="portrait" containerStyle={styles.productCardPortrait} />
+						<ProductCardSkeleton variant="landscape" containerStyle={styles.productCardLandscape} />
 					</View>
 				</View>
 

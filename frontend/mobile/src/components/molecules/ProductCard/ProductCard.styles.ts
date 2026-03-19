@@ -64,7 +64,10 @@ export const styles = StyleSheet.create({
 	landscapeImage: {
 		width: 140,
 		height: 140,
-		borderRadius: 8,
+		borderBottomLeftRadius: 8,
+		borderTopLeftRadius: 8,
+		borderColor: lightColors.border.default,
+		borderRightWidth: 1,
 		backgroundColor: lightColors.background.subtle,
 	},
 	landscapeImageBadge: {

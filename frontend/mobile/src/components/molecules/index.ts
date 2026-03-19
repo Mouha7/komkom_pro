@@ -10,5 +10,5 @@ export type { BottomBarAction, BottomBarProps } from './BottomBar';
 export { ConfirmDialog } from './ConfirmDialog';
 export type { ConfirmDialogProps, ConfirmDialogTone } from './ConfirmDialog';
 
-export { ProductCard } from './ProductCard';
-export type { ProductCardProps, ProductCardVariant } from './ProductCard';
+export { ProductCard, ProductCardSkeleton } from './ProductCard';
+export type { ProductCardProps, ProductCardSkeletonProps, ProductCardVariant } from './ProductCard';
