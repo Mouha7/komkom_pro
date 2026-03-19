@@ -7,21 +7,12 @@ Ce document décrit en détail la structure du projet **frontend/mobile** (React
 Utilise cette sequence dans `frontend/mobile`:
 
 1. `npm install`
-2. `npm run start:stable`
+2. `npm run start:clear`
 3. Scanner le QR depuis l'app Expo Go (pas depuis l'app camera)
-
-Commande recommandee pour eviter les conflits de port Metro:
-
-- `npm run start:stable` : tue les anciens process Metro (8081/8082), puis lance Expo Go en LAN, cache vide, port 8081 fixe
-- `npm run start:stable:tunnel` : meme strategie avec tunnel ngrok
-
 Scripts disponibles:
 
 - `npm start` : demarrage LAN (par defaut)
 - `npm run start:clear` : LAN + cache Metro vide
-- `npm run start:go:lan` : Expo Go explicite + LAN + cache vide + port 8081
-- `npm run start:go:tunnel` : Expo Go explicite + tunnel + cache vide + port 8081
-- `npm run start:kill-metro` : stoppe les process Metro sur 8081/8082
 - `npm run start:lan` : reseau local explicite
 - `npm run start:tunnel` : tunnel ngrok, uniquement si le compte ngrok est verifie
 - `npm run start:tunnel:clear` : tunnel + cache Metro vide
@@ -34,45 +25,8 @@ Si l'erreur persiste:
 - Verifier que le telephone a internet (4G/5G ou Wi-Fi)
 - Mettre a jour Expo Go sur le telephone
 - Redemarrer Metro avec `npm run start:clear`
-- Si port deja utilise, executer `npm run start:kill-metro` puis `npm run start:stable`
 - Si le QR vient d'un mode dev client, relancer en Expo Go standard avec `npm start`
 - Si `npm run start:tunnel` echoue avec `ERR_NGROK_4018`, verifier le compte ngrok et l'email sur ngrok.com avant de reutiliser le tunnel
-- Si le tunnel echoue avec `failed to start tunnel` ou `remote gone away`, verifier d'abord la config locale ngrok avec `ngrok config check`, puis relancer `npm run start:stable:tunnel`
-
-## Development Build (EAS) au lieu de Expo Go
-
-Pourquoi l'utiliser:
-
-- Plus robuste pour les projets qui depassent les limites Expo Go
-- Runtime natif de ton application (pas le runtime generique Expo Go)
-- Compatible avec des modules natifs non supportes dans Expo Go
-
-Important:
-
-- Le dev client a toujours besoin d'acceder au serveur Metro pour le JS bundle
-- Donc un probleme LAN/tunnel peut encore impacter le hot reload, mais tu supprimes la couche Expo Go
-
-Sequence recommandee (premiere installation):
-
-1. `npm install`
-2. `npm run eas:login`
-3. `npm run build:dev:android` (installe ensuite l'apk sur le telephone Android)
-4. `npm run build:dev:ios` (installe ensuite la build iOS sur iPhone via lien EAS)
-
-Note iOS:
-
-- Sur iPhone physique, un premier build peut demander une etape interactive Apple Developer (Apple ID + validation credentials).
-- Si besoin, lancer explicitement: `npm run build:dev:ios:interactive`
-- Pour tester seulement sur simulateur iOS: `npm run build:dev:ios:simulator`
-
-Lancement au quotidien apres installation du dev client:
-
-- `npm run start:dev:lan`
-- ou `npm run start:dev:tunnel`
-
-Astuce:
-
-- Si le LAN reste instable, utilise `npm run start:dev:tunnel` pour les tests sur telephones physiques
 
 ---
 
