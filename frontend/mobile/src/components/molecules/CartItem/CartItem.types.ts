@@ -4,6 +4,7 @@ import type { StockStatus } from '../../atoms/StatusChip';
 
 export type CartItemData = {
 	productId: string;
+	brand?: string;
 	name: string;
 	price: number;
 	currency?: string;

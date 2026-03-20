@@ -107,22 +107,26 @@ const buildBottomActions = (): BottomBarAction[] => [
 
 const cartItemsPreview: CartItemData[] = [
 	{
-		productId: 'prod-ciment',
-		name: 'Ciment SOCOCIM 50kg',
-		price: 6850,
+		productId: 'prod-perceuse',
+		brand: 'PROTOOL',
+		name: 'Perceuse Visseuse sans fil 18V avec 2 batteries',
+		price: 35000,
 		currency: 'FCFA',
-		quantity: 3,
-		description: 'Sac de ciment pour chantier.',
+		quantity: 1,
+		description: 'Unite',
 		stockStatus: 'in_stock',
+		imageUrl: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=400&q=80',
 	},
 	{
-		productId: 'prod-fer',
-		name: 'Fer a beton 10mm',
-		price: 2400,
+		productId: 'prod-ciment',
+		brand: 'BUILDMAT',
+		name: 'Ciment Portland CPJ 45 - Sac de 50kg',
+		price: 4500,
 		currency: 'FCFA',
-		quantity: 6,
-		description: 'Barre de fer standard.',
+		quantity: 20,
+		description: '4 500 / Sac',
 		stockStatus: 'low_stock',
+		imageUrl: 'https://images.unsplash.com/photo-1590247813693-5541d1c609fd?auto=format&fit=crop&w=400&q=80',
 	},
 ];
 
@@ -153,25 +157,47 @@ const ordersPreview: OrderSummaryItem[] = [
 	},
 ];
 
-const productPortrait = {
-	productId: 'prod-ciment',
-	name: 'Ciment Portland CPJ 35',
-	price: 4500,
-	currency: 'FCFA',
-	description: 'Sac de 50 kg',
-	imageUrl: 'https://via.placeholder.com/300x400?text=Ciment',
-	stockStatus: 'in_stock' as const,
-};
+const portraitProductsPreview = [
+	{
+		productId: 'prod-ciment',
+		name: 'Ciment Portland CPJ 35',
+		price: 4500,
+		currency: 'FCFA',
+		description: 'Sac de 50 kg',
+		imageUrl: 'https://via.placeholder.com/300x400?text=Ciment',
+		stockStatus: 'in_stock' as const,
+	},
+	{
+		productId: 'prod-peinture',
+		name: 'Peinture Blanche Mat 20L',
+		price: 18900,
+		currency: 'FCFA',
+		description: 'Seau interieur',
+		imageUrl: 'https://via.placeholder.com/300x400?text=Peinture',
+		stockStatus: 'low_stock' as const,
+	},
+];
 
-const productLandscape = {
-	productId: 'prod-perceuse',
-	name: 'Perceuse Visseuse sans fil 18V',
-	price: 35000,
-	currency: 'FCFA',
-	description: 'Unité',
-	imageUrl: 'https://via.placeholder.com/400x300?text=Perceuse',
-	stockStatus: 'in_stock' as const,
-};
+const landscapeProductsPreview = [
+	{
+		productId: 'prod-perceuse',
+		name: 'Perceuse Visseuse sans fil 18V',
+		price: 35000,
+		currency: 'FCFA',
+		description: 'Unité',
+		imageUrl: 'https://via.placeholder.com/400x300?text=Perceuse',
+		stockStatus: 'in_stock' as const,
+	},
+	{
+		productId: 'prod-meuleuse',
+		name: 'Meuleuse 2200W',
+		price: 27900,
+		currency: 'FCFA',
+		description: 'Disque 230 mm',
+		imageUrl: 'https://via.placeholder.com/400x300?text=Meuleuse',
+		stockStatus: 'out_of_stock' as const,
+	},
+];
 
 export const UIStateLibraryScreen: React.FC = () => {
 	const [dialogOpen, setDialogOpen] = useState(false);
@@ -291,11 +317,45 @@ export const UIStateLibraryScreen: React.FC = () => {
 							<ProductCardSkeleton variant="portrait" containerStyle={styles.productCardPortrait} />
 						</View>
 						<ProductCardSkeleton variant="landscape" containerStyle={styles.productCardLandscape} />
-						<ProductCardSkeleton variant="landscape" containerStyle={styles.productCardLandscape} />
 					</View>
 				</View>
 
-				{/* <View style={styles.section}>
+				<View style={styles.section}>
+					<Text variant="overline" color="secondary">
+						LISTE PRODUITS - PORTRAIT
+					</Text>
+					<View style={styles.skeletonRow}>
+						{portraitProductsPreview.map((product) => (
+							<ProductCard
+								key={product.productId}
+								{...product}
+								containerStyle={styles.productCardPortrait}
+								onPress={(id) => Alert.alert('Navigation', `Ouvrir detail produit: ${id}`)}
+								onAddToCart={(id) => Alert.alert('Panier', `Ajouter au panier: ${id}`)}
+							/>
+						))}
+					</View>
+				</View>
+
+				<View style={styles.section}>
+					<Text variant="overline" color="secondary">
+						LISTE PRODUITS - LANDSCAPE
+					</Text>
+					<View style={styles.skeletonWrap}>
+						{landscapeProductsPreview.map((product) => (
+							<ProductCard
+								key={product.productId}
+								{...product}
+								variant="landscape"
+								containerStyle={styles.productCardLandscape}
+								onPress={(id) => Alert.alert('Navigation', `Ouvrir detail produit: ${id}`)}
+								onAddToCart={(id) => Alert.alert('Panier', `Ajouter au panier: ${id}`)}
+							/>
+						))}
+					</View>
+				</View>
+
+				<View style={styles.section}>
 					<Text variant="overline" color="secondary">
 						CART LIST (ORGANISM)
 					</Text>
@@ -312,29 +372,6 @@ export const UIStateLibraryScreen: React.FC = () => {
 							Alert.alert('Panier', `Supprimer produit: ${productId}`)
 						}
 						onCheckout={() => Alert.alert('Panier', 'Passer la commande (MVP).')}
-					/>
-				</View> */}
-
-				<View style={styles.section}>
-					<Text variant="overline" color="secondary">
-						PRODUCT CARD - PORTRAIT
-					</Text>
-					<ProductCard
-						{...productPortrait}
-						onPress={(id) => Alert.alert('Navigation', `Ouvrir detail produit: ${id}`)}
-						onAddToCart={(id) => Alert.alert('Panier', `Ajouter au panier: ${id}`)}
-					/>
-				</View>
-
-				<View style={styles.section}>
-					<Text variant="overline" color="secondary">
-						PRODUCT CARD - LANDSCAPE
-					</Text>
-					<ProductCard
-						{...productLandscape}
-						variant="landscape"
-						onPress={(id) => Alert.alert('Navigation', `Ouvrir detail produit: ${id}`)}
-						onAddToCart={(id) => Alert.alert('Panier', `Ajouter au panier: ${id}`)}
 					/>
 				</View>
 

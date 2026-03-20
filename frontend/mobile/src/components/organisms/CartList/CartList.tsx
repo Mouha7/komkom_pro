@@ -1,20 +1,20 @@
-import React from 'react';
-import { ActivityIndicator, FlatList, View } from 'react-native';
+import React from "react";
+import { ActivityIndicator, FlatList, View } from "react-native";
 
-import { Button, Text } from '../../atoms';
-import { CartItem } from '../../molecules';
-import { styles } from './CartList.styles';
-import type { CartListProps } from './CartList.types';
+import { Text } from "../../atoms";
+import { CartItem } from "../../molecules";
+import { styles } from "./CartList.styles";
+import type { CartListProps } from "./CartList.types";
 
 const formatPrice = (price: number, currency: string): string => {
-	return new Intl.NumberFormat('fr-FR').format(price) + ' ' + currency;
+	return new Intl.NumberFormat("fr-FR").format(price) + " " + currency;
 };
 
 export const CartList: React.FC<CartListProps> = ({
 	items,
-	currency = 'FCFA',
+	currency = "FCFA",
 	isLoading = false,
-	emptyLabel = 'Votre panier est vide.',
+	emptyLabel = "Votre panier est vide.",
 	onIncreaseQty,
 	onDecreaseQty,
 	onRemoveItem,
@@ -23,7 +23,11 @@ export const CartList: React.FC<CartListProps> = ({
 	testID,
 	renderItemFooter,
 }) => {
-	const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
+	const subtotal = items.reduce(
+		(total, item) => total + item.price * item.quantity,
+		0,
+	);
+	const totalItems = items.reduce((total, item) => total + item.quantity, 0);
 
 	if (isLoading) {
 		return (
@@ -65,11 +69,29 @@ export const CartList: React.FC<CartListProps> = ({
 			<View style={styles.summary}>
 				<View style={styles.totalRow}>
 					<Text variant="body" color="secondary">
-						Sous-total
+						Sous-total ({String(totalItems)} articles)
 					</Text>
-					<Text variant="h2">{formatPrice(subtotal, currency)}</Text>
+					<Text variant="h2" style={styles.priceRow}>
+						{formatPrice(subtotal, currency)}
+					</Text>
 				</View>
-				<Button title="Passer la commande" onPress={onCheckout} />
+				<View style={styles.totalRow}>
+					<Text variant="body" color="secondary">
+						Frais de livraison estimes
+					</Text>
+					<Text variant="h2" style={styles.priceRow}>
+						À calculer
+					</Text>
+				</View>
+				<View style={styles.divider} />
+				<View style={styles.totalRow}>
+					<Text variant="h1" style={styles.totalLabel}>
+						Total estime
+					</Text>
+					<Text variant="h1" style={styles.totalAmount}>
+						{formatPrice(subtotal, currency)}
+					</Text>
+				</View>
 			</View>
 		</View>
 	);

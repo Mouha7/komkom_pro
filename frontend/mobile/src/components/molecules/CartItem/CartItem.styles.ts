@@ -7,39 +7,81 @@ export const styles = StyleSheet.create({
 	container: {
 		borderWidth: 1,
 		borderColor: lightColors.border.default,
-		borderRadius: 12,
+		borderRadius: 6,
 		backgroundColor: lightColors.surface.default,
-		overflow: 'hidden',
 		flexDirection: 'row',
+		alignItems: 'stretch',
+		padding: spacing.s2,
+		// columnGap: spacing.s2,
+		shadowColor: '#0F1724',
+		shadowOpacity: 0.05,
+		shadowRadius: 5,
+		shadowOffset: { width: 0, height: 1 },
+	},
+	imageWrap: {
+		width: 100,
 	},
 	image: {
-		width: 110,
-		height: 110,
+		width: 80,
+		height: 80,
+		borderRadius: 4,
 		backgroundColor: lightColors.background.subtle,
 	},
 	body: {
 		flex: 1,
-		padding: spacing.s2,
-		rowGap: spacing.s1,
+		rowGap: spacing.s2,
 	},
 	topRow: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		columnGap: spacing.s2,
+		alignItems: 'flex-start',
+		columnGap: spacing.s1,
+	},
+	brand: {
+		color: lightColors.primary,
+		fontWeight: '700',
+	},
+	removeButton: {
+		padding: 2,
+	},
+	title: {
+		fontSize: 13,
+		lineHeight: 18,
+		fontWeight: '500',
+	},
+	priceWrap: {
+		rowGap: 2,
+	},
+	totalPrice: {
+		fontSize: 15,
+		fontWeight: '700',
+	},
+	unitPrice: {
+		fontWeight: '400',
 	},
 	footer: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		alignItems: 'center',
+		alignItems: 'flex-end',
 		columnGap: spacing.s2,
 	},
-	qtyRow: {
+	qtyControl: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		columnGap: spacing.s1,
-	},
-	actionButton: {
-		minWidth: 36,
+		justifyContent: 'space-between',
+		width: 96,
+		height: 32,
 		paddingHorizontal: spacing.s2,
+		borderWidth: 1,
+		borderColor: lightColors.border.default,
+		borderRadius: 4,
+		backgroundColor: lightColors.neutral100,
+	},
+	qtyAction: {
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+	qtyValue: {
+		fontWeight: '600',
 	},
 });
