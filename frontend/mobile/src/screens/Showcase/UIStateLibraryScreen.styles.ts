@@ -41,6 +41,10 @@ export const styles = StyleSheet.create({
 	skeletonWrap: {
 		rowGap: spacing.s2,
 	},
+	skeletonRow: {
+		flexDirection: 'row',
+		columnGap: spacing.s1,
+	},
 	listPreview: {
 		backgroundColor: lightColors.surface.default,
 		borderRadius: 12,

@@ -4,14 +4,15 @@ import { lightColors } from '../../../styles/colors';
 import { spacing } from '../../../styles/spacing';
 
 export const styles = StyleSheet.create({
-	container: {
+	// PORTRAIT VARIANT
+	containerPortrait: {
+		width: '50%',
 		borderRadius: 12,
 		borderWidth: 1,
 		borderColor: lightColors.border.default,
 		backgroundColor: lightColors.surface.default,
 		overflow: 'hidden',
 	},
-	// PORTRAIT VARIANT
 	portraitTouchable: {
 		padding: spacing.s2,
 		rowGap: spacing.s2,
@@ -19,7 +20,6 @@ export const styles = StyleSheet.create({
 	portraitImage: {
 		width: '100%',
 		height: 150,
-		borderRadius: 8,
 		backgroundColor: lightColors.background.subtle,
 	},
 	portraitContent: {
@@ -28,13 +28,19 @@ export const styles = StyleSheet.create({
 	portraitPriceRow: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		alignItems: 'center',
+		alignItems: 'flex-end',
 		columnGap: spacing.s2,
 	},
 	portraitPriceWrap: {
 		flexDirection: 'row',
 		alignItems: 'baseline',
 		columnGap: 4,
+	},
+	priceAmount: {
+		fontWeight: '700',
+	},
+	priceCurrency: {
+		fontWeight: '400',
 	},
 	actionButtonBase: {
 		width: 56,
@@ -53,6 +59,14 @@ export const styles = StyleSheet.create({
 	},
 
 	// LANDSCAPE VARIANT
+	containerLandscape: {
+		width: '100%',
+		borderRadius: 12,
+		borderWidth: 1,
+		borderColor: lightColors.border.default,
+		backgroundColor: lightColors.surface.default,
+		overflow: 'hidden',
+	},
 	landscapeTouchable: {
 		flexDirection: 'row',
 		columnGap: spacing.s1,
@@ -63,9 +77,7 @@ export const styles = StyleSheet.create({
 	},
 	landscapeImage: {
 		width: 140,
-		height: 140,
-		borderBottomLeftRadius: 8,
-		borderTopLeftRadius: 8,
+		height: 160,
 		borderColor: lightColors.border.default,
 		borderRightWidth: 1,
 		backgroundColor: lightColors.background.subtle,

@@ -19,14 +19,23 @@ const toneToStyle = {
 	neutral: [styles.toneNeutral, styles.textNeutral],
 } as const;
 
+const toneToSolidStyle = {
+	success: [styles.toneSolidSuccess, styles.textOnSolid],
+	danger: [styles.toneSolidDanger, styles.textOnSolid],
+	warning: [styles.toneSolidWarning, styles.textOnSolid],
+	info: [styles.toneSolidInfo, styles.textOnSolid],
+	neutral: [styles.toneSolidNeutral, styles.textOnSolid],
+} as const;
+
 export const StatusChip: React.FC<StatusChipProps> = ({
 	label,
 	tone = 'neutral',
 	compact = false,
+	solid = false,
 	containerStyle,
 	testID,
 }) => {
-	const [containerToneStyle, textToneStyle] = toneToStyle[tone];
+	const [containerToneStyle, textToneStyle] = solid ? toneToSolidStyle[tone] : toneToStyle[tone];
 
 	return (
 		<View
@@ -75,6 +84,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
 	stockStatus,
 	orderStatus,
 	compact = false,
+	solid = false,
 	testID,
 }) => {
 	const resolved = stockStatus
@@ -88,6 +98,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
 			label={resolved.label}
 			tone={resolved.tone}
 			compact={compact}
+			solid={solid}
 			testID={testID}
 		/>
 	);

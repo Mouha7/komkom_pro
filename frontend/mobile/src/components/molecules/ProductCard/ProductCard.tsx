@@ -6,8 +6,8 @@ import { lightColors } from "../../../styles/colors";
 import { styles } from "./ProductCard.styles";
 import type { ProductCardProps } from "./ProductCard.types";
 
-const formatPrice = (price: number, currency: string): string => {
-	return new Intl.NumberFormat("fr-FR").format(price) + " " + currency;
+const formatAmount = (price: number): string => {
+	return new Intl.NumberFormat("fr-FR").format(price);
 };
 
 export const ProductCard: React.FC<ProductCardProps> = ({
@@ -35,7 +35,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
 	if (isLandscape) {
 		return (
-			<View style={[styles.container, containerStyle]} testID={testID}>
+			<View style={[styles.containerLandscape, containerStyle]} testID={testID}>
 				<Pressable
 					style={styles.landscapeTouchable}
 					onPress={() => onPress?.(productId)}
@@ -55,7 +55,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 							resizeMode="cover"
 						/>
 						<View style={styles.landscapeImageBadge}>
-							<StatusBadge stockStatus={stockStatus} compact />
+							<StatusBadge stockStatus={stockStatus} compact solid />
 						</View>
 					</View>
 
@@ -80,8 +80,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 						{/* Bottom: prix et bouton */}
 						<View style={styles.landscapeBottom}>
 							<View style={styles.landscapePriceWrap}>
-								<Text variant="h2">
-									{formatPrice(price, currency)}
+								<Text variant="h2" style={styles.priceAmount}>
+									{formatAmount(price)}
+								</Text>
+								<Text variant="small" style={styles.priceCurrency}>
+									{currency}
 								</Text>
 							</View>
 							<Button
@@ -123,9 +126,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
 	// PORTRAIT (default)
 	return (
-		<View style={[styles.container, containerStyle]} testID={testID}>
+		<View style={[styles.containerPortrait, containerStyle]} testID={testID}>
 			<Pressable
-				// style={styles.portraitTouchable}
 				onPress={() => onPress?.(productId)}
 				disabled={disabled}
 				accessibilityRole="button"
@@ -133,14 +135,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 			>
 				<View style={styles.landscapeImageWrap}>
 					<View style={styles.landscapeImageBadge}>
-						<StatusBadge stockStatus={stockStatus} compact />
+						<StatusBadge stockStatus={stockStatus} compact solid />
 					</View>
 
 					<Image
 						source={{
 							uri:
 								imageUrl ||
-								"https://via.placeholder.com/300x300?text=Produit",
+								"https://via.placeholder.com/300x200?text=Produit",
 						}}
 						style={styles.portraitImage}
 						resizeMode="cover"
@@ -160,8 +162,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
 					<View style={styles.portraitPriceRow}>
 						<View style={styles.portraitPriceWrap}>
-							<Text variant="h2">
-								{formatPrice(price, currency)}
+							<Text variant="h2" style={styles.priceAmount}>
+								{formatAmount(price)}
+							</Text>
+							<Text variant="small" style={styles.priceCurrency}>
+								{currency}
 							</Text>
 						</View>
 						<Button

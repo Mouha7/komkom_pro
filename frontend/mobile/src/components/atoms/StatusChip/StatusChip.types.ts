@@ -9,6 +9,7 @@ export type StatusChipProps = {
 	label: string;
 	tone?: StatusTone;
 	compact?: boolean;
+	solid?: boolean;
 	containerStyle?: StyleProp<ViewStyle>;
 	testID?: string;
 };
@@ -17,5 +18,6 @@ export type StatusBadgeProps = {
 	stockStatus?: StockStatus;
 	orderStatus?: OrderStatus;
 	compact?: boolean;
+	solid?: boolean;
 	testID?: string;
 };

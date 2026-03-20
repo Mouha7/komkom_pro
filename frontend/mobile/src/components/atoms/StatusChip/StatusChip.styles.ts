@@ -40,9 +40,30 @@ export const styles = StyleSheet.create({
 		backgroundColor: lightColors.background.subtle,
 		borderColor: lightColors.border.default,
 	},
+	toneSolidSuccess: {
+		backgroundColor: lightColors.success,
+		borderColor: lightColors.success,
+	},
+	toneSolidDanger: {
+		backgroundColor: lightColors.danger,
+		borderColor: lightColors.danger,
+	},
+	toneSolidWarning: {
+		backgroundColor: lightColors.warning,
+		borderColor: lightColors.warning,
+	},
+	toneSolidInfo: {
+		backgroundColor: lightColors.info,
+		borderColor: lightColors.info,
+	},
+	toneSolidNeutral: {
+		backgroundColor: lightColors.neutral700,
+		borderColor: lightColors.neutral700,
+	},
 	textSuccess: { color: lightColors.success },
 	textDanger: { color: lightColors.danger },
 	textWarning: { color: lightColors.warning },
 	textInfo: { color: lightColors.info },
 	textNeutral: { color: lightColors.text.secondary },
+	textOnSolid: { color: lightColors.text.onPrimary },
 });

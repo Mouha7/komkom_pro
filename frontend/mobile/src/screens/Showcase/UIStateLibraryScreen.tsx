@@ -286,7 +286,11 @@ export const UIStateLibraryScreen: React.FC = () => {
 						SKELETON LOADERS (PRODUCT CARD)
 					</Text>
 					<View style={styles.skeletonWrap}>
-						<ProductCardSkeleton variant="portrait" containerStyle={styles.productCardPortrait} />
+						<View style={styles.skeletonRow}>
+							<ProductCardSkeleton variant="portrait" containerStyle={styles.productCardPortrait} />
+							<ProductCardSkeleton variant="portrait" containerStyle={styles.productCardPortrait} />
+						</View>
+						<ProductCardSkeleton variant="landscape" containerStyle={styles.productCardLandscape} />
 						<ProductCardSkeleton variant="landscape" containerStyle={styles.productCardLandscape} />
 					</View>
 				</View>
