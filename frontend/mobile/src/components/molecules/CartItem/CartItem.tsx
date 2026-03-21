@@ -69,7 +69,7 @@ export const CartItem: React.FC<CartItemProps> = ({
 							accessibilityRole="button"
 							accessibilityLabel={'Diminuer quantite de ' + item.name}
 						>
-							<Icon name="minus" size={16} color="#111827" />
+							<Icon name="minus" size={18} color="#111827" />
 						</Pressable>
 						<Text variant="small" style={styles.qtyValue}>
 							{String(item.quantity)}
@@ -81,7 +81,7 @@ export const CartItem: React.FC<CartItemProps> = ({
 							accessibilityRole="button"
 							accessibilityLabel={'Augmenter quantite de ' + item.name}
 						>
-							<Icon name="plus" size={16} color="#111827" />
+							<Icon name="plus" size={18} color="#111827" />
 						</Pressable>
 					</View>
 				</View>

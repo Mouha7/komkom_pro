@@ -362,12 +362,6 @@ export const UIStateLibraryScreen: React.FC = () => {
 					<CartList
 						items={cartItemsPreview}
 						containerStyle={styles.listPreview}
-						onIncreaseQty={(productId) =>
-							Alert.alert('Panier', `Augmenter quantite: ${productId}`)
-						}
-						onDecreaseQty={(productId) =>
-							Alert.alert('Panier', `Diminuer quantite: ${productId}`)
-						}
 						onRemoveItem={(productId) =>
 							Alert.alert('Panier', `Supprimer produit: ${productId}`)
 						}

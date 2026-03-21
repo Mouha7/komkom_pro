@@ -20,6 +20,7 @@ export const styles = StyleSheet.create({
 		shadowRadius: 8,
 		shadowOffset: { width: 0, height: 2 },
 		elevation: 1,
+		overflow: 'hidden',
 	},
 	content: {
 		flex: 1,
@@ -42,10 +43,10 @@ export const styles = StyleSheet.create({
 	},
 	accent: {
 		position: 'absolute',
-		left: -0.1,
+		left: 0,
 		top: 0,
 		bottom: 0,
-		width: 5,
+		width: 6,
 		borderTopLeftRadius: 28,
 		borderBottomLeftRadius: 28,
 	},

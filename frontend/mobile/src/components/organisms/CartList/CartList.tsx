@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, View } from "react-native";
 
 import { Text } from "../../atoms";
@@ -23,11 +23,52 @@ export const CartList: React.FC<CartListProps> = ({
 	testID,
 	renderItemFooter,
 }) => {
-	const subtotal = items.reduce(
+	const [localItems, setLocalItems] = useState(items);
+
+	useEffect(() => {
+		setLocalItems(items);
+	}, [items]);
+
+	const subtotal = localItems.reduce(
 		(total, item) => total + item.price * item.quantity,
 		0,
 	);
-	const totalItems = items.reduce((total, item) => total + item.quantity, 0);
+	const totalItems = localItems.reduce((total, item) => total + item.quantity, 0);
+
+	const handleIncreaseQty = useMemo(
+		() => (productId: string): void => {
+			setLocalItems((current) =>
+				current.map((item) =>
+					item.productId === productId
+						? { ...item, quantity: item.quantity + 1 }
+						: item,
+				),
+			);
+			onIncreaseQty?.(productId);
+		},
+		[onIncreaseQty],
+	);
+
+	const handleDecreaseQty = useMemo(
+		() => (productId: string): void => {
+			setLocalItems((current) =>
+				current.map((item) => {
+					if (item.productId !== productId) {
+						return item;
+					}
+
+					return {
+						...item,
+						quantity: Math.max(1, item.quantity - 1),
+					};
+				}),
+			);
+			onDecreaseQty?.(productId);
+		},
+		[onDecreaseQty],
+	);
+
+	const DIVIDER_SEGMENTS = Array.from({ length: 46 }, (_, index) => String(index));
 
 	if (isLoading) {
 		return (
@@ -37,7 +78,7 @@ export const CartList: React.FC<CartListProps> = ({
 		);
 	}
 
-	if (items.length === 0) {
+	if (localItems.length === 0) {
 		return (
 			<View style={[styles.emptyWrap, containerStyle]} testID={testID}>
 				<Text variant="body" color="secondary">
@@ -50,7 +91,7 @@ export const CartList: React.FC<CartListProps> = ({
 	return (
 		<View style={[styles.container, containerStyle]} testID={testID}>
 			<FlatList
-				data={items}
+				data={localItems}
 				scrollEnabled={false}
 				keyExtractor={(item) => item.productId}
 				contentContainerStyle={styles.listContent}
@@ -58,8 +99,8 @@ export const CartList: React.FC<CartListProps> = ({
 					<View>
 						<CartItem
 							item={info.item}
-							onIncrease={onIncreaseQty}
-							onDecrease={onDecreaseQty}
+							onIncrease={handleIncreaseQty}
+							onDecrease={handleDecreaseQty}
 							onRemove={onRemoveItem}
 						/>
 						{renderItemFooter ? renderItemFooter(info) : null}
@@ -83,7 +124,11 @@ export const CartList: React.FC<CartListProps> = ({
 						À calculer
 					</Text>
 				</View>
-				<View style={styles.divider} />
+				<View style={styles.divider} pointerEvents="none">
+					{DIVIDER_SEGMENTS.map((segment) => (
+						<View key={segment} style={styles.dividerSegment} />
+					))}
+				</View>
 				<View style={styles.totalRow}>
 					<Text variant="h1" style={styles.totalLabel}>
 						Total estime
