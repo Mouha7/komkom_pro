@@ -9,7 +9,7 @@ Utilise cette sequence dans `frontend/mobile`:
 1. `npm install`
 2. `npm run start:clear`
 3. Scanner le QR depuis l'app Expo Go (pas depuis l'app camera)
-Scripts disponibles:
+   Scripts disponibles:
 
 - `npm start` : demarrage LAN (par defaut)
 - `npm run start:clear` : LAN + cache Metro vide

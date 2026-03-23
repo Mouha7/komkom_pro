@@ -80,6 +80,15 @@ export const styles = StyleSheet.create({
 	qtyAction: {
 		flexDirection: 'row',
 		alignItems: 'center',
+		borderWidth: 1,
+		borderColor: lightColors.border.default,
+		borderRadius: 50,
+		backgroundColor: lightColors.neutral100,
+		boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
+		shadowColor: '#000',
+		shadowOpacity: 0.05,
+		shadowRadius: 2,
+		shadowOffset: { width: 0, height: 1 },
 	},
 	qtyValue: {
 		fontWeight: '600',

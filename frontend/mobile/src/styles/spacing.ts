@@ -6,6 +6,20 @@ export const spacing = {
 	s4: 24,
 	s5: 32,
 	s6: 40,
+	s7: 48,
+	s8: 64,
+	s9: 80,
+	s10: 96,
+	s11: 112,
+	s12: 128,
+	s13: 144,
+	s14: 160,
+	s15: 176,
+	s16: 192,
+	s17: 208,
+	s18: 224,
+	s19: 240,
+	s20: 256,
 } as const;
 
 export type SpacingKey = keyof typeof spacing;

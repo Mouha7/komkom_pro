@@ -4,6 +4,7 @@ import {
 	Check,
 	House,
 	Info,
+	Hammer,
 	Minus,
 	Package,
 	Plus,
@@ -36,6 +37,7 @@ const ICON_MAP: Record<CommonIconName, LucideIcon> = {
 	wifiOff: WifiOff,
     arrowLeft: ArrowLeft,
     trash: Trash2,
+	hammer: Hammer,
 };
 
 export const Icon: React.FC<IconProps> = ({
