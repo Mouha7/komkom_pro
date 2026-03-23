@@ -40,6 +40,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 					<Input
 						label="Numero de telephone ou Email"
 						labelVariant="button"
+                        labelStyle={styles.labelStyle}
 						placeholder="contact@quincaillerie.sn"
 						autoCapitalize="none"
 						autoCorrect={false}
@@ -50,6 +51,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 					<Input
 						label="Mot de passe"
 						labelVariant="button"
+                        labelStyle={styles.labelStyle}
 						placeholder="••••••••••••••"
 						secureTextEntry={isPasswordHidden}
 						leftElement={<Icon name="lock" size={20} color={lightColors.text.secondary} />}
@@ -98,7 +100,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 						title="Se connecter"
 						onPress={() => navigation.navigate('UIStateLibrary')}
 						containerStyle={styles.loginButton}
-                        textStyle={{ color: '#FFFFFF', fontWeight: '700', fontSize: 16 }}
+                        textStyle={{ color: '#FFFFFF', fontWeight: '700', fontSize: 15 }}
 					/>
 
 					<View style={styles.separatorRow}>
@@ -114,7 +116,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 						variant="secondary"
 						onPress={() => navigation.navigate('Signup')}
 						containerStyle={styles.signupButton}
-                        textStyle={{ color: lightColors.neutral900, fontWeight: '700', fontSize: 16 }}
+                        textStyle={{ color: lightColors.neutral900, fontWeight: '700', fontSize: 15 }}
 					/>
 				</View>
 
@@ -148,6 +150,10 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		rowGap: spacing.s2,
 	},
+    labelStyle: {
+        fontSize: 14,
+        fontWeight: '700',
+    },
     securityText: {
         fontSize: 12,
         fontWeight: '500',
