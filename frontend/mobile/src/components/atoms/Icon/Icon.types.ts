@@ -15,7 +15,11 @@ export type CommonIconName =
     | 'arrowLeft'
     | 'trash'
     | 'hammer'
-    ;
+	| 'lock'
+	| 'eye'
+	| 'eyeOff'
+	| 'shield'
+	| 'shieldCheck';
 
 export type IconProps = {
 	name: CommonIconName;

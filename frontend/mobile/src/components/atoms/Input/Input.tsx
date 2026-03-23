@@ -7,6 +7,8 @@ import type { InputProps } from './Input.types';
 
 export const Input: React.FC<InputProps> = ({
 	label,
+	labelVariant = 'small',
+	labelStyle,
 	errorMessage,
 	leftElement,
 	rightElement,
@@ -21,7 +23,11 @@ export const Input: React.FC<InputProps> = ({
 
 	return (
 		<View style={[styles.wrapper, containerStyle]}>
-			{label ? <Text variant="small">{label}</Text> : null}
+			{label ? (
+				<Text variant={labelVariant} style={labelStyle}>
+					{label}
+				</Text>
+			) : null}
 			<View style={[styles.field, hasError && styles.fieldError, !editable && styles.fieldDisabled]}>
 				{leftElement ? <View>{leftElement}</View> : null}
 				<TextInput

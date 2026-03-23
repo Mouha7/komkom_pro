@@ -17,6 +17,11 @@ import {
     WifiOff,
     ArrowLeft,
     Trash2,
+	Lock,
+	Eye,
+	EyeOff,
+	Shield,
+	ShieldCheck,
 } from 'lucide-react-native';
 
 import type { CommonIconName, IconProps } from './Icon.types';
@@ -38,6 +43,11 @@ const ICON_MAP: Record<CommonIconName, LucideIcon> = {
     arrowLeft: ArrowLeft,
     trash: Trash2,
 	hammer: Hammer,
+	lock: Lock,
+	eye: Eye,
+	eyeOff: EyeOff,
+	shield: Shield,
+	shieldCheck: ShieldCheck,
 };
 
 export const Icon: React.FC<IconProps> = ({

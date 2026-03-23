@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Image } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { SplashScreen as AnimatedSplashScreen } from './src/screens/Auth/SplashScreen';
+import { AppNavigator } from './src/navigation/AppNavigator';
 
 SplashScreen.preventAutoHideAsync().catch(() => {
   // Ignore startup race conditions in development.
@@ -67,7 +67,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
-      <AnimatedSplashScreen />
+      <AppNavigator />
     </SafeAreaProvider>
   );
 }

@@ -13,6 +13,9 @@ export type { InputProps } from './Input';
 export { Icon } from './Icon';
 export type { CommonIconName, IconProps } from './Icon';
 
+export { IconOnlyButton } from './IconOnlyButton';
+export type { IconOnlyButtonProps } from './IconOnlyButton';
+
 export { NotificationToast } from './NotificationToast';
 export type { NotificationToastProps, NotificationTone } from './NotificationToast';
 
