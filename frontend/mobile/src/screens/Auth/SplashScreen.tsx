@@ -133,7 +133,12 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onLoginPress, onSign
 			<Animated.View pointerEvents="none" style={[styles.loaderContainer, { opacity: loaderOpacity }]}> 
 				<Animated.View style={{ transform: [{ scale: loaderScale }] }}>
 					<View style={styles.loaderIconWrap}>
-						<Animated.View style={{ transform: [{ rotate: spinRotate }] }}>
+						<Animated.View
+							style={[
+								styles.loaderIconSpin,
+								{ transform: [{ translateX: 1 }, { rotate: spinRotate }] },
+							]}
+						>
 							<Icon name="hammer" size={34} color={lightColors.text.onPrimary} strokeWidth={2.25} />
 						</Animated.View>
 					</View>
@@ -227,6 +232,12 @@ const styles = StyleSheet.create({
 		backgroundColor: withOpacity('#0F1724', 0.34),
 		borderWidth: 1,
 		borderColor: withOpacity('#FFFFFF', 0.),
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	loaderIconSpin: {
+		width: 34,
+		height: 34,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
