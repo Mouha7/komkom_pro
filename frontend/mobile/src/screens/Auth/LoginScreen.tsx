@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Icon, IconOnlyButton, Text } from '../../components';
+import { useAuth } from '../../hooks/useAuth';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 import { lightColors } from '../../styles/colors';
 import { LoginFormCard } from './Login/LoginFormCard';
@@ -15,6 +16,7 @@ type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 	const { isPasswordHidden, emailInputRef, passwordInputRef, togglePasswordVisibility } = useLoginForm();
+	const { signIn } = useAuth();
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
@@ -33,7 +35,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 					inputRefs={{ emailInputRef, passwordInputRef }}
 					onTogglePasswordVisibility={togglePasswordVisibility}
 					onForgotPasswordPress={() => undefined}
-					onLoginPress={() => navigation.navigate('UIStateLibrary')}
+					onLoginPress={() => signIn({ email: 'buyer@komkom.local', role: 'buyer' })}
 					onCreateAccountPress={() => navigation.navigate('Signup')}
 				/>
 

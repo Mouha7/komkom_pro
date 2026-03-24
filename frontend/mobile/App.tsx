@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { Image } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AuthProvider } from './src/context/AuthContext';
+import { useAuth } from './src/hooks/useAuth';
 import { AppNavigator } from './src/navigation/AppNavigator';
 
 SplashScreen.preventAutoHideAsync().catch(() => {
@@ -67,7 +69,25 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
-      <AppNavigator />
+      <AuthProvider>
+        <AppBootstrappedNavigator />
+      </AuthProvider>
     </SafeAreaProvider>
   );
+}
+
+function AppBootstrappedNavigator() {
+  const { isReady, restoreSession } = useAuth();
+
+  useEffect(() => {
+    restoreSession().catch(() => {
+      // Keep startup resilient while auth backend is not wired yet.
+    });
+  }, [restoreSession]);
+
+  if (!isReady) {
+    return null;
+  }
+
+  return <AppNavigator />;
 }

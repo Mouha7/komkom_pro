@@ -3,6 +3,7 @@ import type { Animated } from 'react-native';
 export type SplashScreenProps = {
 	onLoginPress?: () => void;
 	onSignupPress?: () => void;
+	onDevBypassPress?: () => void;
 };
 
 export interface SplashAnimationState {
