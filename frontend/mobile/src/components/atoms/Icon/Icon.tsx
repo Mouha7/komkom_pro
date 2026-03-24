@@ -14,14 +14,18 @@ import {
 	type LucideIcon,
 	User,
 	X,
-    WifiOff,
-    ArrowLeft,
-    Trash2,
+	WifiOff,
+	ArrowLeft,
+	Trash2,
 	Lock,
 	Eye,
 	EyeOff,
 	Shield,
 	ShieldCheck,
+	Building2,
+	Phone,
+	Mail,
+	MapPin,
 } from 'lucide-react-native';
 
 import type { CommonIconName, IconProps } from './Icon.types';
@@ -40,14 +44,18 @@ const ICON_MAP: Record<CommonIconName, LucideIcon> = {
 	alert: CircleAlert,
 	info: Info,
 	wifiOff: WifiOff,
-    arrowLeft: ArrowLeft,
-    trash: Trash2,
+	arrowLeft: ArrowLeft,
+	trash: Trash2,
 	hammer: Hammer,
 	lock: Lock,
 	eye: Eye,
 	eyeOff: EyeOff,
 	shield: Shield,
 	shieldCheck: ShieldCheck,
+	building2: Building2,
+	phone: Phone,
+	mail: Mail,
+	mapPin: MapPin,
 };
 
 export const Icon: React.FC<IconProps> = ({

@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import type { StyleProp, TextInputProps, TextStyle, ViewStyle } from 'react-native';
+import type { ReactNode, Ref } from 'react';
+import type { StyleProp, TextInput, TextInputProps, TextStyle, ViewStyle } from 'react-native';
 
 import type { TypographyVariantName } from '../../../styles/typography';
 
@@ -12,5 +12,6 @@ export type InputProps = TextInputProps & {
 	rightElement?: ReactNode;
 	containerStyle?: StyleProp<ViewStyle>;
 	inputStyle?: StyleProp<TextStyle>;
+	inputRef?: Ref<TextInput>;
 	testID?: string;
 };

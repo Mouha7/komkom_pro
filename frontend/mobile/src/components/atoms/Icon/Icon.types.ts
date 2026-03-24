@@ -11,15 +11,19 @@ export type CommonIconName =
 	| 'check'
 	| 'alert'
 	| 'info'
-    | 'wifiOff'
-    | 'arrowLeft'
-    | 'trash'
-    | 'hammer'
+	| 'wifiOff'
+	| 'arrowLeft'
+	| 'trash'
+	| 'hammer'
 	| 'lock'
 	| 'eye'
 	| 'eyeOff'
 	| 'shield'
-	| 'shieldCheck';
+	| 'shieldCheck'
+	| 'building2'
+	| 'phone'
+	| 'mail'
+	| 'mapPin';
 
 export type IconProps = {
 	name: CommonIconName;

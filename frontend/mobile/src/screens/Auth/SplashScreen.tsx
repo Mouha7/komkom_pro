@@ -187,6 +187,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onLoginPress, onSign
 					disabled={isCtaDisabled}
 					containerStyle={styles.primaryButton}
 					accessibilityLabel="Se connecter"
+					textStyle={{ color: '#FFFFFF', fontWeight: '700', fontSize: 15 }}
 				/>
 
 				<Button
@@ -196,6 +197,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onLoginPress, onSign
 					disabled={isCtaDisabled}
 					containerStyle={styles.secondaryButton}
 					accessibilityLabel="Creer un compte"
+					textStyle={{ color: '#0F1724', fontWeight: '700', fontSize: 15 }}
 				/>
 			</Animated.View>
 		</View>

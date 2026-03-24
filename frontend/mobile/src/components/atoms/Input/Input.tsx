@@ -14,6 +14,7 @@ export const Input: React.FC<InputProps> = ({
 	rightElement,
 	containerStyle,
 	inputStyle,
+	inputRef,
 	testID,
 	editable = true,
 	accessibilityLabel,
@@ -31,6 +32,7 @@ export const Input: React.FC<InputProps> = ({
 			<View style={[styles.field, hasError && styles.fieldError, !editable && styles.fieldDisabled]}>
 				{leftElement ? <View>{leftElement}</View> : null}
 				<TextInput
+					ref={inputRef}
 					style={[styles.input, inputStyle]}
 					placeholderTextColor="#374151"
 					editable={editable}

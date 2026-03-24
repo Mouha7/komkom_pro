@@ -15,7 +15,8 @@
     "ios": {
       "bundleIdentifier": "com.komkom.mobile",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "KomKom utilise votre position pour calculer les frais et delais de livraison."
       },
       "supportsTablet": true
     },
@@ -32,6 +33,14 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "KomKom utilise votre position pour calculer les frais et delais de livraison."
+        }
+      ]
+    ],
     "extra": {
       "eas": {
         "projectId": "e31768db-cd4b-45f2-9675-af04e4f7ca39"

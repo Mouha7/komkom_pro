@@ -1,18 +1,20 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import type { TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Button, Icon, IconOnlyButton, Input, Text } from '../../components';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 import { lightColors, withOpacity } from '../../styles/colors';
-import { s, spacing } from '../../styles/spacing';
+import { spacing } from '../../styles/spacing';
 
 type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
-	const [rememberMe, setRememberMe] = useState(true);
 	const [isPasswordHidden, setIsPasswordHidden] = useState(true);
+	const emailInputRef = useRef<TextInput>(null);
+	const passwordInputRef = useRef<TextInput>(null);
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
@@ -45,6 +47,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 						autoCapitalize="none"
 						autoCorrect={false}
 						keyboardType="email-address"
+						returnKeyType="next"
+						blurOnSubmit={false}
+						onSubmitEditing={() => passwordInputRef.current?.focus()}
+						inputRef={emailInputRef}
 						leftElement={<Icon name="user" size={20} color={lightColors.text.secondary} />}
 					/>
 
@@ -54,6 +60,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                         labelStyle={styles.labelStyle}
 						placeholder="••••••••••••••"
 						secureTextEntry={isPasswordHidden}
+						returnKeyType="done"
+						onSubmitEditing={() => passwordInputRef.current?.blur()}
+						inputRef={passwordInputRef}
 						leftElement={<Icon name="lock" size={20} color={lightColors.text.secondary} />}
 						rightElement={
 							<Pressable
@@ -68,22 +77,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 					/>
 
 					<View style={styles.metaRow}>
-						{/* <Pressable
-							style={styles.rememberControl}
-							onPress={() => setRememberMe((current) => !current)}
-							hitSlop={8}
-							accessibilityRole="checkbox"
-							accessibilityState={{ checked: rememberMe }}
-							accessibilityLabel="Se souvenir de moi"
-						>
-							<View style={[styles.checkbox, rememberMe ? styles.checkboxChecked : null]}>
-								{rememberMe ? <Icon name="check" size={16} color={lightColors.text.onPrimary} /> : null}
-							</View>
-							<Text variant="bodyLarge" textColorOverride={lightColors.text.primary}>
-								Se souvenir de moi
-							</Text>
-						</Pressable> */}
-
 						<Pressable
 							hitSlop={8}
 							onPress={() => undefined}
