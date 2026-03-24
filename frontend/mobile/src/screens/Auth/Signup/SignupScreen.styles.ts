@@ -146,6 +146,11 @@ export const styles = StyleSheet.create({
 		flex: 1,
 		lineHeight: 18,
 	},
+	legalInlineLinkText: {
+		fontSize: 12,
+		fontWeight: "700",
+		textDecorationLine: "underline",
+	},
 	createButton: {
 		minHeight: 58,
 		borderRadius: 10,

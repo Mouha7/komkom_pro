@@ -30,6 +30,7 @@ import {
 } from "./Signup/SignupScreen.helpers";
 import { LocationPickerModal } from "./Signup/LocationPickerModal";
 import { PasswordStrengthCard } from "./Signup/PasswordStrengthCard";
+import { SignupLegalConsent } from "./Signup/SignupLegalConsent";
 import { styles } from "./Signup/SignupScreen.styles";
 import { useSignupLocation } from "./Signup/useSignupLocation";
 
@@ -131,6 +132,14 @@ export const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
 	const handleScrollToTop = useCallback(() => {
 		scrollViewRef.current?.scrollTo({ y: 0, animated: true });
 	}, []);
+
+	const handleOpenTermsOfUse = useCallback(() => {
+		navigation.navigate("TermsOfUse");
+	}, [navigation]);
+
+	const handleOpenPrivacyPolicy = useCallback(() => {
+		navigation.navigate("PrivacyPolicy");
+	}, [navigation]);
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
@@ -405,57 +414,14 @@ export const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
 							de livraison.
 						</Text>
 
-						<Pressable
-							style={[
-								styles.checkboxRow,
-								acceptedTerms && styles.checkboxRowChecked,
-							]}
-							onPress={() =>
+						<SignupLegalConsent
+							acceptedTerms={acceptedTerms}
+							onToggleAcceptedTerms={() =>
 								setAcceptedTerms((current) => !current)
 							}
-							accessibilityRole="checkbox"
-							accessibilityState={{ checked: acceptedTerms }}
-							accessibilityLabel="Accepter les conditions d'utilisation"
-						>
-							<View
-								style={[
-									styles.checkbox,
-									acceptedTerms && styles.checkboxChecked,
-								]}
-							>
-								{acceptedTerms && (
-									<Icon
-										name="check"
-										size={16}
-										color="#FFFFFF"
-										strokeWidth={3}
-									/>
-								)}
-							</View>
-							<Text
-								variant="bodyLarge"
-								style={styles.checkboxText}
-								textColorOverride={lightColors.text.secondary}
-							>
-								J'accepte les{" "}
-								<Text
-									variant="bodyLarge"
-									textColorOverride={lightColors.primary}
-									style={{ fontSize: 12, fontWeight: "700" }}
-								>
-									conditions d'utilisation
-								</Text>{" "}
-								et la{" "}
-								<Text
-									variant="bodyLarge"
-									textColorOverride={lightColors.primary}
-									style={{ fontSize: 12, fontWeight: "700" }}
-								>
-									politique de confidentialité
-								</Text>
-								.
-							</Text>
-						</Pressable>
+							onOpenTermsOfUse={handleOpenTermsOfUse}
+							onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
+						/>
 
 						<Button
 							title="Créer mon compte"

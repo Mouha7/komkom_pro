@@ -9,6 +9,8 @@ import { LoginScreen } from "../screens/Auth/LoginScreen";
 import { SplashScreen } from "../screens/Auth/SplashScreen";
 import { UIStateLibraryScreen } from "../screens/Showcase/UIStateLibraryScreen";
 import { SignupScreen } from "../screens/Auth/SignupScreen";
+import { TermsOfUseScreen } from "../screens/Legal/TermsOfUseScreen";
+import { PrivacyPolicyScreen } from "../screens/Legal/PrivacyPolicyScreen";
 import { useAuth } from "../hooks/useAuth";
 import { BottomTabNavigator } from "./BottomTabNavigator";
 
@@ -16,6 +18,8 @@ export type RootStackParamList = {
 	Splash: undefined;
 	Login: undefined;
 	Signup: undefined;
+	TermsOfUse: undefined;
+	PrivacyPolicy: undefined;
 	MainTabs: undefined;
 	UIStateLibrary: undefined;
 };
@@ -50,6 +54,14 @@ export const AppNavigator: React.FC = () => {
 						</Stack.Screen>
 						<Stack.Screen name="Login" component={LoginScreen} />
 						<Stack.Screen name="Signup" component={SignupScreen} />
+						<Stack.Screen
+							name="TermsOfUse"
+							component={TermsOfUseScreen}
+						/>
+						<Stack.Screen
+							name="PrivacyPolicy"
+							component={PrivacyPolicyScreen}
+						/>
 					</>
 				) : (
 					<Stack.Screen name="MainTabs" component={BottomTabNavigator} />
