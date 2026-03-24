@@ -175,7 +175,6 @@ export const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		columnGap: spacing.s1,
-		paddingBottom: spacing.s4,
 	},
 	securityText: {
 		fontSize: 12,

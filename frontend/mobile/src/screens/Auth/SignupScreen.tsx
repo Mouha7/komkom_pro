@@ -1,10 +1,23 @@
-import React, { useRef, useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import React, { useCallback, useRef, useState } from "react";
+import {
+	NativeSyntheticEvent,
+	Pressable,
+	ScrollView,
+	View,
+	type NativeScrollEvent,
+} from "react-native";
 import type { TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-import { Button, Icon, IconOnlyButton, Input, Text } from "../../components";
+import {
+	Button,
+	Icon,
+	IconOnlyButton,
+	Input,
+	ScrollToTopButton,
+	Text,
+} from "../../components";
 import type { RootStackParamList } from "../../navigation/AppNavigator";
 import { lightColors } from "../../styles/colors";
 import {
@@ -27,7 +40,9 @@ export const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
 	const [password, setPassword] = useState("");
 	const [acceptedTerms, setAcceptedTerms] = useState(false);
 	const [phoneLocalNumber, setPhoneLocalNumber] = useState("");
+	const [isScrollTopVisible, setIsScrollTopVisible] = useState(false);
 
+	const scrollViewRef = useRef<ScrollView>(null);
 	const storeNameInputRef = useRef<TextInput>(null);
 	const ownerNameInputRef = useRef<TextInput>(null);
 	const phoneInputRef = useRef<TextInput>(null);
@@ -100,11 +115,31 @@ export const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
 		navigation.navigate("UIStateLibrary");
 	};
 
+	const handleSignupScroll = useCallback(
+		(event: NativeSyntheticEvent<NativeScrollEvent>) => {
+				const currentOffsetY = event.nativeEvent.contentOffset.y;
+				const visibilityThreshold = 200; // Appear after ~3-4 form inputs
+				const shouldShowScrollTop = currentOffsetY >= visibilityThreshold;
+
+			setIsScrollTopVisible((current) =>
+				current === shouldShowScrollTop ? current : shouldShowScrollTop,
+			);
+		},
+		[],
+	);
+
+	const handleScrollToTop = useCallback(() => {
+		scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+	}, []);
+
 	return (
 		<SafeAreaView style={styles.safeArea}>
 			<ScrollView
+				ref={scrollViewRef}
 				style={styles.scrollView}
 				showsVerticalScrollIndicator={false}
+				onScroll={handleSignupScroll}
+				scrollEventThrottle={16}
 			>
 				<View style={styles.container}>
 					<IconOnlyButton
@@ -476,6 +511,12 @@ export const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
 					</View>
 				</View>
 			</ScrollView>
+
+			<ScrollToTopButton
+				visible={isScrollTopVisible}
+				onPress={handleScrollToTop}
+				accessibilityLabel="Retour en haut du formulaire"
+			/>
 
 			<LocationPickerModal
 				visible={isLocationModalVisible}

@@ -12,3 +12,6 @@ export type { ConfirmDialogProps, ConfirmDialogTone } from './ConfirmDialog';
 
 export { ProductCard, ProductCardSkeleton } from './ProductCard';
 export type { ProductCardProps, ProductCardSkeletonProps, ProductCardVariant } from './ProductCard';
+
+export { ScrollToTopButton } from './ScrollToTopButton';
+export type { ScrollToTopButtonProps } from './ScrollToTopButton';

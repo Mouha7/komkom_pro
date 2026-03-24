@@ -26,6 +26,7 @@ import {
 	Phone,
 	Mail,
 	MapPin,
+	ChevronUp,
 } from 'lucide-react-native';
 
 import type { CommonIconName, IconProps } from './Icon.types';
@@ -56,6 +57,7 @@ const ICON_MAP: Record<CommonIconName, LucideIcon> = {
 	phone: Phone,
 	mail: Mail,
 	mapPin: MapPin,
+	chevronUp: ChevronUp,
 };
 
 export const Icon: React.FC<IconProps> = ({
