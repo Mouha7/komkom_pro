@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
 		borderBottomColor: lightColors.border.default,
 	},
 	content: {
-		minHeight: 96,
+		minHeight: 76,
 		paddingHorizontal: spacing.s4,
 		paddingBottom: spacing.s2,
 		flexDirection: 'row',

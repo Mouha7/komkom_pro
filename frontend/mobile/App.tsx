@@ -5,6 +5,7 @@ import { Image } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider } from './src/context/AuthContext';
+import { ToastProvider } from './src/context/ToastContext';
 import { useAuth } from './src/hooks/useAuth';
 import { AppNavigator } from './src/navigation/AppNavigator';
 
@@ -70,7 +71,9 @@ export default function App() {
     <SafeAreaProvider>
       <StatusBar style="light" />
       <AuthProvider>
-        <AppBootstrappedNavigator />
+        <ToastProvider>
+          <AppBootstrappedNavigator />
+        </ToastProvider>
       </AuthProvider>
     </SafeAreaProvider>
   );

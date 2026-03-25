@@ -42,6 +42,9 @@ export const NotificationToast: React.FC<NotificationToastProps> = ({
 	message,
 	onClose,
 	closeLabel = 'Fermer la notification',
+	actionLabel,
+	onActionPress,
+	actionLabelA11y,
 	containerStyle,
 	testID,
 }) => {
@@ -54,7 +57,18 @@ export const NotificationToast: React.FC<NotificationToastProps> = ({
 			<View style={styles.content}>
 				<View style={styles.titleRow}>
 					<Text variant="h2">{title}</Text>
-					{onClose ? (
+					{actionLabel && onActionPress ? (
+						<Pressable
+							onPress={onActionPress}
+							style={({ pressed }) => [styles.actionButton, pressed && styles.closeButtonPressed]}
+							accessibilityRole="button"
+							accessibilityLabel={actionLabelA11y ?? actionLabel}
+						>
+							<Text variant="h2" textColorOverride={colorTokens.primary}>
+								{actionLabel}
+							</Text>
+						</Pressable>
+					) : onClose ? (
 						<Pressable
 							onPress={onClose}
 							style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}

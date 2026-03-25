@@ -14,6 +14,7 @@ export type ProductCardProps = {
 	stockStatus?: StockStatus;
 	variant?: ProductCardVariant;
 	onAddToCart?: (productId: string) => void;
+	onCartToggle?: (productId: string, isSelected: boolean, productName: string) => void;
 	onPress?: (productId: string) => void;
 	disabled?: boolean;
 	testID?: string;

@@ -13,41 +13,10 @@ export const styles = StyleSheet.create({
 	contentContainer: {
 		paddingHorizontal: spacing.s4,
 		paddingTop: spacing.s4,
-		paddingBottom: spacing.s5,
+		paddingBottom: spacing.s6,
+		rowGap: spacing.s4,
 	},
-	heroCard: {
-		backgroundColor: lightColors.surface.default,
-		borderRadius: 16,
-		padding: spacing.s4,
+	section: {
 		rowGap: spacing.s2,
-		borderWidth: 1,
-		borderColor: lightColors.border.subtle,
-		marginBottom: spacing.s4,
-	},
-	heroIconWrap: {
-		width: 52,
-		height: 52,
-		borderRadius: 14,
-		backgroundColor: lightColors.primary + '10',
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	sectionCard: {
-		backgroundColor: lightColors.surface.default,
-		borderRadius: 16,
-		padding: spacing.s4,
-		rowGap: spacing.s2,
-		borderWidth: 1,
-		borderColor: lightColors.border.subtle,
-		marginBottom: spacing.s4,
-	},
-	actionButton: {
-		marginBottom: spacing.s3,
-	},
-	logoutRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		columnGap: spacing.s2,
-		paddingVertical: spacing.s1,
 	},
 });

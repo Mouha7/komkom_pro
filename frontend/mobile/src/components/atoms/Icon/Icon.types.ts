@@ -21,6 +21,8 @@ export type CommonIconName =
 	| 'shield'
 	| 'shieldCheck'
 	| 'building2'
+	| 'droplet'
+	| 'zap'
 	| 'phone'
 	| 'mail'
 	| 'mapPin'

@@ -13,7 +13,10 @@ import { getVisibleTabsForRoles, isTabAllowedForRoles, MAIN_TABS, type MainTabRo
 
 export type MainTabParamList = {
 	Home: undefined;
-	Catalog: undefined;
+	Catalog: {
+		categoryId?: string;
+		categoryLabel?: string;
+	} | undefined;
 	Orders: undefined;
 	Profile: undefined;
 };

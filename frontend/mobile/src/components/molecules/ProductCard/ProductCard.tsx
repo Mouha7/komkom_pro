@@ -20,6 +20,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 	stockStatus = "in_stock",
 	variant = "portrait",
 	onAddToCart,
+	onCartToggle,
 	onPress,
 	disabled = false,
 	testID,
@@ -27,10 +28,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
 	const isLandscape = variant === "landscape";
 	const [isAddedToCart, setIsAddedToCart] = useState(false);
+	const isCartActionDisabled = disabled || stockStatus === "out_of_stock";
 
 	const handleAddToCart = (): void => {
-		setIsAddedToCart(true);
-		onAddToCart?.(productId);
+		if (isCartActionDisabled) {
+			return;
+		}
+
+		setIsAddedToCart((prev) => {
+			const next = !prev;
+			if (next) {
+				onAddToCart?.(productId);
+			}
+			onCartToggle?.(productId, next, name);
+			return next;
+		});
 	};
 
 	if (isLandscape) {
@@ -43,13 +55,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 					accessibilityRole="button"
 					accessibilityLabel={name}
 				>
-					{/* Image à gauche avec badge */}
 					<View style={styles.landscapeImageWrap}>
 						<Image
 							source={{
-								uri:
-									imageUrl ||
-									"https://via.placeholder.com/300x300?text=Produit",
+								uri: imageUrl || "https://via.placeholder.com/300x300?text=Produit",
 							}}
 							style={styles.landscapeImage}
 							resizeMode="cover"
@@ -59,25 +68,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 						</View>
 					</View>
 
-					{/* Contenu à droite */}
 					<View style={styles.landscapeContent}>
-						{/* Header: titre et description */}
 						<View style={styles.landscapeHeader}>
 							<Text variant="h3" maxLines={2}>
 								{name}
 							</Text>
 							{description ? (
-								<Text
-									variant="body"
-									color="secondary"
-									maxLines={1}
-								>
+								<Text variant="body" color="secondary" maxLines={1}>
 									{description}
 								</Text>
 							) : null}
 						</View>
 
-						{/* Bottom: prix et bouton */}
 						<View style={styles.landscapeBottom}>
 							<View style={styles.landscapePriceWrap}>
 								<Text variant="h2" style={styles.priceAmount}>
@@ -88,33 +90,30 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 								</Text>
 							</View>
 							<Button
-								title={
-									isAddedToCart
-										? "Ajoute au panier"
-										: "Ajouter au panier"
-								}
+								title={isAddedToCart ? "Ajoute au panier" : "Ajouter au panier"}
 								iconOnly
 								leftIcon={
 									<Icon
 										name={isAddedToCart ? "check" : "plus"}
 										size={24}
 										color={lightColors.text.onPrimary}
-										accessibilityLabel={
-											isAddedToCart ? "check" : "plus"
-										}
+										accessibilityLabel={isAddedToCart ? "check" : "plus"}
 									/>
 								}
 								onPress={handleAddToCart}
-								disabled={disabled}
+								disabled={isCartActionDisabled}
 								accessibilityLabel={
-									isAddedToCart
-										? "Produit ajoute au panier"
-										: "Ajouter " + name + " au panier"
+									isCartActionDisabled
+										? `Produit en rupture: ${name}`
+										: isAddedToCart
+											? "Produit ajoute au panier"
+											: `Ajouter ${name} au panier`
 								}
 								containerStyle={[
 									styles.actionButtonBase,
 									styles.landscapeActionButton,
 									isAddedToCart && styles.actionButtonSuccess,
+									isCartActionDisabled && styles.actionButtonDisabled,
 								]}
 							/>
 						</View>
@@ -124,7 +123,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 		);
 	}
 
-	// PORTRAIT (default)
 	return (
 		<View style={[styles.containerPortrait, containerStyle]} testID={testID}>
 			<Pressable
@@ -140,9 +138,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
 					<Image
 						source={{
-							uri:
-								imageUrl ||
-								"https://via.placeholder.com/300x200?text=Produit",
+							uri: imageUrl || "https://via.placeholder.com/300x200?text=Produit",
 						}}
 						style={styles.portraitImage}
 						resizeMode="cover"
@@ -170,33 +166,30 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 							</Text>
 						</View>
 						<Button
-							title={
-								isAddedToCart
-									? "Ajoute au panier"
-									: "Ajouter au panier"
-							}
+							title={isAddedToCart ? "Ajoute au panier" : "Ajouter au panier"}
 							iconOnly
 							leftIcon={
 								<Icon
 									name={isAddedToCart ? "check" : "plus"}
 									size={24}
 									color={lightColors.text.onPrimary}
-									accessibilityLabel={
-										isAddedToCart ? "check" : "plus"
-									}
+									accessibilityLabel={isAddedToCart ? "check" : "plus"}
 								/>
 							}
 							onPress={handleAddToCart}
-							disabled={disabled}
+							disabled={isCartActionDisabled}
 							accessibilityLabel={
-								isAddedToCart
-									? "Produit ajoute au panier"
-									: "Ajouter " + name + " au panier"
+								isCartActionDisabled
+									? `Produit en rupture: ${name}`
+									: isAddedToCart
+										? "Produit ajoute au panier"
+										: `Ajouter ${name} au panier`
 							}
 							containerStyle={[
 								styles.actionButtonBase,
 								styles.portraitActionButton,
 								isAddedToCart && styles.actionButtonSuccess,
+								isCartActionDisabled && styles.actionButtonDisabled,
 							]}
 						/>
 					</View>

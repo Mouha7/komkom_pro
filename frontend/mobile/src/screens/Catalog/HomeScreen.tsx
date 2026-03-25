@@ -1,12 +1,22 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
 import { AppBar, Button, Text } from '../../components';
 import { lightColors } from '../../styles/colors';
 import { spacing } from '../../styles/spacing';
+import type { MainTabParamList } from '../../navigation/BottomTabNavigator';
 
-export const CatalogScreen: React.FC = () => {
+type CatalogScreenProps = BottomTabScreenProps<MainTabParamList, 'Catalog'>;
+
+
+export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
+	const selectedCategoryLabel = route.params?.categoryLabel;
+	const subtitle = selectedCategoryLabel
+		? `Categorie selectionnee: ${selectedCategoryLabel}`
+		: 'Ecran provisoire pour continuer le dev frontend avant branchement backend.';
+
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
 			<AppBar title='Catalogue' titleAlign='left' />
@@ -16,7 +26,7 @@ export const CatalogScreen: React.FC = () => {
 						Catalogue
 					</Text>
 					<Text variant='body' textColorOverride={lightColors.text.secondary}>
-						Ecran provisoire pour continuer le dev frontend avant branchement backend.
+						{subtitle}
 					</Text>
 					<Button title='Simuler recherche produit' variant='secondary' onPress={() => undefined} />
 				</View>

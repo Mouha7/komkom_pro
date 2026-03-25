@@ -8,6 +8,9 @@ export type NotificationToastProps = {
 	message: string;
 	onClose?: () => void;
 	closeLabel?: string;
+	actionLabel?: string;
+	onActionPress?: () => void;
+	actionLabelA11y?: string;
 	containerStyle?: StyleProp<ViewStyle>;
 	testID?: string;
 };

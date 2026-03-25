@@ -29,7 +29,6 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'flex-end',
-		columnGap: spacing.s2,
 	},
 	portraitPriceWrap: {
 		flexDirection: 'row',
@@ -53,6 +52,9 @@ export const styles = StyleSheet.create({
 	actionButtonSuccess: {
 		backgroundColor: lightColors.success,
 		borderColor: lightColors.success,
+	},
+	actionButtonDisabled: {
+		opacity: 0.45,
 	},
 	portraitActionButton: {
 		width: 56,

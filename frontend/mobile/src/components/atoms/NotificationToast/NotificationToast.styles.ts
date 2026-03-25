@@ -38,6 +38,10 @@ export const styles = StyleSheet.create({
 		justifyContent: 'center',
 		borderRadius: 13,
 	},
+	actionButton: {
+		paddingHorizontal: spacing.s1,
+		paddingVertical: spacing.s1,
+	},
 	closeButtonPressed: {
 		opacity: 0.7,
 	},
