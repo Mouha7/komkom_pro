@@ -177,6 +177,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 		});
 	};
 
+	const handleOutOfStockPress = (productName: string): void => {
+		showToast({
+			tone: 'info',
+			title: 'Produit en rupture',
+			message: `${productName} n'est pas disponible actuellement`,
+		});
+	};
+
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
 			<HomeAppBar
@@ -213,6 +221,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 						onPressProduct={handleOpenProduct}
 						onAddToCart={handleAddToCart}
 						onCartToggle={handleCartToggle}
+						onOutOfStockPress={handleOutOfStockPress}
 					/>
 				</View>
 			</ScrollView>

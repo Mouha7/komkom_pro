@@ -1,5 +1,5 @@
-import React from 'react';
-import { FlatList, Pressable, StyleSheet, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { FlatList, Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 
 import { Icon, Text } from '../../../components';
 import { lightColors } from '../../../styles/colors';
@@ -11,28 +11,50 @@ type HomeCategoriesSectionProps = {
 	onPressCategory: (category: HomeCategoryItem) => void;
 };
 
+const CATEGORY_ITEM_WIDTH = 92;
+const CATEGORY_ITEM_GAP = spacing.s2;
+
 export const HomeCategoriesSection: React.FC<HomeCategoriesSectionProps> = ({
 	items,
 	onPressCategory,
 }) => {
+	const [containerWidth, setContainerWidth] = useState(0);
+
+	const canScrollHorizontally = useMemo(() => {
+		if (containerWidth === 0) {
+			return true;
+		}
+
+		const totalItemsWidth = items.length * CATEGORY_ITEM_WIDTH;
+		const totalGapsWidth = Math.max(items.length - 1, 0) * CATEGORY_ITEM_GAP;
+		const totalContentWidth = totalItemsWidth + totalGapsWidth + spacing.s2;
+
+		return totalContentWidth > containerWidth;
+	}, [containerWidth, items.length]);
+
+	const handleLayout = (event: LayoutChangeEvent): void => {
+		const nextWidth = event.nativeEvent.layout.width;
+		if (nextWidth !== containerWidth) {
+			setContainerWidth(nextWidth);
+		}
+	};
+
 	return (
-		<View style={styles.section}>
+		<View style={styles.section} onLayout={handleLayout}>
 			<Text variant='h2' style={{ fontSize: 18, fontWeight: 'bold' }} textColorOverride={lightColors.text.primary}>
 				Catégories
 			</Text>
 			<FlatList
 				horizontal
+				scrollEnabled={canScrollHorizontally}
 				showsHorizontalScrollIndicator={false}
 				data={items}
 				keyExtractor={(item) => item.id}
 				contentContainerStyle={styles.listContent}
-				renderItem={({ item, index }) => (
+				renderItem={({ item }) => (
 					<Pressable
 						onPress={() => onPressCategory(item)}
-						style={[
-							styles.categoryButton,
-							index === items.length - 1 && styles.lastItemSpacing,
-						]}
+						style={styles.categoryButton}
 						accessibilityRole='button'
 						accessibilityLabel={`Ouvrir la categorie ${item.label}`}
 					>
@@ -58,7 +80,7 @@ const styles = StyleSheet.create({
 	},
 	categoryButton: {
 		alignItems: 'center',
-		width: 92,
+		width: CATEGORY_ITEM_WIDTH,
 		rowGap: spacing.s2,
 	},
 	iconWrap: {
@@ -72,11 +94,8 @@ const styles = StyleSheet.create({
 		borderColor: lightColors.border.default,
 	},
 	label: {
-        fontSize: 13,
+		fontSize: 13,
 		fontWeight: '700',
 		textAlign: 'center',
-	},
-	lastItemSpacing: {
-		marginRight: spacing.s2,
 	},
 });

@@ -16,6 +16,7 @@ export type ProductCardProps = {
 	onAddToCart?: (productId: string) => void;
 	onCartToggle?: (productId: string, isSelected: boolean, productName: string) => void;
 	onPress?: (productId: string) => void;
+	onOutOfStockPress?: (productName: string) => void;
 	disabled?: boolean;
 	testID?: string;
 	containerStyle?: StyleProp<ViewStyle>;

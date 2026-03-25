@@ -11,6 +11,7 @@ type HomeProductsSectionProps = {
 	onPressProduct: (productId: string) => void;
 	onAddToCart: (productId: string) => void;
 	onCartToggle: (productId: string, isSelected: boolean, productName: string) => void;
+	onOutOfStockPress?: (productName: string) => void;
 };
 
 export const HomeProductsSection: React.FC<HomeProductsSectionProps> = ({
@@ -18,6 +19,7 @@ export const HomeProductsSection: React.FC<HomeProductsSectionProps> = ({
 	onPressProduct,
 	onAddToCart,
     onCartToggle,
+	onOutOfStockPress,
 }) => {
 
 	return (
@@ -46,8 +48,7 @@ export const HomeProductsSection: React.FC<HomeProductsSectionProps> = ({
 							stockStatus={item.stockStatus}
 							onPress={onPressProduct}
 							onAddToCart={onAddToCart}
-							onCartToggle={onCartToggle}
-                            containerStyle={{ width: '48%' }}
+							onCartToggle={onCartToggle}						onOutOfStockPress={onOutOfStockPress}                            containerStyle={{ width: '48%' }}
 						/>
 					))}
 				</View>

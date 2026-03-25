@@ -22,6 +22,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 	onAddToCart,
 	onCartToggle,
 	onPress,
+	onOutOfStockPress,
 	disabled = false,
 	testID,
 	containerStyle,
@@ -30,7 +31,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 	const [isAddedToCart, setIsAddedToCart] = useState(false);
 	const isCartActionDisabled = disabled || stockStatus === "out_of_stock";
 
+	const handleCardPress = (): void => {
+		if (stockStatus === "out_of_stock") {
+			onOutOfStockPress?.(name);
+			return;
+		}
+
+		onPress?.(productId);
+	};
+
 	const handleAddToCart = (): void => {
+		if (stockStatus === "out_of_stock") {
+			onOutOfStockPress?.(name);
+			return;
+		}
+
 		if (isCartActionDisabled) {
 			return;
 		}
@@ -50,7 +65,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 			<View style={[styles.containerLandscape, containerStyle]} testID={testID}>
 				<Pressable
 					style={styles.landscapeTouchable}
-					onPress={() => onPress?.(productId)}
+					onPress={handleCardPress}
 					disabled={disabled}
 					accessibilityRole="button"
 					accessibilityLabel={name}
@@ -126,7 +141,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 	return (
 		<View style={[styles.containerPortrait, containerStyle]} testID={testID}>
 			<Pressable
-				onPress={() => onPress?.(productId)}
+				onPress={handleCardPress}
 				disabled={disabled}
 				accessibilityRole="button"
 				accessibilityLabel={name}

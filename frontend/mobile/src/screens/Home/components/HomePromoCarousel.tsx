@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	FlatList,
 	Pressable,
@@ -29,6 +29,7 @@ const BANNER_GAP = spacing.s3;
 // Gradient settings: edit these two colors if you want a different look.
 const BANNER_GRADIENT_START = "#ED762F";
 const BANNER_GRADIENT_END = "#C55A1F";
+const INTERACTION_RESUME_DELAY_MS = 2500;
 
 // Angle control (45deg): top-left -> bottom-right.
 // To tweak direction, edit x1/y1/x2/y2 values.
@@ -45,9 +46,25 @@ export const HomePromoCarousel: React.FC<HomePromoCarouselProps> = ({
 	onPressItem,
 }) => {
 	const listRef = useRef<FlatList<HomePromoItem>>(null);
+	const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const [containerWidth, setContainerWidth] = useState(0);
 	const [activeIndex, setActiveIndex] = useState(0);
 	const [isInteracting, setIsInteracting] = useState(false);
+
+	const scheduleAutoPlayResume = useCallback((): void => {
+		if (resumeTimerRef.current) {
+			clearTimeout(resumeTimerRef.current);
+		}
+
+		resumeTimerRef.current = setTimeout(() => {
+			setIsInteracting(false);
+		}, INTERACTION_RESUME_DELAY_MS);
+	}, []);
+
+	const markInteracting = useCallback((): void => {
+		setIsInteracting(true);
+		scheduleAutoPlayResume();
+	}, [scheduleAutoPlayResume]);
 
 	const canAutoPlay = useMemo(
 		() => items.length > 1 && containerWidth > 0 && !isInteracting,
@@ -94,6 +111,14 @@ export const HomePromoCarousel: React.FC<HomePromoCarouselProps> = ({
 		return () => clearInterval(timer);
 	}, [autoPlayIntervalMs, canAutoPlay, itemSpan, items.length]);
 
+	useEffect(() => {
+		return () => {
+			if (resumeTimerRef.current) {
+				clearTimeout(resumeTimerRef.current);
+			}
+		};
+	}, []);
+
 	if (items.length === 0) {
 		return null;
 	}
@@ -110,6 +135,7 @@ export const HomePromoCarousel: React.FC<HomePromoCarouselProps> = ({
 			<FlatList
 				ref={listRef}
 				horizontal
+				pagingEnabled
 				data={items}
 				keyExtractor={(item) => item.id}
 				showsHorizontalScrollIndicator={false}
@@ -123,8 +149,9 @@ export const HomePromoCarousel: React.FC<HomePromoCarouselProps> = ({
 						? () => <View style={styles.separator} />
 						: undefined
 				}
-				onTouchStart={() => setIsInteracting(true)}
-				onScrollBeginDrag={() => setIsInteracting(true)}
+				onTouchStart={markInteracting}
+				onScrollBeginDrag={markInteracting}
+				onScrollEndDrag={scheduleAutoPlayResume}
 				onMomentumScrollEnd={(event) => {
 					if (itemSpan === 0) {
 						return;
@@ -134,6 +161,7 @@ export const HomePromoCarousel: React.FC<HomePromoCarouselProps> = ({
 						event.nativeEvent.contentOffset.x / itemSpan,
 					);
 					setActiveIndex(nextIndex);
+					scheduleAutoPlayResume();
 				}}
 				renderItem={({ item }) => (
 					<Pressable
