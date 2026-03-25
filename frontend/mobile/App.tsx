@@ -69,7 +69,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar style="light" />
+      <StatusBar style="dark" animated />
       <AuthProvider>
         <ToastProvider>
           <AppBootstrappedNavigator />
