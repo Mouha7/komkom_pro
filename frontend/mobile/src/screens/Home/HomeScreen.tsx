@@ -3,17 +3,55 @@ import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
-import { AppBar, Button, Icon, Text } from '../../components';
+import { Button, HomeAppBar, Icon, Text } from '../../components';
+import { useAuth } from '../../hooks/useAuth';
 import { lightColors } from '../../styles/colors';
 import { styles } from './HomeScreen.styles';
 import type { MainTabParamList } from '../../navigation/BottomTabNavigator';
 
 type HomeScreenProps = BottomTabScreenProps<MainTabParamList, 'Home'>;
 
+const getDisplayNameFromEmail = (email?: string): string => {
+	if (!email) {
+		return 'Amira';
+	}
+
+	const [localPart] = email.split('@');
+	if (!localPart || localPart.trim().length === 0) {
+		return 'Amira';
+	}
+
+	const cleaned = localPart.replace(/[._-]+/g, ' ').trim();
+	if (cleaned.length === 0) {
+		return 'Amira';
+	}
+
+	return cleaned
+		.split(' ')
+		.filter(Boolean)
+		.map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+		.join(' ');
+};
+
 export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+	const { roles, user } = useAuth();
+	const isEmployee = roles.includes('employee');
+	const userName = getDisplayNameFromEmail(user?.email);
+	const storeName = isEmployee
+		? 'Magasin Partenaire KomKom'
+		: 'Quincaillerie Centrale';
+
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
-			<AppBar title='Accueil' titleAlign='left' />
+			<HomeAppBar
+				userName={userName}
+				storeName={storeName}
+				notificationCount={2}
+				cartCount={5}
+				onPressProfile={() => navigation.navigate('Profile')}
+				onPressNotifications={() => navigation.navigate('Orders')}
+				onPressCart={() => navigation.navigate('Catalog')}
+			/>
 			<ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
 				<View style={styles.heroCard}>
 					<View style={styles.heroIconWrap}>

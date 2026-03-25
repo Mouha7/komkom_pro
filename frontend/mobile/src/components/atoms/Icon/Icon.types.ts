@@ -24,7 +24,8 @@ export type CommonIconName =
 	| 'phone'
 	| 'mail'
 	| 'mapPin'
-	| 'chevronUp';
+	| 'chevronUp'
+	| 'bell';
 
 export type IconProps = {
 	name: CommonIconName;
