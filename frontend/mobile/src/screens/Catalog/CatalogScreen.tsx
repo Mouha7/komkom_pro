@@ -4,7 +4,14 @@ import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
-import { CatalogAppBar, CatalogFilterModal, ProductCardList, EmptyState, ScrollToTopButton } from '../../components';
+import {
+	CatalogAppBar,
+	CatalogFilterModal,
+	ProductCardList,
+	EmptyState,
+	ScrollToTopButton,
+	useScrollToTopButton,
+} from '../../components';
 import type { CatalogCategory, ViewMode, FilterOptions, ProductListItemData } from '../../components';
 import { lightColors } from '../../styles/colors';
 import { spacing } from '../../styles/spacing';
@@ -102,7 +109,6 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 	const initialLoadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const loadMoreTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const isLoadMoreLockedRef = useRef(false);
-	const scrollViewRef = useRef<ScrollView>(null);
 
 	// Search and view mode
 	const [searchQuery, setSearchQuery] = useState('');
@@ -110,7 +116,6 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 	const [isLoadingInitial, setIsLoadingInitial] = useState(true);
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
-	const [isScrollTopVisible, setIsScrollTopVisible] = useState(false);
 
 	// Filter modal
 	const [filterModalVisible, setFilterModalVisible] = useState(false);
@@ -129,10 +134,6 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 	const getProductCardVariant = useCallback((): 'portrait' | 'landscape' => {
 		return viewMode === 'grid' ? 'portrait' : 'landscape';
 	}, [viewMode]);
-
-	const handleScrollToTop = useCallback((): void => {
-		scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-	}, []);
 
 	// Filter products based on search, category, and filter options
 	const filteredProducts = useMemo(() => {
@@ -213,19 +214,6 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 		};
 	}, []);
 
-	// Reset pagination when filters change
-	useEffect(() => {
-		setVisibleCount(BATCH_SIZE);
-		setIsLoadingMore(false);
-		isLoadMoreLockedRef.current = false;
-		setIsScrollTopVisible(false);
-
-		if (loadMoreTimeoutRef.current) {
-			clearTimeout(loadMoreTimeoutRef.current);
-			loadMoreTimeoutRef.current = null;
-		}
-	}, [searchQuery, selectedCategoryId, filterOptions]);
-
 	// Cleanup timeout on unmount
 	useEffect(() => {
 		return () => {
@@ -258,12 +246,10 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 		}, LOAD_MORE_DELAY_MS);
 	}, [filteredProducts.length, hasMoreProducts, isLoadingMore]);
 
-	const handleScroll = useCallback(
+	const handleCatalogScroll = useCallback(
 		(event: NativeSyntheticEvent<NativeScrollEvent>): void => {
 			const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
 			const y = contentOffset.y;
-
-			setIsScrollTopVisible(y > SCROLL_TO_TOP_VISIBILITY_THRESHOLD);
 
 			const distanceFromEnd = contentSize.height - (y + layoutMeasurement.height);
 			if (distanceFromEnd <= SCROLL_END_THRESHOLD) {
@@ -272,6 +258,30 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 		},
 		[handleLoadMore],
 	);
+
+	const {
+		scrollViewRef,
+		isScrollTopVisible,
+		handleScroll,
+		handleScrollToTop,
+		resetScrollTopVisibility,
+	} = useScrollToTopButton({
+		visibilityThreshold: SCROLL_TO_TOP_VISIBILITY_THRESHOLD,
+		onScroll: handleCatalogScroll,
+	});
+
+	// Reset pagination when filters change
+	useEffect(() => {
+		setVisibleCount(BATCH_SIZE);
+		setIsLoadingMore(false);
+		isLoadMoreLockedRef.current = false;
+		resetScrollTopVisibility();
+
+		if (loadMoreTimeoutRef.current) {
+			clearTimeout(loadMoreTimeoutRef.current);
+			loadMoreTimeoutRef.current = null;
+		}
+	}, [searchQuery, selectedCategoryId, filterOptions, resetScrollTopVisibility]);
 
 	const handlePressProduct = useCallback((productId: string) => {
 		console.log('Product pressed:', productId);

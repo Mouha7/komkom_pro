@@ -1,2 +1,7 @@
 export { ScrollToTopButton } from './ScrollToTopButton';
-export type { ScrollToTopButtonProps } from './ScrollToTopButton.types';
+export { useScrollToTopButton } from './useScrollToTopButton';
+export type {
+	ScrollToTopButtonProps,
+	UseScrollToTopButtonOptions,
+	UseScrollToTopButtonResult,
+} from './ScrollToTopButton.types';

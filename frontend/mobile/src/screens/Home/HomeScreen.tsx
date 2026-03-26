@@ -10,7 +10,11 @@ import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 
-import { HomeAppBar, ScrollToTopButton } from "../../components";
+import {
+	HomeAppBar,
+	ScrollToTopButton,
+	useScrollToTopButton,
+} from "../../components";
 import { useAuth } from "../../hooks/useAuth";
 import { useToast } from "../../hooks/useToast";
 import { styles } from "./HomeScreen.styles";
@@ -69,9 +73,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 		null,
 	);
 
-	const scrollViewRef = useRef<ScrollView>(null);
 	const isLoadMoreLockedRef = useRef(false);
-	const [isScrollTopVisible, setIsScrollTopVisible] = useState(false);
 
 	const { roles, user } = useAuth();
 	const { showToast } = useToast();
@@ -187,10 +189,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 		[filteredProducts, visibleCount],
 	);
 
-	const handleScrollToTop = useCallback(() => {
-		scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-	}, []);
-
 	const skeletonCount = isLoadingMore
 		? Math.min(
 				BATCH_SIZE,
@@ -217,18 +215,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 			}
 		};
 	}, []);
-
-	useEffect(() => {
-		setVisibleCount(BATCH_SIZE);
-		setIsLoadingMore(false);
-		isLoadMoreLockedRef.current = false;
-		setIsScrollTopVisible(false);
-
-		if (loadMoreTimeoutRef.current) {
-			clearTimeout(loadMoreTimeoutRef.current);
-			loadMoreTimeoutRef.current = null;
-		}
-	}, [query]);
 
 	useEffect(() => {
 		return () => {
@@ -260,13 +246,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 		}, LOAD_MORE_DELAY_MS);
 	}, [filteredProducts.length, hasMoreProducts, isLoadingMore]);
 
-	const handleScroll = useCallback(
+	const handleHomeScroll = useCallback(
 		(event: NativeSyntheticEvent<NativeScrollEvent>): void => {
 			const { contentOffset, contentSize, layoutMeasurement } =
 				event.nativeEvent;
 			const y = contentOffset.y;
-
-			setIsScrollTopVisible(y > SCROLL_TO_TOP_VISIBILITY_THRESHOLD);
 
 			const distanceFromEnd =
 				contentSize.height - (y + layoutMeasurement.height);
@@ -276,6 +260,29 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 		},
 		[handleLoadMore],
 	);
+
+	const {
+		scrollViewRef,
+		isScrollTopVisible,
+		handleScroll,
+		handleScrollToTop,
+		resetScrollTopVisibility,
+	} = useScrollToTopButton({
+		visibilityThreshold: SCROLL_TO_TOP_VISIBILITY_THRESHOLD,
+		onScroll: handleHomeScroll,
+	});
+
+	useEffect(() => {
+		setVisibleCount(BATCH_SIZE);
+		setIsLoadingMore(false);
+		isLoadMoreLockedRef.current = false;
+		resetScrollTopVisibility();
+
+		if (loadMoreTimeoutRef.current) {
+			clearTimeout(loadMoreTimeoutRef.current);
+			loadMoreTimeoutRef.current = null;
+		}
+	}, [query, resetScrollTopVisibility]);
 
 	const handleOpenCategory = (category: HomeCategoryItem): void => {
 		navigation.navigate("Catalog", {

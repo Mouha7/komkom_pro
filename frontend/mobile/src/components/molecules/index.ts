@@ -23,4 +23,9 @@ export { ProductCard, ProductCardSkeleton } from './ProductCard';
 export type { ProductCardProps, ProductCardSkeletonProps, ProductCardVariant } from './ProductCard';
 
 export { ScrollToTopButton } from './ScrollToTopButton';
-export type { ScrollToTopButtonProps } from './ScrollToTopButton';
+export { useScrollToTopButton } from './ScrollToTopButton';
+export type {
+	ScrollToTopButtonProps,
+	UseScrollToTopButtonOptions,
+	UseScrollToTopButtonResult,
+} from './ScrollToTopButton';
