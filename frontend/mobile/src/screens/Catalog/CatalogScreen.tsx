@@ -3,6 +3,8 @@ import { ScrollView, StyleSheet } from 'react-native';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { CompositeScreenProps } from '@react-navigation/native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import {
 	CatalogAppBar,
@@ -16,10 +18,14 @@ import type { CatalogCategory, ViewMode, FilterOptions, ProductListItemData } fr
 import { lightColors } from '../../styles/colors';
 import { spacing } from '../../styles/spacing';
 import type { MainTabParamList } from '../../navigation/BottomTabNavigator';
+import type { RootStackParamList } from '../../navigation/AppNavigator';
 import { PRODUCT_TYPES, STOCK_STATUSES } from '../../constants';
 import { useToast } from '../../hooks/useToast';
 
-type CatalogScreenProps = BottomTabScreenProps<MainTabParamList, 'Catalog'>;
+type CatalogScreenProps = CompositeScreenProps<
+	BottomTabScreenProps<MainTabParamList, 'Catalog'>,
+	NativeStackScreenProps<RootStackParamList>
+>;
 
 const INITIAL_LOAD_DELAY_MS = 600;
 const LOAD_MORE_DELAY_MS = 1200;
@@ -27,7 +33,7 @@ const BATCH_SIZE = 4;
 const SCROLL_END_THRESHOLD = 220;
 const SCROLL_TO_TOP_VISIBILITY_THRESHOLD = 260;
 
-export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
+export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation }) => {
 	// Mock product data
 	const mockProducts: ProductListItemData[] = [
 		{
@@ -284,9 +290,8 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 	}, [searchQuery, selectedCategoryId, filterOptions, resetScrollTopVisibility]);
 
 	const handlePressProduct = useCallback((productId: string) => {
-		console.log('Product pressed:', productId);
-		// TODO: Navigate to ProductDetailScreen
-	}, []);
+		navigation.navigate('ProductDetail', { productId });
+	}, [navigation]);
 
 	const handleAddToCart = useCallback((productId: string) => {
 		console.log('Add to cart:', productId);

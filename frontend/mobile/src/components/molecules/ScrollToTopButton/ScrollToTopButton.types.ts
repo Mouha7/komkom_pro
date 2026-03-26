@@ -10,6 +10,7 @@ export interface ScrollToTopButtonProps {
 	onPress: () => void;
 	accessibilityLabel?: string;
 	testID?: string;
+	bottomOffset?: number;
 }
 
 export interface UseScrollToTopButtonOptions {

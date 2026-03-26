@@ -12,6 +12,7 @@ export const ScrollToTopButton: React.FC<ScrollToTopButtonProps> = ({
 	onPress,
 	accessibilityLabel = 'Retour en haut',
 	testID,
+	bottomOffset = 0,
 }) => {
 	const insets = useSafeAreaInsets();
 	const visibilityAnim = useRef(new Animated.Value(0)).current;
@@ -30,7 +31,7 @@ export const ScrollToTopButton: React.FC<ScrollToTopButtonProps> = ({
 			style={[
 				styles.container,
 				{
-					bottom: Math.max(insets.bottom + 12, 24),
+					bottom: Math.max(insets.bottom + 12 + bottomOffset, 24 + bottomOffset),
 					opacity: visibilityAnim,
 					transform: [
 						{

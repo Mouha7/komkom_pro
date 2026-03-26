@@ -30,11 +30,13 @@ import {
 	MapPin,
 	ChevronUp,
 	Bell,
-	Grid,
-	List,
 	SlidersHorizontal,
 	LayoutGrid,
 	LayoutList,
+	ChevronDown,
+	Heart,
+	Share2,
+	Truck,
 } from 'lucide-react-native';
 
 import type { CommonIconName, IconProps } from './Icon.types';
@@ -68,10 +70,14 @@ const ICON_MAP: Record<CommonIconName, LucideIcon> = {
 	mail: Mail,
 	mapPin: MapPin,
 	chevronUp: ChevronUp,
+	chevronDown: ChevronDown,
 	bell: Bell,
 	grid: LayoutGrid,
 	list: LayoutList,
 	sliderFilter: SlidersHorizontal,
+	share: Share2,
+	heart: Heart,
+	truck: Truck,
 };
 
 export const Icon: React.FC<IconProps> = ({
