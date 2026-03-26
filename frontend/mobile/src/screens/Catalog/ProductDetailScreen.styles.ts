@@ -8,6 +8,14 @@ export const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: lightColors.background.default,
 	},
+	appBarOverlay: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		zIndex: 30,
+		elevation: 30,
+	},
 	scrollView: {
 		flex: 1,
 	},
@@ -15,11 +23,11 @@ export const styles = StyleSheet.create({
 		paddingBottom: 188,
 	},
 	galleryWrap: {
-		height: 360,
 		backgroundColor: lightColors.background.default,
 	},
 	imagePager: {
 		flex: 1,
+        marginTop: spacing.s12,
 	},
 	image: {
 		width: '100%',
@@ -29,7 +37,7 @@ export const styles = StyleSheet.create({
 		position: 'absolute',
 		left: 0,
 		right: 0,
-		bottom: spacing.s4,
+		bottom: -spacing.s6,
 		alignItems: 'center',
 		justifyContent: 'center',
 		flexDirection: 'row',

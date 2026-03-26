@@ -70,6 +70,10 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({ naviga
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [quantity, setQuantity] = useState(1);
 	const [isFavorite, setIsFavorite] = useState(false);
+	const galleryHeight = useMemo(
+		() => Math.min(460, Math.max(300, Math.round(width * 0.95))),
+		[width],
+	);
 
 	const product = useMemo(() => {
 		const productId = route.params?.productId;
@@ -108,12 +112,14 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({ naviga
 
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
-			<ProductDetailAppBar
-				onPressBack={() => navigation.goBack()}
-				onPressShare={handleShare}
-				onPressFavorite={() => setIsFavorite((current) => !current)}
-				isFavorite={isFavorite}
-			/>
+			<View style={styles.appBarOverlay}>
+				<ProductDetailAppBar
+					onPressBack={() => navigation.goBack()}
+					onPressShare={handleShare}
+					onPressFavorite={() => setIsFavorite((current) => !current)}
+					isFavorite={isFavorite}
+				/>
+			</View>
 
 			<ScrollView
 				ref={scrollViewRef}
@@ -123,7 +129,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({ naviga
 				scrollEventThrottle={16}
 				showsVerticalScrollIndicator={false}
 			>
-				<View style={styles.galleryWrap}>
+				<View style={[styles.galleryWrap, { height: galleryHeight }]}>
 					<ScrollView
 						horizontal
 						pagingEnabled

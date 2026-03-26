@@ -1,11 +1,10 @@
 import { StyleSheet } from 'react-native';
 
-import { lightColors } from '../../../styles/colors';
 import { spacing } from '../../../styles/spacing';
 
 export const styles = StyleSheet.create({
 	container: {
-		backgroundColor: lightColors.background.default,
+		backgroundColor: 'transparent',
 		paddingHorizontal: spacing.s3,
 		paddingBottom: spacing.s2,
 	},
