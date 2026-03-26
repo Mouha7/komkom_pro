@@ -15,6 +15,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useToast } from "../../hooks/useToast";
 import { styles } from "./HomeScreen.styles";
 import type { MainTabParamList } from "../../navigation/BottomTabNavigator";
+import { PRODUCT_TYPES, STOCK_STATUSES } from "../../constants";
 import {
 	HomeCategoriesSection,
 	HomeProductsSection,
@@ -121,8 +122,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 				description: "Sac de 50 kg",
 				imageUrl:
 					"https://images.unsplash.com/photo-1610725664285-7c57e6eeac3f?auto=format&fit=crop&w=640&q=80",
-				stockStatus: "in_stock",
-				categoryId: "cat-gros-oeuvre",
+				stockStatus: STOCK_STATUSES.IN_STOCK,
+				categoryId: PRODUCT_TYPES.GROS_OEUVRE,
 			},
 			{
 				productId: "p-perceuse-18v",
@@ -131,8 +132,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 				description: "Unite",
 				imageUrl:
 					"https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=640&q=80",
-				stockStatus: "in_stock",
-				categoryId: "cat-outillage",
+				stockStatus: STOCK_STATUSES.IN_STOCK,
+				categoryId: PRODUCT_TYPES.OUTILLAGE,
 			},
 			{
 				productId: "p-tuyau-pvc",
@@ -141,8 +142,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 				description: "Barre de 4m",
 				imageUrl:
 					"https://unsplash.com/fr/photos/un-gros-plan-de-tuyaux-et-de-tuyaux-devant-un-arbre-eebb1aXTL_8",
-				stockStatus: "out_of_stock",
-				categoryId: "cat-plomberie",
+				stockStatus: STOCK_STATUSES.OUT_OF_STOCK,
+				categoryId: PRODUCT_TYPES.PLOMBERIE,
 			},
 			{
 				productId: "p-cable-r2v",
@@ -151,8 +152,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 				description: "Rouleau de 50m",
 				imageUrl:
 					"https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=640&q=80",
-				stockStatus: "low_stock",
-				categoryId: "cat-electricite",
+				stockStatus: STOCK_STATUSES.LOW_STOCK,
+				categoryId: PRODUCT_TYPES.ELECTRICITE,
 			},
 		];
 

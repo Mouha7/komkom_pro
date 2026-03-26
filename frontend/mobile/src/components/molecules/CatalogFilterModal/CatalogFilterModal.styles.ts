@@ -59,6 +59,15 @@ export const styles = StyleSheet.create({
 		columnGap: spacing.s2,
 		paddingVertical: spacing.s2,
 	},
+	categoriesContainer: {
+		rowGap: spacing.s2,
+	},
+	categoryOption: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: spacing.s2,
+		paddingVertical: spacing.s2,
+	},
 	actions: {
 		flexDirection: 'row',
 		columnGap: spacing.s2,

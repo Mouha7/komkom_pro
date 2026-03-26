@@ -1,3 +1,5 @@
+import type { ProductType, StockStatus } from '../../../constants';
+
 export type HomeCategoryItem = {
 	id: string;
 	label: string;
@@ -19,6 +21,6 @@ export type HomeProductItem = {
 	currency?: string;
 	description?: string;
 	imageUrl?: string;
-	stockStatus?: 'in_stock' | 'low_stock' | 'out_of_stock';
-	categoryId: string;
+	stockStatus?: StockStatus;
+	categoryId?: ProductType;
 };

@@ -1,5 +1,6 @@
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useEffect, useMemo, useCallback, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
@@ -8,15 +9,17 @@ import type { CatalogCategory, ViewMode, FilterOptions, ProductListItemData } fr
 import { lightColors } from '../../styles/colors';
 import { spacing } from '../../styles/spacing';
 import type { MainTabParamList } from '../../navigation/BottomTabNavigator';
+import { PRODUCT_TYPES, STOCK_STATUSES } from '../../constants';
+import { useToast } from '../../hooks/useToast';
 
 type CatalogScreenProps = BottomTabScreenProps<MainTabParamList, 'Catalog'>;
 
-export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
-	const selectedCategoryLabel = route.params?.categoryLabel;
-	const subtitle = selectedCategoryLabel
-		? `Categorie selectionnee: ${selectedCategoryLabel}`
-		: 'Ecran provisoire pour continuer le dev frontend avant branchement backend.';
+const INITIAL_LOAD_DELAY_MS = 600;
+const LOAD_MORE_DELAY_MS = 1200;
+const BATCH_SIZE = 4;
+const SCROLL_END_THRESHOLD = 220;
 
+export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 	// Mock product data
 	const mockProducts: ProductListItemData[] = [
 		{
@@ -26,6 +29,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 			currency: 'FCFA',
 			description: 'Perceuse professionnelle DeWalt 18V',
 			stockStatus: 'in_stock',
+			categoryId: PRODUCT_TYPES.OUTILLAGE,
 		},
 		{
 			productId: 'prod-2',
@@ -34,6 +38,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 			currency: 'FCFA',
 			description: 'Sac de 50 kg',
 			stockStatus: 'in_stock',
+			categoryId: PRODUCT_TYPES.GROS_OEUVRE,
 		},
 		{
 			productId: 'prod-3',
@@ -42,6 +47,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 			currency: 'FCFA',
 			description: 'Rouleau de 50m',
 			stockStatus: 'low_stock',
+			categoryId: PRODUCT_TYPES.PLOMBERIE,
 		},
 		{
 			productId: 'prod-4',
@@ -50,6 +56,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 			currency: 'FCFA',
 			description: 'Seau de 15L',
 			stockStatus: 'in_stock',
+			categoryId: PRODUCT_TYPES.GROS_OEUVRE,
 		},
 		{
 			productId: 'prod-5',
@@ -58,6 +65,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 			currency: 'FCFA',
 			description: 'Pour plomberie',
 			stockStatus: 'in_stock',
+			categoryId: PRODUCT_TYPES.PLOMBERIE,
 		},
 		{
 			productId: 'prod-6',
@@ -66,6 +74,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 			currency: 'FCFA',
 			description: 'Haute qualité',
 			stockStatus: 'in_stock',
+			categoryId: PRODUCT_TYPES.PLOMBERIE,
 		},
 		{
 			productId: 'prod-7',
@@ -74,6 +83,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 			currency: 'FCFA',
 			description: 'Boîte de 5kg',
 			stockStatus: 'in_stock',
+			categoryId: PRODUCT_TYPES.GROS_OEUVRE,
 		},
 		{
 			productId: 'prod-8',
@@ -82,12 +92,23 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 			currency: 'FCFA',
 			description: '500 pièces',
 			stockStatus: 'low_stock',
+			categoryId: PRODUCT_TYPES.OUTILLAGE,
 		},
 	];
+
+	// Hooks
+	const { showToast } = useToast();
+	const initialLoadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const loadMoreTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const isLoadMoreLockedRef = useRef(false);
+	const scrollViewRef = useRef<ScrollView>(null);
 
 	// Search and view mode
 	const [searchQuery, setSearchQuery] = useState('');
 	const [viewMode, setViewMode] = useState<ViewMode>('list');
+	const [isLoadingInitial, setIsLoadingInitial] = useState(true);
+	const [isLoadingMore, setIsLoadingMore] = useState(false);
+	const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
 
 	// Filter modal
 	const [filterModalVisible, setFilterModalVisible] = useState(false);
@@ -136,14 +157,113 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 			if (filterOptions.priceMin && product.price < filterOptions.priceMin) return false;
 			if (filterOptions.priceMax && product.price > filterOptions.priceMax) return false;
 
-			// Stock filter
-			if (filterOptions.inStock && product.stockStatus !== 'in_stock') return false;
+			// Stock status filter
+			if (filterOptions.stockStatuses && filterOptions.stockStatuses.length > 0) {
+				if (!product.stockStatus || !filterOptions.stockStatuses.includes(product.stockStatus)) {
+					return false;
+				}
+			}
+
+			// Product type filter (from modal)
+			if (filterOptions.categoryIds && filterOptions.categoryIds.length > 0) {
+				if (!product.categoryId || !filterOptions.categoryIds.includes(product.categoryId)) {
+					return false;
+				}
+			}
 
 			return true;
 		});
 	}, [searchQuery, selectedCategoryId, filterOptions]);
 
+	const hasMoreProducts = visibleCount < filteredProducts.length;
+	const displayedProducts = useMemo(
+		() => filteredProducts.slice(0, visibleCount),
+		[filteredProducts, visibleCount],
+	);
+
+	// Calculate skeleton count
+	const skeletonCount = isLoadingMore
+		? Math.min(BATCH_SIZE, Math.max(filteredProducts.length - visibleCount, 0))
+		: isLoadingInitial
+			? BATCH_SIZE
+			: 0;
+
+	// Initial loading effect
+	useEffect(() => {
+		if (initialLoadTimeoutRef.current) {
+			clearTimeout(initialLoadTimeoutRef.current);
+		}
+
+		initialLoadTimeoutRef.current = setTimeout(() => {
+			setIsLoadingInitial(false);
+			initialLoadTimeoutRef.current = null;
+		}, INITIAL_LOAD_DELAY_MS);
+
+		return () => {
+			if (initialLoadTimeoutRef.current) {
+				clearTimeout(initialLoadTimeoutRef.current);
+				initialLoadTimeoutRef.current = null;
+			}
+		};
+	}, []);
+
+	// Reset pagination when filters change
+	useEffect(() => {
+		setVisibleCount(BATCH_SIZE);
+		setIsLoadingMore(false);
+		isLoadMoreLockedRef.current = false;
+
+		if (loadMoreTimeoutRef.current) {
+			clearTimeout(loadMoreTimeoutRef.current);
+			loadMoreTimeoutRef.current = null;
+		}
+	}, [searchQuery, selectedCategoryId, filterOptions]);
+
+	// Cleanup timeout on unmount
+	useEffect(() => {
+		return () => {
+			if (loadMoreTimeoutRef.current) {
+				clearTimeout(loadMoreTimeoutRef.current);
+			}
+		};
+	}, []);
+
 	// Handlers
+	const handleLoadMore = useCallback((): void => {
+		if (isLoadMoreLockedRef.current || isLoadingMore || !hasMoreProducts) {
+			return;
+		}
+
+		isLoadMoreLockedRef.current = true;
+		setIsLoadingMore(true);
+
+		if (loadMoreTimeoutRef.current) {
+			clearTimeout(loadMoreTimeoutRef.current);
+		}
+
+		loadMoreTimeoutRef.current = setTimeout(() => {
+			setVisibleCount((previousCount) =>
+				Math.min(previousCount + BATCH_SIZE, filteredProducts.length),
+			);
+			setIsLoadingMore(false);
+			isLoadMoreLockedRef.current = false;
+			loadMoreTimeoutRef.current = null;
+		}, LOAD_MORE_DELAY_MS);
+	}, [filteredProducts.length, hasMoreProducts, isLoadingMore]);
+
+	const handleScroll = useCallback(
+		(event: NativeSyntheticEvent<NativeScrollEvent>): void => {
+			const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+			const y = contentOffset.y;
+
+			const distanceFromEnd = contentSize.height - (y + layoutMeasurement.height);
+			if (distanceFromEnd <= SCROLL_END_THRESHOLD) {
+				handleLoadMore();
+			}
+		},
+		[handleLoadMore],
+	);
+
 	const handlePressProduct = useCallback((productId: string) => {
 		console.log('Product pressed:', productId);
 		// TODO: Navigate to ProductDetailScreen
@@ -155,14 +275,33 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 	}, []);
 
 	const handleCartToggle = useCallback((productId: string, isSelected: boolean, productName: string) => {
-		console.log('Cart toggle:', { productId, isSelected, productName });
-		// TODO: Update product selection state
-	}, []);
+		if (isSelected) {
+			showToast({
+				tone: 'success',
+				title: 'Produit ajoute',
+				message: `${productName} a ete ajoute au panier`,
+				actionLabel: 'Voir',
+				actionLabelA11y: 'Voir le panier',
+			});
+			return;
+		}
+
+		showToast({
+			tone: 'info',
+			title: 'Produit retire',
+			message: `${productName} a ete retire du panier`,
+			actionLabel: 'Voir',
+			actionLabelA11y: 'Voir le panier',
+		});
+	}, [showToast]);
 
 	const handleOutOfStockPress = useCallback((productName: string) => {
-		console.log('Out of stock pressed:', productName);
-		// TODO: Show notification
-	}, []);
+		showToast({
+			tone: 'info',
+			title: 'Produit en rupture',
+			message: `${productName} n'est pas disponible actuellement`,
+		});
+	}, [showToast]);
 
 	const handleFilterPress = () => {
 		setFilterModalVisible(true);
@@ -199,7 +338,13 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 				onApply={handleApplyFilters}
 			/>
 
-			<ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
+			<ScrollView
+				ref={scrollViewRef}
+				style={styles.scrollView}
+				contentContainerStyle={styles.contentContainer}
+				onScroll={handleScroll}
+				scrollEventThrottle={16}
+			>
 				{filteredProducts.length === 0 ? (
 					<EmptyState
 						title="Aucun produit trouvé"
@@ -208,11 +353,11 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 					/>
 				) : (
 					<ProductCardList
-						items={filteredProducts}
+						items={displayedProducts}
 						variant={getProductCardVariant()}
-						isLoadingInitial={false}
-						isLoadingMore={false}
-						skeletonCount={0}
+						isLoadingInitial={isLoadingInitial}
+						isLoadingMore={isLoadingMore}
+						skeletonCount={skeletonCount}
 						onPressProduct={handlePressProduct}
 						onAddToCart={handleAddToCart}
 						onCartToggle={handleCartToggle}

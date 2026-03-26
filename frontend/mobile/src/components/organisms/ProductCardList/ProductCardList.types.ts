@@ -1,7 +1,7 @@
 import type { StyleProp, ViewStyle } from 'react-native';
 
-import type { StockStatus } from '../../atoms';
 import type { ProductCardVariant } from '../../molecules';
+import type { ProductType, StockStatus } from '../../../constants';
 
 export type ProductListItemData = {
 	productId: string;
@@ -11,6 +11,7 @@ export type ProductListItemData = {
 	description?: string;
 	imageUrl?: string;
 	stockStatus?: StockStatus;
+	categoryId?: ProductType;
 };
 
 export type ProductCardListProps = {

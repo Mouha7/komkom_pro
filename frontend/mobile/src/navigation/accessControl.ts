@@ -21,7 +21,7 @@ export const MAIN_TABS: ReadonlyArray<MainTabDefinition> = [
 	{
 		id: 'Catalog',
 		label: 'Catalogue',
-		iconName: 'search',
+		iconName: 'grid',
 		allowedRoles: ['buyer', 'employee'],
 	},
 	{

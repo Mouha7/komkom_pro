@@ -1,7 +1,10 @@
+import type { ProductType, StockStatus } from '../../../constants';
+
 export type FilterOptions = {
 	priceMin?: number;
 	priceMax?: number;
-	inStock?: boolean;
+	stockStatuses?: StockStatus[];
+	categoryIds?: ProductType[];
 };
 
 export type CatalogFilterModalProps = {
