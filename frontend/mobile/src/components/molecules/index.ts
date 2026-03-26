@@ -7,6 +7,12 @@ export type { AppBarAction, AppBarProps } from './AppBar';
 export { HomeAppBar } from './HomeAppBar';
 export type { HomeAppBarProps } from './HomeAppBar';
 
+export { CatalogAppBar } from './CatalogAppBar';
+export type { CatalogAppBarProps, CatalogCategory, ViewMode } from './CatalogAppBar';
+
+export { CatalogFilterModal } from './CatalogFilterModal';
+export type { CatalogFilterModalProps, FilterOptions } from './CatalogFilterModal';
+
 export { BottomBar } from './BottomBar';
 export type { BottomBarAction, BottomBarProps } from './BottomBar';
 

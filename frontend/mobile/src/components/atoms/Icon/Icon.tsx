@@ -29,7 +29,12 @@ import {
 	Mail,
 	MapPin,
 	ChevronUp,
-	Bell
+	Bell,
+	Grid,
+	List,
+	SlidersHorizontal,
+	LayoutGrid,
+	LayoutList,
 } from 'lucide-react-native';
 
 import type { CommonIconName, IconProps } from './Icon.types';
@@ -63,7 +68,10 @@ const ICON_MAP: Record<CommonIconName, LucideIcon> = {
 	mail: Mail,
 	mapPin: MapPin,
 	chevronUp: ChevronUp,
-	bell: Bell
+	bell: Bell,
+	grid: LayoutGrid,
+	list: LayoutList,
+	sliderFilter: SlidersHorizontal,
 };
 
 export const Icon: React.FC<IconProps> = ({

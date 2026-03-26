@@ -8,11 +8,15 @@ import { lightColors } from "../../styles/colors";
 import { spacing } from "../../styles/spacing";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import type { MainTabParamList } from "../../navigation/BottomTabNavigator";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../../navigation/AppNavigator";
 
 type ProfileScreenProps = BottomTabScreenProps<MainTabParamList, "Profile">;
+type RootStackNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 	const { signOut, user } = useAuth();
+	const rootNavigation = navigation.getParent<RootStackNavigationProp>();
 
 	return (
 		<SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
@@ -38,7 +42,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 					<Button
 						title="Ouvrir UI State Library"
 						variant="secondary"
-						onPress={() => navigation.navigate("UIStateLibrary")}
+						onPress={() => rootNavigation?.navigate("UIStateLibrary")}
 					/>
 
 					<Button

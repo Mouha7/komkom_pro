@@ -23,13 +23,20 @@ export const Input: React.FC<InputProps> = ({
 	const hasError = Boolean(errorMessage);
 
 	return (
-		<View style={[styles.wrapper, containerStyle]}>
+		<View style={styles.wrapper}>
 			{label ? (
 				<Text variant={labelVariant} style={labelStyle}>
 					{label}
 				</Text>
 			) : null}
-			<View style={[styles.field, hasError && styles.fieldError, !editable && styles.fieldDisabled]}>
+			<View
+				style={[
+					styles.field,
+					containerStyle,
+					hasError && styles.fieldError,
+					!editable && styles.fieldDisabled,
+				]}
+			>
 				{leftElement ? <View>{leftElement}</View> : null}
 				<TextInput
 					ref={inputRef}

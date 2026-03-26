@@ -6,7 +6,7 @@ import { BottomBar, Text } from '../components';
 import { useAuth } from '../hooks/useAuth';
 import { lightColors } from '../styles/colors';
 import { HomeScreen } from '../screens/Home/HomeScreen';
-import { CatalogScreen } from '../screens/Catalog/HomeScreen';
+import { CatalogScreen } from '../screens/Catalog/CatalogScreen';
 import { OrdersScreen } from '../screens/Orders/OrdersScreen';
 import { ProfileScreen } from '../screens/Profile/ProfileScreen';
 import { getVisibleTabsForRoles, isTabAllowedForRoles, MAIN_TABS, type MainTabRouteName } from './accessControl';
