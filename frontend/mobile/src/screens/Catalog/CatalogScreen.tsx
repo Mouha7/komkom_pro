@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useCallback, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
-import { Button, CatalogAppBar, CatalogFilterModal, Text, ProductCardList, EmptyState } from '../../components';
+import { CatalogAppBar, CatalogFilterModal, ProductCardList, EmptyState, ScrollToTopButton } from '../../components';
 import type { CatalogCategory, ViewMode, FilterOptions, ProductListItemData } from '../../components';
 import { lightColors } from '../../styles/colors';
 import { spacing } from '../../styles/spacing';
@@ -18,6 +18,7 @@ const INITIAL_LOAD_DELAY_MS = 600;
 const LOAD_MORE_DELAY_MS = 1200;
 const BATCH_SIZE = 4;
 const SCROLL_END_THRESHOLD = 220;
+const SCROLL_TO_TOP_VISIBILITY_THRESHOLD = 260;
 
 export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 	// Mock product data
@@ -28,7 +29,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 			price: 35000,
 			currency: 'FCFA',
 			description: 'Perceuse professionnelle DeWalt 18V',
-			stockStatus: 'in_stock',
+			stockStatus: STOCK_STATUSES.IN_STOCK,
 			categoryId: PRODUCT_TYPES.OUTILLAGE,
 		},
 		{
@@ -37,7 +38,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 			price: 4500,
 			currency: 'FCFA',
 			description: 'Sac de 50 kg',
-			stockStatus: 'in_stock',
+			stockStatus: STOCK_STATUSES.IN_STOCK,
 			categoryId: PRODUCT_TYPES.GROS_OEUVRE,
 		},
 		{
@@ -46,7 +47,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 			price: 18500,
 			currency: 'FCFA',
 			description: 'Rouleau de 50m',
-			stockStatus: 'low_stock',
+			stockStatus: STOCK_STATUSES.LOW_STOCK,
 			categoryId: PRODUCT_TYPES.PLOMBERIE,
 		},
 		{
@@ -55,7 +56,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 			price: 12500,
 			currency: 'FCFA',
 			description: 'Seau de 15L',
-			stockStatus: 'in_stock',
+			stockStatus: STOCK_STATUSES.IN_STOCK,
 			categoryId: PRODUCT_TYPES.GROS_OEUVRE,
 		},
 		{
@@ -64,7 +65,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 			price: 2800,
 			currency: 'FCFA',
 			description: 'Pour plomberie',
-			stockStatus: 'in_stock',
+			stockStatus: STOCK_STATUSES.IN_STOCK,
 			categoryId: PRODUCT_TYPES.PLOMBERIE,
 		},
 		{
@@ -73,7 +74,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 			price: 8900,
 			currency: 'FCFA',
 			description: 'Haute qualité',
-			stockStatus: 'in_stock',
+			stockStatus: STOCK_STATUSES.IN_STOCK,
 			categoryId: PRODUCT_TYPES.PLOMBERIE,
 		},
 		{
@@ -82,7 +83,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 			price: 1500,
 			currency: 'FCFA',
 			description: 'Boîte de 5kg',
-			stockStatus: 'in_stock',
+			stockStatus: STOCK_STATUSES.IN_STOCK,
 			categoryId: PRODUCT_TYPES.GROS_OEUVRE,
 		},
 		{
@@ -91,7 +92,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 			price: 2200,
 			currency: 'FCFA',
 			description: '500 pièces',
-			stockStatus: 'low_stock',
+			stockStatus: STOCK_STATUSES.LOW_STOCK,
 			categoryId: PRODUCT_TYPES.OUTILLAGE,
 		},
 	];
@@ -109,6 +110,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 	const [isLoadingInitial, setIsLoadingInitial] = useState(true);
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
+	const [isScrollTopVisible, setIsScrollTopVisible] = useState(false);
 
 	// Filter modal
 	const [filterModalVisible, setFilterModalVisible] = useState(false);
@@ -127,6 +129,10 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 	const getProductCardVariant = useCallback((): 'portrait' | 'landscape' => {
 		return viewMode === 'grid' ? 'portrait' : 'landscape';
 	}, [viewMode]);
+
+	const handleScrollToTop = useCallback((): void => {
+		scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+	}, []);
 
 	// Filter products based on search, category, and filter options
 	const filteredProducts = useMemo(() => {
@@ -212,6 +218,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 		setVisibleCount(BATCH_SIZE);
 		setIsLoadingMore(false);
 		isLoadMoreLockedRef.current = false;
+		setIsScrollTopVisible(false);
 
 		if (loadMoreTimeoutRef.current) {
 			clearTimeout(loadMoreTimeoutRef.current);
@@ -255,6 +262,8 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 		(event: NativeSyntheticEvent<NativeScrollEvent>): void => {
 			const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
 			const y = contentOffset.y;
+
+			setIsScrollTopVisible(y > SCROLL_TO_TOP_VISIBILITY_THRESHOLD);
 
 			const distanceFromEnd = contentSize.height - (y + layoutMeasurement.height);
 			if (distanceFromEnd <= SCROLL_END_THRESHOLD) {
@@ -365,6 +374,12 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route }) => {
 					/>
 				)}
 			</ScrollView>
+
+			<ScrollToTopButton
+				visible={isScrollTopVisible}
+				onPress={handleScrollToTop}
+				accessibilityLabel="Retour au top du catalogue"
+			/>
 		</SafeAreaView>
 	);
 };
