@@ -14,6 +14,7 @@ export const styles = StyleSheet.create({
 		paddingLeft: spacing.s4,
 		flexDirection: 'row',
 		alignItems: 'flex-start',
+		justifyContent: 'flex-start',
 		columnGap: spacing.s2,
 		shadowColor: '#000000',
 		shadowOpacity: 0.06,
@@ -24,12 +25,15 @@ export const styles = StyleSheet.create({
 	},
 	content: {
 		flex: 1,
-		rowGap: spacing.s1,
 	},
 	titleRow: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
+	},
+	title: {
+		fontSize: 16,
+		fontWeight: '700',
 	},
 	closeButton: {
 		width: 26,

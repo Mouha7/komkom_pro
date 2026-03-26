@@ -56,7 +56,9 @@ export const NotificationToast: React.FC<NotificationToastProps> = ({
 			</View>
 			<View style={styles.content}>
 				<View style={styles.titleRow}>
-					<Text variant="h2">{title}</Text>
+					<Text variant="h2" style={styles.title}>
+						{title}
+					</Text>
 					{actionLabel && onActionPress ? (
 						<Pressable
 							onPress={onActionPress}
