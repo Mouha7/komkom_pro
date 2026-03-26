@@ -41,21 +41,11 @@ export const styles = StyleSheet.create({
 	skeletonWrap: {
 		rowGap: spacing.s2,
 	},
-	skeletonRow: {
-		flexDirection: 'row',
-		columnGap: spacing.s1,
-	},
 	listPreview: {
 		backgroundColor: lightColors.surface.default,
 		borderRadius: 12,
 		borderWidth: 1,
 		borderColor: lightColors.border.default,
 		padding: spacing.s2,
-	},
-	productCardPortrait: {
-		width: '50%',
-	},
-	productCardLandscape: {
-		width: '100%',
 	},
 });

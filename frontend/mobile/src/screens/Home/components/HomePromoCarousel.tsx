@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
 	bannerRow: {
 		flexDirection: "row",
 		alignItems: "center",
-		justifyContent: "space-between",
+		justifyContent: "space-evenly",
 	},
 	textBlock: {
 		flex: 1,

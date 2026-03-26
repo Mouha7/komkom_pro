@@ -8,6 +8,7 @@ export type ProductCardProps = {
 	productId: string;
 	name: string;
 	price: number;
+	loading?: boolean;
 	currency?: string;
 	description?: string;
 	imageUrl?: string;

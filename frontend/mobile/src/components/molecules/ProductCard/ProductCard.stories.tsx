@@ -45,3 +45,33 @@ export const States = {
 		</View>
 	),
 };
+
+export const Loading = {
+	render: () => (
+		<View style={{ rowGap: spacing.s3 }}>
+			<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+				<ProductCard
+					loading
+					productId="loading-product-1"
+					name=""
+					price={0}
+					containerStyle={{ width: '48%' }}
+				/>
+				<ProductCard
+					loading
+					productId="loading-product-2"
+					name=""
+					price={0}
+					containerStyle={{ width: '48%' }}
+				/>
+			</View>
+			<ProductCard
+				loading
+				productId="loading-product-3"
+				name=""
+				price={0}
+				variant="landscape"
+			/>
+		</View>
+	),
+};

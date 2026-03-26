@@ -12,8 +12,7 @@ import {
 	IconOnlyButton,
 	NotificationToast,
 	OrderList,
-	ProductCard,
-	ProductCardSkeleton,
+	ProductCardList,
 	SkeletonListItem,
 	Text,
 } from "../../components";
@@ -346,19 +345,16 @@ export const UIStateLibraryScreen: React.FC = () => {
 						SKELETON LOADERS (PRODUCT CARD)
 					</Text>
 					<View style={styles.skeletonWrap}>
-						<View style={styles.skeletonRow}>
-							<ProductCardSkeleton
-								variant="portrait"
-								containerStyle={styles.productCardPortrait}
-							/>
-							<ProductCardSkeleton
-								variant="portrait"
-								containerStyle={styles.productCardPortrait}
-							/>
-						</View>
-						<ProductCardSkeleton
+						<ProductCardList
+							items={[]}
+							isLoadingInitial
+							skeletonCount={2}
+						/>
+						<ProductCardList
+							items={[]}
 							variant="landscape"
-							containerStyle={styles.productCardLandscape}
+							isLoadingInitial
+							skeletonCount={1}
 						/>
 					</View>
 				</View>
@@ -367,55 +363,31 @@ export const UIStateLibraryScreen: React.FC = () => {
 					<Text variant="overline" color="secondary">
 						LISTE PRODUITS - PORTRAIT
 					</Text>
-					<View style={styles.skeletonRow}>
-						{portraitProductsPreview.map((product) => (
-							<ProductCard
-								key={product.productId}
-								{...product}
-								containerStyle={styles.productCardPortrait}
-								onPress={(id) =>
-									Alert.alert(
-										"Navigation",
-										`Ouvrir detail produit: ${id}`,
-									)
-								}
-								onAddToCart={(id) =>
-									Alert.alert(
-										"Panier",
-										`Ajouter au panier: ${id}`,
-									)
-								}
-							/>
-						))}
-					</View>
+					<ProductCardList
+						items={portraitProductsPreview}
+						onPressProduct={(id: string) =>
+							Alert.alert("Navigation", `Ouvrir detail produit: ${id}`)
+						}
+						onAddToCart={(id: string) =>
+							Alert.alert("Panier", `Ajouter au panier: ${id}`)
+						}
+					/>
 				</View>
 
 				<View style={styles.section}>
 					<Text variant="overline" color="secondary">
 						LISTE PRODUITS - LANDSCAPE
 					</Text>
-					<View style={styles.skeletonWrap}>
-						{landscapeProductsPreview.map((product) => (
-							<ProductCard
-								key={product.productId}
-								{...product}
-								variant="landscape"
-								containerStyle={styles.productCardLandscape}
-								onPress={(id) =>
-									Alert.alert(
-										"Navigation",
-										`Ouvrir detail produit: ${id}`,
-									)
-								}
-								onAddToCart={(id) =>
-									Alert.alert(
-										"Panier",
-										`Ajouter au panier: ${id}`,
-									)
-								}
-							/>
-						))}
-					</View>
+					<ProductCardList
+						items={landscapeProductsPreview}
+						variant="landscape"
+						onPressProduct={(id: string) =>
+							Alert.alert("Navigation", `Ouvrir detail produit: ${id}`)
+						}
+						onAddToCart={(id: string) =>
+							Alert.alert("Panier", `Ajouter au panier: ${id}`)
+						}
+					/>
 				</View>
 
 				<View style={styles.section}>

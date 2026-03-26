@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -19,6 +20,12 @@ import {
 } from './components';
 
 type HomeScreenProps = BottomTabScreenProps<MainTabParamList, 'Home'>;
+
+const BATCH_SIZE = 4;
+const INITIAL_LOAD_DELAY_MS = 900;
+const LOAD_MORE_DELAY_MS = 1200;
+const MAX_MOCK_PAGES = 3;
+const SCROLL_END_THRESHOLD = 220;
 
 const getDisplayNameFromEmail = (email?: string): string => {
 	if (!email) {
@@ -44,6 +51,12 @@ const getDisplayNameFromEmail = (email?: string): string => {
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 	const [query, setQuery] = useState('');
+	const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
+	const [isLoadingInitial, setIsLoadingInitial] = useState(true);
+	const [isLoadingMore, setIsLoadingMore] = useState(false);
+	const initialLoadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const loadMoreTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const isLoadMoreLockedRef = useRef(false);
 	const { roles, user } = useAuth();
 	const { showToast } = useToast();
 	const isEmployee = roles.includes('employee');
@@ -80,8 +93,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 		[],
 	);
 
-	const products: HomeProductItem[] = useMemo(
-		() => [
+	const products: HomeProductItem[] = useMemo(() => {
+		const baseProducts: HomeProductItem[] = [
 			{
 				productId: 'p-ciment-portland',
 				name: 'Ciment Portland CPJ 35',
@@ -122,11 +135,20 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 				stockStatus: 'low_stock',
 				categoryId: 'cat-electricite',
 			},
-		],
-		[],
-	);
+		];
 
-	const displayedProducts = useMemo(() => {
+		return Array.from({ length: MAX_MOCK_PAGES }).flatMap((_, pageIndex) =>
+			baseProducts.map((product) => ({
+				...product,
+				productId:
+					pageIndex === 0
+						? product.productId
+						: `${product.productId}-page-${pageIndex + 1}`,
+			})),
+		);
+	}, []);
+
+	const filteredProducts = useMemo(() => {
 		const normalizedQuery = query.trim().toLowerCase();
 		if (!normalizedQuery) {
 			return products;
@@ -137,6 +159,89 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 			return haystack.includes(normalizedQuery);
 		});
 	}, [products, query]);
+
+	const hasMoreProducts = visibleCount < filteredProducts.length;
+	const displayedProducts = useMemo(
+		() => filteredProducts.slice(0, visibleCount),
+		[filteredProducts, visibleCount],
+	);
+
+	const skeletonCount = isLoadingMore
+		? Math.min(BATCH_SIZE, Math.max(filteredProducts.length - visibleCount, 0))
+		: isLoadingInitial
+			? BATCH_SIZE
+			: 0;
+
+	useEffect(() => {
+		if (initialLoadTimeoutRef.current) {
+			clearTimeout(initialLoadTimeoutRef.current);
+		}
+
+		initialLoadTimeoutRef.current = setTimeout(() => {
+			setIsLoadingInitial(false);
+			initialLoadTimeoutRef.current = null;
+		}, INITIAL_LOAD_DELAY_MS);
+
+		return () => {
+			if (initialLoadTimeoutRef.current) {
+				clearTimeout(initialLoadTimeoutRef.current);
+				initialLoadTimeoutRef.current = null;
+			}
+		};
+	}, []);
+
+	useEffect(() => {
+		setVisibleCount(BATCH_SIZE);
+		setIsLoadingMore(false);
+		isLoadMoreLockedRef.current = false;
+
+		if (loadMoreTimeoutRef.current) {
+			clearTimeout(loadMoreTimeoutRef.current);
+			loadMoreTimeoutRef.current = null;
+		}
+	}, [query]);
+
+	useEffect(() => {
+		return () => {
+			if (loadMoreTimeoutRef.current) {
+				clearTimeout(loadMoreTimeoutRef.current);
+			}
+		};
+	}, []);
+
+	const handleLoadMore = useCallback((): void => {
+		if (isLoadMoreLockedRef.current || isLoadingMore || !hasMoreProducts) {
+			return;
+		}
+
+		isLoadMoreLockedRef.current = true;
+		setIsLoadingMore(true);
+
+		if (loadMoreTimeoutRef.current) {
+			clearTimeout(loadMoreTimeoutRef.current);
+		}
+
+		loadMoreTimeoutRef.current = setTimeout(() => {
+			setVisibleCount((previousCount) =>
+				Math.min(previousCount + BATCH_SIZE, filteredProducts.length),
+			);
+			setIsLoadingMore(false);
+			isLoadMoreLockedRef.current = false;
+			loadMoreTimeoutRef.current = null;
+		}, LOAD_MORE_DELAY_MS);
+	}, [filteredProducts.length, hasMoreProducts, isLoadingMore]);
+
+	const handleScroll = useCallback(
+		(event: NativeSyntheticEvent<NativeScrollEvent>): void => {
+			const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+			const distanceFromEnd = contentSize.height - (contentOffset.y + layoutMeasurement.height);
+
+			if (distanceFromEnd <= SCROLL_END_THRESHOLD) {
+				handleLoadMore();
+			}
+		},
+		[handleLoadMore],
+	);
 
 	const handleOpenCategory = (category: HomeCategoryItem): void => {
 		navigation.navigate('Catalog', { categoryId: category.id, categoryLabel: category.label });
@@ -199,6 +304,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 			<ScrollView
 				style={styles.scrollView}
 				contentContainerStyle={styles.contentContainer}
+				onScroll={handleScroll}
+				scrollEventThrottle={16}
 				showsVerticalScrollIndicator={false}
 			>
 				<View style={styles.section}>
@@ -215,9 +322,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 					<HomeSearchSection value={query} onChangeText={setQuery} />
 				</View>
 
-				<View style={styles.section}>
+				<View style={[styles.section, styles.productsSection]}>
 					<HomeProductsSection
 						items={displayedProducts}
+						isLoadingInitial={isLoadingInitial}
+						isLoadingMore={isLoadingMore}
+						skeletonCount={skeletonCount}
 						onPressProduct={handleOpenProduct}
 						onAddToCart={handleAddToCart}
 						onCartToggle={handleCartToggle}

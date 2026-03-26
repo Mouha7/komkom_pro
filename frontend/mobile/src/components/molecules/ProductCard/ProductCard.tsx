@@ -4,6 +4,7 @@ import { Image, Pressable, View } from "react-native";
 import { Button, Icon, StatusBadge, Text } from "../../atoms";
 import { lightColors } from "../../../styles/colors";
 import { styles } from "./ProductCard.styles";
+import { ProductCardSkeleton } from "./ProductCardSkeleton";
 import type { ProductCardProps } from "./ProductCard.types";
 
 const formatAmount = (price: number): string => {
@@ -14,6 +15,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 	productId,
 	name,
 	price,
+	loading = false,
 	currency = "FCFA",
 	description,
 	imageUrl,
@@ -27,6 +29,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 	testID,
 	containerStyle,
 }) => {
+	if (loading) {
+		return (
+			<ProductCardSkeleton
+				variant={variant}
+				containerStyle={containerStyle}
+				testID={testID}
+			/>
+		);
+	}
+
 	const isLandscape = variant === "landscape";
 	const [isAddedToCart, setIsAddedToCart] = useState(false);
 	const isCartActionDisabled = disabled || stockStatus === "out_of_stock";

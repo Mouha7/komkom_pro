@@ -19,4 +19,7 @@ export const styles = StyleSheet.create({
 	section: {
 		rowGap: spacing.s2,
 	},
+	productsSection: {
+		paddingBottom: spacing.s2,
+	},
 });

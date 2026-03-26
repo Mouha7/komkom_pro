@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 
-import { EmptyState, ProductCard, Text } from "../../../components";
+import { EmptyState, ProductCardList, Text } from "../../../components";
 import { lightColors } from "../../../styles/colors";
 import type { HomeProductItem } from "./HomeSections.types";
 import { spacing } from "../../../styles/spacing";
@@ -12,46 +12,47 @@ type HomeProductsSectionProps = {
 	onAddToCart: (productId: string) => void;
 	onCartToggle: (productId: string, isSelected: boolean, productName: string) => void;
 	onOutOfStockPress?: (productName: string) => void;
+	isLoadingInitial?: boolean;
+	isLoadingMore?: boolean;
+	skeletonCount?: number;
 };
 
 export const HomeProductsSection: React.FC<HomeProductsSectionProps> = ({
 	items,
 	onPressProduct,
 	onAddToCart,
-    onCartToggle,
+	onCartToggle,
 	onOutOfStockPress,
+	isLoadingInitial = false,
+	isLoadingMore = false,
+	skeletonCount = 0,
 }) => {
+	const hasSkeletons = skeletonCount > 0;
+	const showInitialSkeletons = isLoadingInitial && hasSkeletons;
 
 	return (
 		<View style={styles.section}>
 			<Text variant="h2" style={styles.title} textColorOverride={lightColors.text.primary}>
 				En stock pres de vous
 			</Text>
-			{items.length === 0 ? (
+			{items.length === 0 && !showInitialSkeletons ? (
 				<EmptyState
 					title="Aucun produit trouve"
 					description="Essayez une autre recherche ou une autre categorie."
 					icon="package"
 				/>
 			) : (
-				<View style={styles.list}>
-					{items.map((item) => (
-						<ProductCard
-							key={item.productId}
-							variant="portrait"
-							productId={item.productId}
-							name={item.name}
-							price={item.price}
-							currency={item.currency}
-							description={item.description}
-							imageUrl={item.imageUrl}
-							stockStatus={item.stockStatus}
-							onPress={onPressProduct}
-							onAddToCart={onAddToCart}
-							onCartToggle={onCartToggle}						onOutOfStockPress={onOutOfStockPress}                            containerStyle={{ width: '48%' }}
-						/>
-					))}
-				</View>
+				<ProductCardList
+					items={items}
+					variant="portrait"
+					isLoadingInitial={isLoadingInitial}
+					isLoadingMore={isLoadingMore}
+					skeletonCount={skeletonCount}
+					onPressProduct={onPressProduct}
+					onAddToCart={onAddToCart}
+					onCartToggle={onCartToggle}
+					onOutOfStockPress={onOutOfStockPress}
+				/>
 			)}
 		</View>
 	);
@@ -64,11 +65,5 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: 18,
 		fontWeight: "bold",
-	},
-	list: {
-		flexDirection: "row",
-        flexWrap: "wrap",
-        justifyContent: "space-between",
-        rowGap: spacing.s3,
 	},
 });
