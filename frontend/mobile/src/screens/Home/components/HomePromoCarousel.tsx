@@ -83,6 +83,18 @@ export const HomePromoCarousel: React.FC<HomePromoCarouselProps> = ({
 		return containerWidth - BANNER_GAP;
 	}, [containerWidth, items.length]);
 
+	const bannerHeight = useMemo(() => {
+		if (containerWidth === 0) {
+			return 0;
+		}
+
+		if (items.length <= 1) {
+			return containerWidth;
+		}
+
+		return containerWidth - BANNER_GAP;
+	}, [containerWidth, items.length]);
+
 	const itemSpan = useMemo(() => {
 		if (bannerWidth === 0) {
 			return 0;
@@ -178,24 +190,30 @@ export const HomePromoCarousel: React.FC<HomePromoCarouselProps> = ({
 					>
 						{!item.backgroundColor ? (
 							<View style={styles.gradientLayer} pointerEvents="none">
-								<Svg width="100%" height="100%">
+								<Svg
+									style={StyleSheet.absoluteFillObject}
+									width={bannerWidth || "100%"}
+									height={bannerHeight || "100%"}
+									viewBox={`0 0 ${bannerWidth || 1} ${bannerHeight || 1}`}
+								>
 									<Defs>
 										<SvgLinearGradient
 											id={`promoGradient-${item.id}`}
-											x1={GRADIENT_VECTOR.x1}
-											y1={GRADIENT_VECTOR.y1}
-											x2={GRADIENT_VECTOR.x2}
-											y2={GRADIENT_VECTOR.y2}
+											gradientUnits="userSpaceOnUse"
+											x1={0}
+											y1={0}
+											x2={bannerWidth || 1}
+											y2={bannerHeight || 1}
 										>
-											<Stop offset="0%" stopColor={BANNER_GRADIENT_START} />
-											<Stop offset="100%" stopColor={BANNER_GRADIENT_END} />
+											<Stop offset="0" stopColor={BANNER_GRADIENT_START} />
+											<Stop offset="1" stopColor={BANNER_GRADIENT_END} />
 										</SvgLinearGradient>
 									</Defs>
 									<Rect
-										x="0"
-										y="0"
-										width="100%"
-										height="100%"
+										x={0}
+										y={0}
+										width={bannerWidth || 1}
+										height={bannerHeight || 1}
 										fill={`url(#promoGradient-${item.id})`}
 									/>
 								</Svg>
