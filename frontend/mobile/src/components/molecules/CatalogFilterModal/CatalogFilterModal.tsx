@@ -297,12 +297,14 @@ export const CatalogFilterModal: React.FC<CatalogFilterModalProps> = ({
 							variant="secondary"
 							onPress={handleReset}
 							containerStyle={styles.actionButton}
+                            textStyle={{ fontWeight: '700' }}
 						/>
 						<Button
 							title="Appliquer"
 							variant="primary"
 							onPress={handleApply}
 							containerStyle={styles.actionButton}
+                            textStyle={{ fontWeight: '700' }}
 						/>
 					</View>
 				</Pressable>

@@ -37,14 +37,14 @@ export const styles = StyleSheet.create({
 	},
 	content: {
 		rowGap: spacing.s4,
-		marginBottom: spacing.s4,
 	},
 	section: {
-		rowGap: spacing.s2,
+		rowGap: spacing.s1,
+		marginBottom: spacing.s4,
 	},
 	sectionLabel: {
 		fontSize: 14,
-		fontWeight: '600',
+		fontWeight: '700',
 	},
 	priceInputsRow: {
 		flexDirection: 'row',

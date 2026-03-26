@@ -133,7 +133,7 @@ export const CatalogAppBar: React.FC<CatalogAppBarProps> = ({
 												: undefined
 										}
 										textStyle={
-											isSelected ? { color: "#FFFFFF" } : undefined
+											isSelected ? { color: "#FFFFFF", fontWeight: "700" } : undefined
 										}
 									/>
 								);
