@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { lightColors, withOpacity } from '../../../styles/colors';
 import { spacing } from '../../../styles/spacing';
 
-export const ACTION_BAR_HEIGHT = 95;
+export const ACTION_BAR_HEIGHT = 55;
 
 export const styles = StyleSheet.create({
 	container: {

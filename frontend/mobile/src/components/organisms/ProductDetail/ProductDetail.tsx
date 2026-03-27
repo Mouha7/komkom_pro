@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Image, ScrollView, View, useWindowDimensions } from "react-native";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ErrorState, Icon, StatusBadge, Text } from "../../atoms";
 import {
@@ -11,9 +11,11 @@ import {
 	ScrollToTopButton,
 	useScrollToTopButton,
 } from "../../molecules";
+import { ACTION_BAR_HEIGHT } from "../../molecules/ProductDetailActionBar/ProductDetailActionBar.styles";
 import { useToast } from "../../../hooks/useToast";
 import { formatAmount } from "../../../utils/formatPrice";
 import { getProductDetail } from "../../../api/products";
+import { spacing } from "../../../styles/spacing";
 import type {
 	ProductDetailData,
 	ProductDetailProps,
@@ -30,7 +32,12 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 	onAddToCart,
 }) => {
 	const { width } = useWindowDimensions();
+	const insets = useSafeAreaInsets();
 	const { showToast } = useToast();
+
+	// Calculate contentContainer padding to account for ActionBar height + safe area insets
+	// This ensures content scrolls above the action bar without overlap
+	const contentContainerPaddingBottom = ACTION_BAR_HEIGHT + Math.max(insets.bottom, spacing.s2);
 	const [product, setProduct] = useState<ProductDetailData | null>(null);
 	const [isLoadingProduct, setIsLoadingProduct] = useState(true);
 	const [loadError, setLoadError] = useState<string | null>(null);
@@ -138,7 +145,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 			<ScrollView
 				ref={scrollViewRef}
 				style={styles.scrollView}
-				contentContainerStyle={styles.contentContainer}
+				contentContainerStyle={[styles.contentContainer, { paddingBottom: contentContainerPaddingBottom }]}
 				onScroll={handleScroll}
 				scrollEventThrottle={16}
 				showsVerticalScrollIndicator={false}

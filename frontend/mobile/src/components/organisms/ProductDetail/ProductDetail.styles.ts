@@ -20,7 +20,7 @@ export const styles = StyleSheet.create({
 		flex: 1,
 	},
 	contentContainer: {
-		paddingBottom: 66,
+		paddingBottom: 0,
 	},
 	galleryWrap: {
 		backgroundColor: '#FFFFFF',
@@ -174,6 +174,8 @@ export const styles = StyleSheet.create({
 		marginTop: spacing.s1,
 		borderTopWidth: 1,
 		borderTopColor: lightColors.border.default,
+        borderBottomWidth: 1,
+        borderBottomColor: lightColors.border.default,
 		paddingHorizontal: spacing.s3,
 		paddingVertical: spacing.s3,
 		rowGap: spacing.s3,
