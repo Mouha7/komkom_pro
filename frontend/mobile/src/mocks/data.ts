@@ -263,7 +263,7 @@ export const HOME_PROMOS: HomePromoModel[] = [
 	{
 		id: 'promo-outillage',
 		title: '-10% sur l\'outillage',
-		description: 'Prix pro sur une selection de references',
+		description: 'Prix pro sur une selection d\'outils electriques',
 		ctaLabel: 'Commander',
 	},
 ];

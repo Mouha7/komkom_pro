@@ -2,10 +2,10 @@ import React, { createContext, useCallback, useEffect, useMemo, useState } from 
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { NotificationToast } from '../components';
+import { NotificationToast } from '../components/atoms';
 import { lightColors } from '../styles/colors';
 import { spacing } from '../styles/spacing';
-import type { NotificationTone } from '../components';
+import type { NotificationTone } from '../components/atoms';
 
 export type ToastPayload = {
 	tone?: NotificationTone;

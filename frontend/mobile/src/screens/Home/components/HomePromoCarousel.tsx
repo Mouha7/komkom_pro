@@ -31,15 +31,6 @@ const BANNER_GRADIENT_START = "#ED762F";
 const BANNER_GRADIENT_END = "#C55A1F";
 const INTERACTION_RESUME_DELAY_MS = 2500;
 
-// Angle control (45deg): top-left -> bottom-right.
-// To tweak direction, edit x1/y1/x2/y2 values.
-const GRADIENT_VECTOR = {
-	x1: "0%",
-	y1: "0%",
-	x2: "100%",
-	y2: "100%",
-};
-
 export const HomePromoCarousel: React.FC<HomePromoCarouselProps> = ({
 	items,
 	autoPlayIntervalMs = 6000,
@@ -238,7 +229,7 @@ export const HomePromoCarousel: React.FC<HomePromoCarouselProps> = ({
 										textColorOverride={
 											lightColors.text.onPrimary
 										}
-                                        maxLines={1}
+                                        maxLines={2}
 									>
 										{item.description}
 									</Text>
@@ -276,7 +267,7 @@ const styles = StyleSheet.create({
 	banner: {
 		backgroundColor: lightColors.primary,
 		borderRadius: 8,
-		height: 85,
+		height: 95,
 		paddingHorizontal: spacing.s2,
 		paddingVertical: spacing.s2,
 		justifyContent: "center",
@@ -289,18 +280,21 @@ const styles = StyleSheet.create({
 	bannerRow: {
 		flexDirection: "row",
 		alignItems: "center",
-		justifyContent: "space-evenly",
+		justifyContent: "space-between",
+		columnGap: spacing.s2,
 	},
 	textBlock: {
 		flex: 1,
-		rowGap: spacing.s1,
+		minWidth: 0,
+		flexShrink: 1,
 	},
 	ctaPill: {
 		backgroundColor: lightColors.surface.default,
 		paddingHorizontal: spacing.s3,
 		paddingVertical: spacing.s1,
 		borderRadius: 6,
-		minWidth: 132,
+		width: 132,
+		flexShrink: 0,
 		alignItems: "center",
 		justifyContent: "center",
 	},
