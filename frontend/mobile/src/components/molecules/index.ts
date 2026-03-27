@@ -22,6 +22,9 @@ export type { ConfirmDialogProps, ConfirmDialogTone } from './ConfirmDialog';
 export { ExpandableSection } from './ExpandableSection';
 export type { ExpandableSectionProps } from './ExpandableSection';
 
+export { QuantityControl } from './QuantityControl';
+export type { QuantityControlProps } from './QuantityControl';
+
 export { ProductCard, ProductCardSkeleton } from './ProductCard';
 export type { ProductCardProps, ProductCardSkeletonProps, ProductCardVariant } from './ProductCard';
 

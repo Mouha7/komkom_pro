@@ -19,6 +19,9 @@ export type { IconOnlyButtonProps } from './IconOnlyButton';
 export { NotificationToast } from './NotificationToast';
 export type { NotificationToastProps, NotificationTone } from './NotificationToast';
 
+export { QuantityButton } from './QuantityButton';
+export type { QuantityButtonProps } from './QuantityButton';
+
 export { SkeletonListItem } from './Skeleton';
 export type { SkeletonListItemProps } from './Skeleton';
 

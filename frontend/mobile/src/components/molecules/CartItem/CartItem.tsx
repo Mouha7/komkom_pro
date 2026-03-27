@@ -2,6 +2,7 @@ import React from 'react';
 import { Image, Pressable, View } from 'react-native';
 
 import { Icon, Text } from '../../atoms';
+import { QuantityControl } from '../QuantityControl';
 import { styles } from './CartItem.styles';
 import type { CartItemProps } from './CartItem.types';
 
@@ -61,29 +62,18 @@ export const CartItem: React.FC<CartItemProps> = ({
 							</Text>
 						) : null}
 					</View>
-					<View style={styles.qtyControl}>
-						<Pressable
-							onPress={() => onDecrease?.(item.productId)}
-							disabled={disabled || item.quantity <= 1}
-							style={styles.qtyAction}
-							accessibilityRole="button"
-							accessibilityLabel={'Diminuer quantite de ' + item.name}
-						>
-							<Icon name="minus" size={20} color="#111827" />
-						</Pressable>
-						<Text variant="small" style={styles.qtyValue}>
-							{String(item.quantity)}
-						</Text>
-						<Pressable
-							onPress={() => onIncrease?.(item.productId)}
-							disabled={disabled}
-							style={styles.qtyAction}
-							accessibilityRole="button"
-							accessibilityLabel={'Augmenter quantite de ' + item.name}
-						>
-							<Icon name="plus" size={20} color="#111827" />
-						</Pressable>
-					</View>
+					<QuantityControl
+						quantity={item.quantity}
+						onDecrease={() => onDecrease?.(item.productId)}
+						onIncrease={() => onIncrease?.(item.productId)}
+						disabled={disabled}
+						decreaseAccessibilityLabel={'Diminuer quantite de ' + item.name}
+						increaseAccessibilityLabel={'Augmenter quantite de ' + item.name}
+						containerStyle={styles.qtyControl}
+						buttonStyle={styles.qtyAction}
+						valueVariant='small'
+						valueStyle={styles.qtyValue}
+					/>
 				</View>
 			</View>
 		</View>

@@ -78,8 +78,8 @@ export const styles = StyleSheet.create({
 		backgroundColor: lightColors.neutral100,
 	},
 	qtyAction: {
-		flexDirection: 'row',
-		alignItems: 'center',
+		width: 28,
+		height: 28,
 		borderWidth: 1,
 		borderColor: lightColors.border.default,
 		borderRadius: 50,

@@ -33,26 +33,6 @@ export const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		paddingHorizontal: spacing.s2,
 	},
-	quantityAction: {
-		width: 35,
-		height: 35,
-		borderRadius: 50,
-		backgroundColor: lightColors.surface.default,
-		alignItems: 'center',
-		justifyContent: 'center',
-		shadowColor: withOpacity('#000000', 0.14),
-		shadowOffset: { width: 0, height: 6 },
-		shadowOpacity: 1,
-		shadowRadius: 12,
-		elevation: 4,
-	},
-	quantityActionPressed: {
-		opacity: 0.85,
-		transform: [{ scale: 0.98 }],
-	},
-	quantityActionDisabled: {
-		opacity: 0.55,
-	},
 	quantityValue: {
 		minWidth: 32,
 		textAlign: 'center',
