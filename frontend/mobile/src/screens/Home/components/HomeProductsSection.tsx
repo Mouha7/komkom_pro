@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 
-import { EmptyState, ProductCardList, Text } from "../../../components";
+import { EmptyState, Icon, ProductCardList, Text } from "../../../components";
 import { lightColors } from "../../../styles/colors";
 import type { HomeProductItem } from "./HomeSections.types";
 import { spacing } from "../../../styles/spacing";
@@ -39,7 +39,7 @@ export const HomeProductsSection: React.FC<HomeProductsSectionProps> = ({
 				<EmptyState
 					title="Aucun produit trouve"
 					description="Essayez une autre recherche ou une autre categorie."
-					icon="package"
+					icon={<Icon name="package" size={44} color={lightColors.text.secondary} />}
 				/>
 			) : (
 				<ProductCardList

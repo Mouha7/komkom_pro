@@ -10,6 +10,7 @@ import {
 	CatalogAppBar,
 	CatalogFilterModal,
 	ProductCardList,
+	Icon,
 	EmptyState,
 	ErrorState,
 	ScrollToTopButton,
@@ -319,7 +320,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 					<EmptyState
 						title="Aucun produit trouvé"
 						description="Essayez une autre recherche, catégorie, ou modifiez vos filtres."
-						icon="package"
+						icon={<Icon name="package" size={44} color={lightColors.text.secondary} />}
 					/>
 				) : (
 					<ProductCardList

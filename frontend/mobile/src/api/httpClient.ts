@@ -10,6 +10,16 @@ export class HttpError extends Error {
 	}
 }
 
+export class NetworkError extends Error {
+	readonly url: string;
+
+	constructor(url: string, message: string) {
+		super(message);
+		this.name = 'NetworkError';
+		this.url = url;
+	}
+}
+
 export const buildApiUrl = (path: string): string => {
 	const base = appConfig.apiBaseUrl.replace(/\/$/, '');
 	const nextPath = path.startsWith('/') ? path : `/${path}`;
@@ -17,14 +27,31 @@ export const buildApiUrl = (path: string): string => {
 };
 
 export const getJson = async <T>(path: string): Promise<T> => {
-	const response = await fetch(buildApiUrl(path), {
-		headers: {
-			Accept: 'application/json',
-		},
-	});
+	const requestUrl = buildApiUrl(path);
+	let response: Response;
+
+	try {
+		response = await fetch(requestUrl, {
+			headers: {
+				Accept: 'application/json',
+			},
+		});
+	} catch (error) {
+		if (__DEV__) {
+			// eslint-disable-next-line no-console
+			console.warn('[api] Network request failed', { requestUrl, error });
+		}
+
+		const localhostHint =
+			requestUrl.includes('://localhost:') || requestUrl.includes('://127.0.0.1:')
+				? ' If you are on a physical device, use LAN IP or EXPO_PUBLIC_API_TUNNEL_BASE_URL (ngrok).' 
+				: '';
+
+		throw new NetworkError(requestUrl, `Network request failed for ${requestUrl}.${localhostHint}`.trim());
+	}
 
 	if (!response.ok) {
-		throw new HttpError(response.status, `Request failed with status ${response.status}`);
+		throw new HttpError(response.status, `Request failed with status ${response.status} for ${requestUrl}`);
 	}
 
 	return (await response.json()) as T;

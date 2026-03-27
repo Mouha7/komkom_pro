@@ -39,6 +39,25 @@ Le frontend mobile utilise maintenant un mini backend local json-server comme so
 3. Lancer le backend mock dans un terminal: `npm run mock:server`
 4. Lancer Expo dans un second terminal: `npm run start:lan`
 
+### Cas specifique: Expo Go en mode tunnel (`start:tunnel`)
+
+Le tunnel Expo ne publie que le serveur Metro (bundle JS). Il ne publie pas ton API locale json-server.
+
+Pour que le telephone charge les donnees quand Expo tourne en tunnel:
+
+1. Terminal A: `npm run mock:server`
+2. Terminal B: `npm run mock:server:tunnel` puis copier l'URL HTTPS ngrok (ex: `https://xxxx.ngrok.app`)
+3. Mettre a jour `.env.local`:
+  - `EXPO_PUBLIC_API_TUNNEL_BASE_URL=https://xxxx.ngrok.app`
+  - (optionnel) garder `EXPO_PUBLIC_API_BASE_URL=http://localhost:3001` pour le simulateur local
+4. Terminal C: `npm run start:tunnel`
+5. Dans Expo Go: faire un reload complet (Dev menu -> Reload)
+
+Verification rapide:
+- Ouvrir `https://xxxx.ngrok.app/api` dans le navigateur du telephone: le JSON doit s'afficher.
+- Si tu vois encore des requetes vers `http://localhost:3001/api`, l'env n'a pas ete rechargee: relancer Expo et refaire un full reload.
+- Si ngrok retourne `ERR_NGROK_4018`, verifier le compte et configurer le token (`ngrok authtoken <token>`).
+
 Source principale exposee par json-server:
 - `/api`
 

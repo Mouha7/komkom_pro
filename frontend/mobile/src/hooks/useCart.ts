@@ -22,8 +22,14 @@ export const useCart = (): UseCartResult => {
 		try {
 			const nextItems = await listCartItems();
 			setItems(nextItems);
-		} catch {
-			setErrorMessage('Impossible de charger le panier depuis json-server.');
+		} catch (error) {
+			const baseMessage = 'Impossible de charger le panier.';
+
+			if (__DEV__ && error instanceof Error) {
+				setErrorMessage(`${baseMessage} ${error.message}`);
+			} else {
+				setErrorMessage(baseMessage);
+			}
 		} finally {
 			setIsLoading(false);
 		}

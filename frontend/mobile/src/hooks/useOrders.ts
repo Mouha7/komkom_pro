@@ -22,8 +22,14 @@ export const useOrders = (): UseOrdersResult => {
 		try {
 			const nextOrders = await listOrders();
 			setOrders(nextOrders);
-		} catch {
-			setErrorMessage('Impossible de charger les commandes depuis json-server.');
+		} catch (error) {
+			const baseMessage = 'Impossible de charger les commandes.';
+
+			if (__DEV__ && error instanceof Error) {
+				setErrorMessage(`${baseMessage} ${error.message}`);
+			} else {
+				setErrorMessage(baseMessage);
+			}
 		} finally {
 			setIsLoading(false);
 		}
