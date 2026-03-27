@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 import { spacing } from '../../../styles/spacing';
 import { OrderList } from './OrderList';
+import type { OrderSummaryItem } from '../../../components';
+import { listOrders } from '../../../api/orders';
 
 const meta = {
 	title: 'Organisms/OrderList',
@@ -11,14 +13,39 @@ const meta = {
 
 export default meta;
 
-const sampleOrders = [
-	{ id: 'ord-1', reference: 'CMD-1029', total: 65000, status: 'confirmed' as const, createdAt: '2026-02-20' },
-	{ id: 'ord-2', reference: 'CMD-1030', total: 24500, status: 'delivered' as const, createdAt: '2026-02-18' },
-	{ id: 'ord-3', reference: 'CMD-1031', total: 35000, status: 'pending' as const, createdAt: '2026-02-15' },
-];
+const ApiOrderListStory: React.FC = () => {
+	const [orders, setOrders] = useState<OrderSummaryItem[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		let isMounted = true;
+		void listOrders()
+			.then((nextOrders) => {
+				if (isMounted) {
+					setOrders(nextOrders);
+				}
+			})
+			.catch(() => {
+				if (isMounted) {
+					setOrders([]);
+				}
+			})
+			.finally(() => {
+				if (isMounted) {
+					setIsLoading(false);
+				}
+			});
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
+
+	return <OrderList orders={orders} isLoading={isLoading} onPressOrder={() => undefined} />;
+};
 
 export const Default = {
-	render: () => <OrderList orders={sampleOrders} onPressOrder={() => undefined} />,
+	render: () => <ApiOrderListStory />,
 };
 
 export const Empty = {

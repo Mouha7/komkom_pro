@@ -11,6 +11,7 @@ import {
 	CatalogFilterModal,
 	ProductCardList,
 	EmptyState,
+	ErrorState,
 	ScrollToTopButton,
 	useScrollToTopButton,
 } from '../../components';
@@ -19,100 +20,22 @@ import { lightColors } from '../../styles/colors';
 import { spacing } from '../../styles/spacing';
 import type { MainTabParamList } from '../../navigation/BottomTabNavigator';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
-import { PRODUCT_TYPES, STOCK_STATUSES } from '../../constants';
 import { useToast } from '../../hooks/useToast';
+import { listCatalogCategories, listProducts } from '../../api/products';
 
 type CatalogScreenProps = CompositeScreenProps<
 	BottomTabScreenProps<MainTabParamList, 'Catalog'>,
 	NativeStackScreenProps<RootStackParamList>
 >;
 
-const INITIAL_LOAD_DELAY_MS = 600;
 const LOAD_MORE_DELAY_MS = 1200;
 const BATCH_SIZE = 4;
 const SCROLL_END_THRESHOLD = 220;
 const SCROLL_TO_TOP_VISIBILITY_THRESHOLD = 260;
 
 export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation }) => {
-	// Mock product data
-	const mockProducts: ProductListItemData[] = [
-		{
-			productId: 'prod-1',
-			name: 'Perceuse Visseuse sans fil 18V',
-			price: 35000,
-			currency: 'FCFA',
-			description: 'Perceuse professionnelle DeWalt 18V',
-			stockStatus: STOCK_STATUSES.IN_STOCK,
-			categoryId: PRODUCT_TYPES.OUTILLAGE,
-		},
-		{
-			productId: 'prod-2',
-			name: 'Ciment Portland CPJ 35',
-			price: 4500,
-			currency: 'FCFA',
-			description: 'Sac de 50 kg',
-			stockStatus: STOCK_STATUSES.IN_STOCK,
-			categoryId: PRODUCT_TYPES.GROS_OEUVRE,
-		},
-		{
-			productId: 'prod-3',
-			name: 'Câble Électrique U1000 R2V 3G1.5',
-			price: 18500,
-			currency: 'FCFA',
-			description: 'Rouleau de 50m',
-			stockStatus: STOCK_STATUSES.LOW_STOCK,
-			categoryId: PRODUCT_TYPES.PLOMBERIE,
-		},
-		{
-			productId: 'prod-4',
-			name: 'Peinture Acrylique Blanc Mat',
-			price: 12500,
-			currency: 'FCFA',
-			description: 'Seau de 15L',
-			stockStatus: STOCK_STATUSES.IN_STOCK,
-			categoryId: PRODUCT_TYPES.GROS_OEUVRE,
-		},
-		{
-			productId: 'prod-5',
-			name: 'Tube PVC Ø32mm - 1m',
-			price: 2800,
-			currency: 'FCFA',
-			description: 'Pour plomberie',
-			stockStatus: STOCK_STATUSES.IN_STOCK,
-			categoryId: PRODUCT_TYPES.PLOMBERIE,
-		},
-		{
-			productId: 'prod-6',
-			name: 'Robinet Mitigeur Chromé',
-			price: 8900,
-			currency: 'FCFA',
-			description: 'Haute qualité',
-			stockStatus: STOCK_STATUSES.IN_STOCK,
-			categoryId: PRODUCT_TYPES.PLOMBERIE,
-		},
-		{
-			productId: 'prod-7',
-			name: 'Clou Galvanisé 100mm - Kg',
-			price: 1500,
-			currency: 'FCFA',
-			description: 'Boîte de 5kg',
-			stockStatus: STOCK_STATUSES.IN_STOCK,
-			categoryId: PRODUCT_TYPES.GROS_OEUVRE,
-		},
-		{
-			productId: 'prod-8',
-			name: 'Vis à Bois 4x40mm - Boîte',
-			price: 2200,
-			currency: 'FCFA',
-			description: '500 pièces',
-			stockStatus: STOCK_STATUSES.LOW_STOCK,
-			categoryId: PRODUCT_TYPES.OUTILLAGE,
-		},
-	];
-
 	// Hooks
 	const { showToast } = useToast();
-	const initialLoadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const loadMoreTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const isLoadMoreLockedRef = useRef(false);
 
@@ -120,20 +43,18 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 	const [searchQuery, setSearchQuery] = useState('');
 	const [viewMode, setViewMode] = useState<ViewMode>('list');
 	const [isLoadingInitial, setIsLoadingInitial] = useState(true);
+	const [isReloading, setIsReloading] = useState(false);
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
+	const [allProducts, setAllProducts] = useState<ProductListItemData[]>([]);
+	const [apiError, setApiError] = useState<string | null>(null);
 
 	// Filter modal
 	const [filterModalVisible, setFilterModalVisible] = useState(false);
 	const [filterOptions, setFilterOptions] = useState<FilterOptions>({});
 
 	// Categories
-	const [categories] = useState<CatalogCategory[]>([
-		{ id: 'all', name: 'Tous' },
-		{ id: 'gros-oeuvre', name: 'Gros œuvre' },
-		{ id: '3-utillage', name: '3 utillage' },
-		{ id: 'plomberie', name: 'Plomberie' },
-	]);
+	const [categories, setCategories] = useState<CatalogCategory[]>([]);
 	const [selectedCategoryId, setSelectedCategoryId] = useState<string | undefined>('all');
 
 	// Get variant based on viewMode
@@ -141,9 +62,39 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 		return viewMode === 'grid' ? 'portrait' : 'landscape';
 	}, [viewMode]);
 
+	const loadCatalogData = useCallback(async (): Promise<void> => {
+		setApiError(null);
+		setIsLoadingInitial(true);
+
+		try {
+			const [nextProducts, nextCategories] = await Promise.all([
+				listProducts({ perPage: 100 }),
+				listCatalogCategories(),
+			]);
+
+			setAllProducts(nextProducts);
+			setCategories(nextCategories);
+		} catch {
+			setApiError('Impossible de charger le catalogue depuis json-server.');
+		} finally {
+			setIsLoadingInitial(false);
+		}
+	}, []);
+
+	useEffect(() => {
+		void loadCatalogData();
+	}, [loadCatalogData]);
+
+	useEffect(() => {
+		const initialCategoryId = route.params?.categoryId;
+		if (initialCategoryId) {
+			setSelectedCategoryId(initialCategoryId);
+		}
+	}, [route.params?.categoryId]);
+
 	// Filter products based on search, category, and filter options
 	const filteredProducts = useMemo(() => {
-		return mockProducts.filter((product) => {
+		return allProducts.filter((product) => {
 			// Search filter
 			const searchLower = searchQuery.toLowerCase();
 			const matchesSearch =
@@ -153,17 +104,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 
 			// Category filter (except 'all' which shows all)
 			if (selectedCategoryId && selectedCategoryId !== 'all') {
-				// Mock mapping: categoryId -> product category
-				const categoryMap: Record<string, string[]> = {
-					'gros-oeuvre': ['Ciment', 'Clou'],
-					'3-utillage': ['Perceuse', 'Vis'],
-					plomberie: ['Tube PVC', 'Robinet', 'Câble'],
-				};
-				const categoryProducts = categoryMap[selectedCategoryId] || [];
-				const matchesCategory = categoryProducts.some((cat) =>
-					product.name.includes(cat)
-				);
-				if (!matchesCategory) return false;
+				if (product.categoryId !== selectedCategoryId) return false;
 			}
 
 			// Price range filter
@@ -186,7 +127,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 
 			return true;
 		});
-	}, [searchQuery, selectedCategoryId, filterOptions]);
+	}, [allProducts, searchQuery, selectedCategoryId, filterOptions]);
 
 	const hasMoreProducts = visibleCount < filteredProducts.length;
 	const displayedProducts = useMemo(
@@ -200,25 +141,6 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 		: isLoadingInitial
 			? BATCH_SIZE
 			: 0;
-
-	// Initial loading effect
-	useEffect(() => {
-		if (initialLoadTimeoutRef.current) {
-			clearTimeout(initialLoadTimeoutRef.current);
-		}
-
-		initialLoadTimeoutRef.current = setTimeout(() => {
-			setIsLoadingInitial(false);
-			initialLoadTimeoutRef.current = null;
-		}, INITIAL_LOAD_DELAY_MS);
-
-		return () => {
-			if (initialLoadTimeoutRef.current) {
-				clearTimeout(initialLoadTimeoutRef.current);
-				initialLoadTimeoutRef.current = null;
-			}
-		};
-	}, []);
 
 	// Cleanup timeout on unmount
 	useEffect(() => {
@@ -294,9 +216,15 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 	}, [navigation]);
 
 	const handleAddToCart = useCallback((productId: string) => {
-		console.log('Add to cart:', productId);
-		// TODO: Call cart API
-	}, []);
+		showToast({
+			tone: 'success',
+			title: 'Produit ajoute',
+			message: `Produit ${productId} ajoute au panier`,
+			actionLabel: 'Voir',
+			actionLabelA11y: 'Voir le panier',
+			onActionPress: () => navigation.navigate('Cart'),
+		});
+	}, [navigation, showToast]);
 
 	const handleCartToggle = useCallback((productId: string, isSelected: boolean, productName: string) => {
 		if (isSelected) {
@@ -306,6 +234,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 				message: `${productName} a ete ajoute au panier`,
 				actionLabel: 'Voir',
 				actionLabelA11y: 'Voir le panier',
+				onActionPress: () => navigation.navigate('Cart'),
 			});
 			return;
 		}
@@ -316,8 +245,9 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 			message: `${productName} a ete retire du panier`,
 			actionLabel: 'Voir',
 			actionLabelA11y: 'Voir le panier',
+			onActionPress: () => navigation.navigate('Cart'),
 		});
-	}, [showToast]);
+	}, [navigation, showToast]);
 
 	const handleOutOfStockPress = useCallback((productName: string) => {
 		showToast({
@@ -337,8 +267,17 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 
 	const handleApplyFilters = () => {
 		setFilterModalVisible(false);
-		// TODO: Appliquer les filtres à la requête API
-		console.log('Filters applied:', filterOptions);
+	};
+
+	const handleRetryCatalog = (): void => {
+		if (isReloading) {
+			return;
+		}
+
+		setIsReloading(true);
+		void loadCatalogData().finally(() => {
+			setIsReloading(false);
+		});
 	};
 
 	return (
@@ -369,7 +308,14 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 				onScroll={handleScroll}
 				scrollEventThrottle={16}
 			>
-				{filteredProducts.length === 0 ? (
+				{apiError ? (
+					<ErrorState
+						title='Catalogue indisponible'
+						description={apiError}
+						actionLabel={isReloading ? 'Rechargement...' : 'Reessayer'}
+						onActionPress={handleRetryCatalog}
+					/>
+				) : filteredProducts.length === 0 ? (
 					<EmptyState
 						title="Aucun produit trouvé"
 						description="Essayez une autre recherche, catégorie, ou modifiez vos filtres."

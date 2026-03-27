@@ -1,8 +1,10 @@
-import React from 'react';
-import { View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Text, View } from 'react-native';
 
 import { spacing } from '../../../styles/spacing';
 import { ProductCard } from './ProductCard';
+import type { ProductListItemData } from '../../../components';
+import { listProducts } from '../../../api/products';
 
 const meta = {
 	title: 'Molecules/ProductCard',
@@ -11,37 +13,59 @@ const meta = {
 
 export default meta;
 
-export const Default = {
-	render: () => (
+const ApiProductCardStory: React.FC<{ index: number; stockOverride?: ProductListItemData['stockStatus'] }> = ({
+	index,
+	stockOverride,
+}) => {
+	const [products, setProducts] = useState<ProductListItemData[]>([]);
+
+	useEffect(() => {
+		let isMounted = true;
+		void listProducts({ perPage: 8 })
+			.then((nextProducts) => {
+				if (isMounted) {
+					setProducts(nextProducts);
+				}
+			})
+			.catch(() => {
+				if (isMounted) {
+					setProducts([]);
+				}
+			});
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
+
+	const product = products[index];
+
+	if (!product) {
+		return <ProductCard loading productId='loading-product' name='' price={0} />;
+	}
+
+	return (
 		<ProductCard
-			productId="product-1"
-			name="Perceuse visseuse sans fil 18V"
-			price={35000}
-			description="Unite"
+			productId={product.productId}
+			name={product.name}
+			price={product.price}
+			description={product.description}
+			stockStatus={stockOverride ?? product.stockStatus}
 			onAddToCart={() => undefined}
 		/>
-	),
+	);
+};
+
+export const Default = {
+	render: () => <ApiProductCardStory index={0} />,
 };
 
 export const States = {
 	render: () => (
 		<View style={{ rowGap: spacing.s3 }}>
-			<ProductCard
-				productId="product-2"
-				name="Ciment Portland CPJ 35"
-				price={4500}
-				description="Sac de 50 kg"
-				stockStatus="in_stock"
-				onAddToCart={() => undefined}
-			/>
-			<ProductCard
-				productId="product-3"
-				name="Cable electrique U1000 R2V 3G1.5"
-				price={18500}
-				description="Rouleau de 50m"
-				stockStatus="low_stock"
-				onAddToCart={() => undefined}
-			/>
+			<ApiProductCardStory index={1} />
+			<ApiProductCardStory index={2} />
+			<Text style={{ opacity: 0.6 }}>Demarrer json-server pour visualiser les donnees reelles.</Text>
 		</View>
 	),
 };

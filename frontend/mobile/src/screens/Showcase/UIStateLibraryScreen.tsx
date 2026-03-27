@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Alert, ScrollView, View } from "react-native";
 
 import {
@@ -24,6 +24,10 @@ import type {
 	OrderSummaryItem,
 } from "../../components";
 import { styles } from "./UIStateLibraryScreen.styles";
+import type { ProductListItemData } from "../../components";
+import { listProducts } from "../../api/products";
+import { useCart } from "../../hooks/useCart";
+import { useOrders } from "../../hooks/useOrders";
 
 type ToastItem = {
 	id: string;
@@ -49,8 +53,7 @@ const initialToasts: ToastItem[] = [
 		id: "danger-permission",
 		tone: "danger",
 		title: "Action impossible",
-		message:
-			"Vous n'avez pas les droits necessaires pour modifier ce magasin.",
+		message: "Vous n'avez pas les droits necessaires pour modifier ce magasin.",
 	},
 	{
 		id: "info-catalog",
@@ -108,108 +111,38 @@ const buildBottomActions = (): BottomBarAction[] => [
 	},
 ];
 
-const cartItemsPreview: CartItemData[] = [
-	{
-		productId: "prod-perceuse",
-		brand: "PROTOOL",
-		name: "Perceuse Visseuse sans fil 18V avec 2 batteries",
-		price: 35000,
-		currency: "FCFA",
-		quantity: 1,
-		description: "Unite",
-		stockStatus: "in_stock",
-		imageUrl:
-			"https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=400&q=80",
-	},
-	{
-		productId: "prod-ciment",
-		brand: "BUILDMAT",
-		name: "Ciment Portland CPJ 45 - Sac de 50kg",
-		price: 4500,
-		currency: "FCFA",
-		quantity: 20,
-		description: "4 500 / Sac",
-		stockStatus: "low_stock",
-		imageUrl:
-			"https://images.unsplash.com/photo-1590247813693-5541d1c609fd?auto=format&fit=crop&w=400&q=80",
-	},
-];
-
-const ordersPreview: OrderSummaryItem[] = [
-	{
-		id: "cmd-1029",
-		reference: "CMD-1029",
-		total: 34950,
-		currency: "FCFA",
-		status: "pending",
-		createdAt: "2026-03-12T10:00:00.000Z",
-	},
-	{
-		id: "cmd-1030",
-		reference: "CMD-1030",
-		total: 87200,
-		currency: "FCFA",
-		status: "confirmed",
-		createdAt: "2026-03-13T15:30:00.000Z",
-	},
-	{
-		id: "cmd-1031",
-		reference: "CMD-1031",
-		total: 19100,
-		currency: "FCFA",
-		status: "delivered",
-		createdAt: "2026-03-15T09:45:00.000Z",
-	},
-];
-
-const portraitProductsPreview = [
-	{
-		productId: "prod-ciment",
-		name: "Ciment Portland CPJ 35",
-		price: 4500,
-		currency: "FCFA",
-		description: "Sac de 50 kg",
-		imageUrl: "https://via.placeholder.com/300x400?text=Ciment",
-		stockStatus: "in_stock" as const,
-	},
-	{
-		productId: "prod-peinture",
-		name: "Peinture Blanche Mat 20L",
-		price: 18900,
-		currency: "FCFA",
-		description: "Seau interieur",
-		imageUrl: "https://via.placeholder.com/300x400?text=Peinture",
-		stockStatus: "low_stock" as const,
-	},
-];
-
-const landscapeProductsPreview = [
-	{
-		productId: "prod-perceuse",
-		name: "Perceuse Visseuse sans fil 18V",
-		price: 35000,
-		currency: "FCFA",
-		description: "Unité",
-		imageUrl: "https://via.placeholder.com/400x300?text=Perceuse",
-		stockStatus: "in_stock" as const,
-	},
-	{
-		productId: "prod-meuleuse",
-		name: "Meuleuse 2200W",
-		price: 27900,
-		currency: "FCFA",
-		description: "Disque 230 mm",
-		imageUrl: "https://via.placeholder.com/400x300?text=Meuleuse",
-		stockStatus: "out_of_stock" as const,
-	},
-];
-
 export const UIStateLibraryScreen: React.FC = () => {
+	const { items: cartItems } = useCart();
+	const { orders } = useOrders();
+	const [products, setProducts] = useState<ProductListItemData[]>([]);
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [toasts, setToasts] = useState<ToastItem[]>(initialToasts);
 
+	useEffect(() => {
+		let isMounted = true;
+		void listProducts({ perPage: 12 })
+			.then((nextProducts) => {
+				if (isMounted) {
+					setProducts(nextProducts);
+				}
+			})
+			.catch(() => {
+				if (isMounted) {
+					setProducts([]);
+				}
+			});
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
+
 	const visibleToasts = useMemo(() => toasts, [toasts]);
 	const bottomActions = useMemo(() => buildBottomActions(), []);
+	const cartItemsPreview: CartItemData[] = cartItems;
+	const ordersPreview: OrderSummaryItem[] = orders;
+	const portraitProductsPreview = products.slice(0, 2);
+	const landscapeProductsPreview = products.slice(2, 4);
 
 	const removeToast = (toastId: string): void => {
 		setToasts((current) => current.filter((toast) => toast.id !== toastId));
@@ -365,6 +298,7 @@ export const UIStateLibraryScreen: React.FC = () => {
 					</Text>
 					<ProductCardList
 						items={portraitProductsPreview}
+						isLoadingInitial={portraitProductsPreview.length === 0}
 						onPressProduct={(id: string) =>
 							Alert.alert("Navigation", `Ouvrir detail produit: ${id}`)
 						}
@@ -381,6 +315,7 @@ export const UIStateLibraryScreen: React.FC = () => {
 					<ProductCardList
 						items={landscapeProductsPreview}
 						variant="landscape"
+						isLoadingInitial={landscapeProductsPreview.length === 0}
 						onPressProduct={(id: string) =>
 							Alert.alert("Navigation", `Ouvrir detail produit: ${id}`)
 						}

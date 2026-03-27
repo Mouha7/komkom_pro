@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 import { spacing } from '../../../styles/spacing';
 import { CartItem } from './CartItem';
+import { listCartItems } from '../../../api/cart';
+import type { CartItemData } from '../../../components';
 
 const meta = {
 	title: 'Molecules/CartItem',
@@ -11,29 +13,57 @@ const meta = {
 
 export default meta;
 
-const sample = {
-	productId: 'prod-1',
-	name: 'Perceuse visseuse sans fil 18V',
-	price: 35000,
-	quantity: 2,
-	description: 'Unite',
-	stockStatus: 'in_stock' as const,
+const ApiCartItemStory: React.FC<{ index: number }> = ({ index }) => {
+	const [items, setItems] = useState<CartItemData[]>([]);
+
+	useEffect(() => {
+		let isMounted = true;
+		void listCartItems()
+			.then((nextItems) => {
+				if (isMounted) {
+					setItems(nextItems);
+				}
+			})
+			.catch(() => {
+				if (isMounted) {
+					setItems([]);
+				}
+			});
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
+
+	const item = items[index];
+
+	if (!item) {
+		return (
+			<CartItem
+				item={{
+					productId: 'loading',
+					name: 'Chargement',
+					price: 0,
+					quantity: 1,
+					currency: 'FCFA',
+				}}
+				disabled
+			/>
+		);
+	}
+
+	return <CartItem item={item} onIncrease={() => undefined} onDecrease={() => undefined} />;
 };
 
 export const Default = {
-	render: () => <CartItem item={sample} onIncrease={() => undefined} onDecrease={() => undefined} />,
+	render: () => <ApiCartItemStory index={0} />,
 };
 
 export const List = {
 	render: () => (
 		<View style={{ rowGap: spacing.s2 }}>
-			<CartItem item={sample} onIncrease={() => undefined} onDecrease={() => undefined} />
-			<CartItem
-				item={{ ...sample, productId: 'prod-2', name: 'Cable electrique U1000 R2V 3G1.5', quantity: 1 }}
-				onIncrease={() => undefined}
-				onDecrease={() => undefined}
-				onRemove={() => undefined}
-			/>
+			<ApiCartItemStory index={0} />
+			<ApiCartItemStory index={1} />
 		</View>
 	),
 };

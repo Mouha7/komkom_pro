@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Image, ScrollView, View, useWindowDimensions } from 'react-native';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,6 +11,7 @@ import {
 	ProductDetailAppBar,
 	ScrollToTopButton,
 	Text,
+	ErrorState,
 	useScrollToTopButton,
 } from '../../components';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
@@ -18,55 +19,18 @@ import { useToast } from '../../hooks/useToast';
 import { formatAmount } from '../../utils/formatPrice';
 import { styles } from './ProductDetailScreen.styles';
 import type { ProductDetailData } from './ProductDetailScreen.types';
+import { getProductDetail } from '../../api/products';
 
 type ProductDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'ProductDetail'>;
 
 const SCROLL_TO_TOP_VISIBILITY_THRESHOLD = 240;
 
-const PRODUCT_DETAILS: Record<string, ProductDetailData> = {
-	'prod-1': {
-		id: 'prod-1',
-		brand: 'PROTOOL',
-		reference: 'PT-18V-500',
-		name: 'Perceuse Visseuse sans fil 18V avec 2 batteries',
-		price: 35000,
-		currency: 'FCFA',
-		unitLabel: 'Unite (Coffret complet)',
-		stockStatus: 'in_stock',
-		imageUrls: [
-			'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=900&q=80',
-			'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?auto=format&fit=crop&w=900&q=80',
-			'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=900&q=80',
-		],
-		description:
-			'Ideale pour le perçage dans le bois, le metal et le plastique, ainsi que pour toutes les applications de vissage. Design compact et leger pour une maniabilite optimale.',
-		specifications: [
-			{ label: 'Tension', value: '18 V' },
-			{ label: 'Batterie', value: '2.0 Ah Li-Ion (x2)' },
-			{ label: 'Mandrin', value: '13 mm sans cle' },
-			{ label: 'Couple max', value: '42 Nm' },
-			{ label: 'Poids', value: '1.5 kg' },
-		],
-		highlights: [
-			{
-				iconName: 'truck',
-				title: 'Livraison express disponible',
-				description: 'Commandez avant 14h pour une expedition le jour meme.',
-			},
-			{
-				iconName: 'shieldCheck',
-				title: 'Garantie Pro 1 An',
-				description: 'Couvre les defauts de fabrication et la batterie.',
-			},
-		],
-	},
-};
-
-const FALLBACK_PRODUCT: ProductDetailData = PRODUCT_DETAILS['prod-1'];
-
 export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({ navigation, route }) => {
 	const { width } = useWindowDimensions();
 	const { showToast } = useToast();
+	const [product, setProduct] = useState<ProductDetailData | null>(null);
+	const [isLoadingProduct, setIsLoadingProduct] = useState(true);
+	const [loadError, setLoadError] = useState<string | null>(null);
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [quantity, setQuantity] = useState(1);
 	const [isFavorite, setIsFavorite] = useState(false);
@@ -75,13 +39,33 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({ naviga
 		[width],
 	);
 
-	const product = useMemo(() => {
-		const productId = route.params?.productId;
+	const productId = route.params?.productId;
+
+	const loadProduct = useCallback(async (): Promise<void> => {
 		if (!productId) {
-			return FALLBACK_PRODUCT;
+			setProduct(null);
+			setIsLoadingProduct(false);
+			setLoadError('Produit introuvable.');
+			return;
 		}
-		return PRODUCT_DETAILS[productId] ?? FALLBACK_PRODUCT;
-	}, [route.params?.productId]);
+
+		setIsLoadingProduct(true);
+		setLoadError(null);
+
+		try {
+			const detail = await getProductDetail(productId);
+			setProduct(detail);
+		} catch {
+			setLoadError('Impossible de charger les details produit depuis json-server.');
+			setProduct(null);
+		} finally {
+			setIsLoadingProduct(false);
+		}
+	}, [productId]);
+
+	useEffect(() => {
+		void loadProduct();
+	}, [loadProduct]);
 
 	const handleDetailScroll = (event: NativeSyntheticEvent<NativeScrollEvent>): void => {
 		const nextIndex = Math.round(event.nativeEvent.contentOffset.x / Math.max(width, 1));
@@ -93,10 +77,17 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({ naviga
 	});
 
 	const handleAddToCart = (): void => {
+		if (!product) {
+			return;
+		}
+
 		showToast({
 			tone: 'success',
 			title: 'Produit ajoute',
 			message: `${quantity} x ${product.name} ajoute au panier`,
+			actionLabel: 'Voir',
+			actionLabelA11y: 'Voir le panier',
+			onActionPress: () => navigation.navigate('Cart'),
 		});
 	};
 
@@ -108,7 +99,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({ naviga
 		});
 	};
 
-	const priceAmount = formatAmount(product.price);
+	const priceAmount = product ? formatAmount(product.price) : '0';
 
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
@@ -129,109 +120,124 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({ naviga
 				scrollEventThrottle={16}
 				showsVerticalScrollIndicator={false}
 			>
-				<View style={[styles.galleryWrap, { height: galleryHeight }]}>
-					<ScrollView
-						horizontal
-						pagingEnabled
-						showsHorizontalScrollIndicator={false}
-						onMomentumScrollEnd={handleDetailScroll}
-						style={styles.imagePager}
-					>
-						{product.imageUrls.map((imageUrl) => (
-							<Image
-								key={imageUrl}
-								source={{ uri: imageUrl }}
-								style={[styles.image, { width }]}
-								resizeMode='contain'
-							/>
-						))}
-					</ScrollView>
-					<View style={styles.dotsWrap}>
-						{product.imageUrls.map((imageUrl, index) => (
-							<View
-								key={`${imageUrl}-${index}`}
-								style={[styles.dot, index === currentImageIndex && styles.dotActive]}
-							/>
-						))}
-					</View>
-				</View>
+				{loadError ? (
+					<ErrorState
+						title='Detail produit indisponible'
+						description={loadError}
+						actionLabel={isLoadingProduct ? 'Rechargement...' : 'Reessayer'}
+						onActionPress={() => {
+							void loadProduct();
+						}}
+					/>
+				) : null}
 
-				<View style={styles.mainBlock}>
-					<View style={styles.stockChip}>
-						<Text variant='small' style={styles.stockLabel}>
-							EN STOCK
-						</Text>
-					</View>
-
-					<View style={styles.brandRow}>
-						<Text variant='small' style={styles.brandLabel}>
-							{product.brand}
-						</Text>
-						<Text variant='small' style={styles.referenceLabel}>
-							Ref: {product.reference}
-						</Text>
-					</View>
-
-					<Text variant='h1' style={styles.productName}>
-						{product.name}
-					</Text>
-
-					<View style={styles.priceRow}>
-						<Text style={styles.priceValue}>{priceAmount}</Text>
-						<Text variant='h2' style={styles.priceCurrency}>
-							{product.currency}
-						</Text>
-					</View>
-
-					<View style={styles.unitChip}>
-						<Icon name='package' size={16} color='#4B5563' />
-						<Text variant='body' style={styles.unitLabel}>
-							{product.unitLabel}
-						</Text>
-					</View>
-				</View>
-
-				<ExpandableSection title='Description' defaultExpanded>
-					<Text variant='bodyLarge' style={styles.descriptionText}>
-						{product.description}
-					</Text>
-				</ExpandableSection>
-
-				<ExpandableSection title='Caracteristiques techniques' defaultExpanded>
-					<View style={styles.specTable}>
-						{product.specifications.map((spec, index) => (
-							<View
-								key={spec.label}
-								style={[styles.specRow, index % 2 === 0 && styles.specRowAlt]}
+				{product ? (
+					<>
+						<View style={[styles.galleryWrap, { height: galleryHeight }]}>
+							<ScrollView
+								horizontal
+								pagingEnabled
+								showsHorizontalScrollIndicator={false}
+								onMomentumScrollEnd={handleDetailScroll}
+								style={styles.imagePager}
 							>
-								<Text variant='body' style={styles.specLabel}>
-									{spec.label}
-								</Text>
-								<Text variant='body' style={styles.specValue}>
-									{spec.value}
-								</Text>
+								{product.imageUrls.map((imageUrl) => (
+									<Image
+										key={imageUrl}
+										source={{ uri: imageUrl }}
+										style={[styles.image, { width }]}
+										resizeMode='contain'
+									/>
+								))}
+							</ScrollView>
+							<View style={styles.dotsWrap}>
+								{product.imageUrls.map((imageUrl, index) => (
+									<View
+										key={`${imageUrl}-${index}`}
+										style={[styles.dot, index === currentImageIndex && styles.dotActive]}
+									/>
+								))}
 							</View>
-						))}
-					</View>
-				</ExpandableSection>
+						</View>
 
-				<View style={styles.highlightBlock}>
-					{product.highlights.map((highlight) => (
-						<View key={highlight.title} style={styles.highlightRow}>
-							<View style={styles.highlightIconWrap}>
-								<Icon name={highlight.iconName} size={20} color='#ED762F' />
-							</View>
-							<View style={styles.highlightTexts}>
-								<Text variant='h3' style={styles.highlightTitle}>
-									{highlight.title}
+						<View style={styles.mainBlock}>
+							<View style={styles.stockChip}>
+								<Text variant='small' style={styles.stockLabel}>
+									EN STOCK
 								</Text>
-								<Text variant='body' style={styles.highlightDescription}>
-									{highlight.description}
+							</View>
+
+							<View style={styles.brandRow}>
+								<Text variant='small' style={styles.brandLabel}>
+									{product.brand}
+								</Text>
+								<Text variant='small' style={styles.referenceLabel}>
+									Ref: {product.reference}
+								</Text>
+							</View>
+
+							<Text variant='h1' style={styles.productName}>
+								{product.name}
+							</Text>
+
+							<View style={styles.priceRow}>
+								<Text style={styles.priceValue}>{priceAmount}</Text>
+								<Text variant='h2' style={styles.priceCurrency}>
+									{product.currency}
+								</Text>
+							</View>
+
+							<View style={styles.unitChip}>
+								<Icon name='package' size={16} color='#4B5563' />
+								<Text variant='body' style={styles.unitLabel}>
+									{product.unitLabel}
 								</Text>
 							</View>
 						</View>
-					))}
-				</View>
+
+						<ExpandableSection title='Description' defaultExpanded>
+							<Text variant='bodyLarge' style={styles.descriptionText}>
+								{product.description}
+							</Text>
+						</ExpandableSection>
+
+						<ExpandableSection title='Caracteristiques techniques' defaultExpanded>
+							<View style={styles.specTable}>
+								{product.specifications.map((spec, index) => (
+									<View
+										key={spec.label}
+										style={[styles.specRow, index % 2 === 0 && styles.specRowAlt]}
+									>
+										<Text variant='body' style={styles.specLabel}>
+											{spec.label}
+										</Text>
+										<Text variant='body' style={styles.specValue}>
+											{spec.value}
+										</Text>
+									</View>
+								))}
+							</View>
+						</ExpandableSection>
+
+						<View style={styles.highlightBlock}>
+							{product.highlights.map((highlight) => (
+								<View key={highlight.title} style={styles.highlightRow}>
+									<View style={styles.highlightIconWrap}>
+										<Icon name={highlight.iconName} size={20} color='#ED762F' />
+									</View>
+									<View style={styles.highlightTexts}>
+										<Text variant='h3' style={styles.highlightTitle}>
+											{highlight.title}
+										</Text>
+										<Text variant='body' style={styles.highlightDescription}>
+											{highlight.description}
+										</Text>
+									</View>
+								</View>
+							))}
+						</View>
+					</>
+				) : null}
 			</ScrollView>
 
 			<ScrollToTopButton
@@ -247,6 +253,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({ naviga
 					onDecrease={() => setQuantity((current) => Math.max(1, current - 1))}
 					onIncrease={() => setQuantity((current) => current + 1)}
 					onAddToCart={handleAddToCart}
+					disabled={!product}
 				/>
 			</View>
 		</SafeAreaView>

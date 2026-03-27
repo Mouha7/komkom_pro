@@ -9,17 +9,21 @@ import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import type { CompositeScreenProps } from "@react-navigation/native";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import {
 	HomeAppBar,
 	ScrollToTopButton,
+	ErrorState,
 	useScrollToTopButton,
 } from "../../components";
 import { useAuth } from "../../hooks/useAuth";
 import { useToast } from "../../hooks/useToast";
 import { styles } from "./HomeScreen.styles";
 import type { MainTabParamList } from "../../navigation/BottomTabNavigator";
-import { PRODUCT_TYPES, STOCK_STATUSES } from "../../constants";
+import type { RootStackParamList } from "../../navigation/AppNavigator";
+import { listHomeCategories, listHomePromos, listProducts } from "../../api/products";
 import {
 	HomeCategoriesSection,
 	HomeProductsSection,
@@ -30,12 +34,13 @@ import {
 	type HomePromoItem,
 } from "./components";
 
-type HomeScreenProps = BottomTabScreenProps<MainTabParamList, "Home">;
+type HomeScreenProps = CompositeScreenProps<
+	BottomTabScreenProps<MainTabParamList, "Home">,
+	NativeStackScreenProps<RootStackParamList>
+>;
 
 const BATCH_SIZE = 4;
-const INITIAL_LOAD_DELAY_MS = 900;
 const LOAD_MORE_DELAY_MS = 1200;
-const MAX_MOCK_PAGES = 3;
 const SCROLL_END_THRESHOLD = 220;
 const SCROLL_TO_TOP_VISIBILITY_THRESHOLD = 260;
 
@@ -65,13 +70,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 	const [query, setQuery] = useState("");
 	const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
 	const [isLoadingInitial, setIsLoadingInitial] = useState(true);
+	const [isReloading, setIsReloading] = useState(false);
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
-	const initialLoadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-		null,
-	);
 	const loadMoreTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
 		null,
 	);
+	const [products, setProducts] = useState<HomeProductItem[]>([]);
+	const [categories, setCategories] = useState<HomeCategoryItem[]>([]);
+	const [promos, setPromos] = useState<HomePromoItem[]>([]);
+	const [apiError, setApiError] = useState<string | null>(null);
 
 	const isLoadMoreLockedRef = useRef(false);
 
@@ -83,91 +90,25 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 		? "Magasin Partenaire KomKom"
 		: "Quincaillerie Centrale";
 
-	const categories: HomeCategoryItem[] = useMemo(
-		() => [
-			{
-				id: "cat-gros-oeuvre",
-				label: "Gros oeuvre",
-				iconName: "building2",
-			},
-			{ id: "cat-outillage", label: "Outillage", iconName: "hammer" },
-			{ id: "cat-plomberie", label: "Plomberie", iconName: "droplet" },
-			{ id: "cat-electricite", label: "Electricite", iconName: "zap" },
-		],
-		[],
-	);
+	const loadHomeData = useCallback(async (): Promise<void> => {
+		setIsLoadingInitial(true);
+		setApiError(null);
 
-	const promos: HomePromoItem[] = useMemo(
-		() => [
-			{
-				id: "promo-ciment",
-				title: "-15% sur le ciment",
-				description: "Offre valable jusqu'a vendredi",
-				ctaLabel: "Commander",
-			},
-			{
-				id: "promo-ferraille",
-				title: "-15% sur le ferraille",
-				description: "Offre valable jusqu'a vendredi",
-				ctaLabel: "Commander",
-			},
-		],
-		[],
-	);
+		try {
+			const [nextProducts, nextCategories, nextPromos] = await Promise.all([
+				listProducts({ perPage: 100 }),
+				listHomeCategories(),
+				listHomePromos(),
+			]);
 
-	const products: HomeProductItem[] = useMemo(() => {
-		const baseProducts: HomeProductItem[] = [
-			{
-				productId: "p-ciment-portland",
-				name: "Ciment Portland CPJ 35",
-				price: 4500,
-				description: "Sac de 50 kg",
-				imageUrl:
-					"https://images.unsplash.com/photo-1610725664285-7c57e6eeac3f?auto=format&fit=crop&w=640&q=80",
-				stockStatus: STOCK_STATUSES.IN_STOCK,
-				categoryId: PRODUCT_TYPES.GROS_OEUVRE,
-			},
-			{
-				productId: "p-perceuse-18v",
-				name: "Perceuse Visseuse sans fil 18V",
-				price: 3500,
-				description: "Unite",
-				imageUrl:
-					"https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=640&q=80",
-				stockStatus: STOCK_STATUSES.IN_STOCK,
-				categoryId: PRODUCT_TYPES.OUTILLAGE,
-			},
-			{
-				productId: "p-tuyau-pvc",
-				name: "Tuyau PVC evacuation",
-				price: 2800,
-				description: "Barre de 4m",
-				imageUrl:
-					"https://unsplash.com/fr/photos/un-gros-plan-de-tuyaux-et-de-tuyaux-devant-un-arbre-eebb1aXTL_8",
-				stockStatus: STOCK_STATUSES.OUT_OF_STOCK,
-				categoryId: PRODUCT_TYPES.PLOMBERIE,
-			},
-			{
-				productId: "p-cable-r2v",
-				name: "Cable Electrique U1000 R2V 3G1.5",
-				price: 18500,
-				description: "Rouleau de 50m",
-				imageUrl:
-					"https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=640&q=80",
-				stockStatus: STOCK_STATUSES.LOW_STOCK,
-				categoryId: PRODUCT_TYPES.ELECTRICITE,
-			},
-		];
-
-		return Array.from({ length: MAX_MOCK_PAGES }).flatMap((_, pageIndex) =>
-			baseProducts.map((product) => ({
-				...product,
-				productId:
-					pageIndex === 0
-						? product.productId
-						: `${product.productId}-page-${pageIndex + 1}`,
-			})),
-		);
+			setProducts(nextProducts);
+			setCategories(nextCategories);
+			setPromos(nextPromos);
+		} catch {
+			setApiError('Impossible de charger les donnees accueil depuis json-server.');
+		} finally {
+			setIsLoadingInitial(false);
+		}
 	}, []);
 
 	const filteredProducts = useMemo(() => {
@@ -199,22 +140,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 			: 0;
 
 	useEffect(() => {
-		if (initialLoadTimeoutRef.current) {
-			clearTimeout(initialLoadTimeoutRef.current);
-		}
-
-		initialLoadTimeoutRef.current = setTimeout(() => {
-			setIsLoadingInitial(false);
-			initialLoadTimeoutRef.current = null;
-		}, INITIAL_LOAD_DELAY_MS);
-
-		return () => {
-			if (initialLoadTimeoutRef.current) {
-				clearTimeout(initialLoadTimeoutRef.current);
-				initialLoadTimeoutRef.current = null;
-			}
-		};
-	}, []);
+		void loadHomeData();
+	}, [loadHomeData]);
 
 	useEffect(() => {
 		return () => {
@@ -300,6 +227,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 	};
 
 	const handleAddToCart = (_productId: string): void => {
+		showToast({
+			tone: "success",
+			title: "Produit ajoute",
+			message: "Article ajoute au panier",
+			actionLabel: "Voir",
+			actionLabelA11y: "Voir le panier",
+			onActionPress: () => navigation.navigate("Cart"),
+		});
 		return;
 	};
 
@@ -315,7 +250,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 				message: `${productName} a ete ajoute au panier`,
 				actionLabel: "Voir",
 				actionLabelA11y: "Voir le panier",
-				onActionPress: () => navigation.navigate("Catalog"),
+				onActionPress: () => navigation.navigate("Cart"),
 			});
 			return;
 		}
@@ -326,7 +261,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 			message: `${productName} a ete retire du panier`,
 			actionLabel: "Voir",
 			actionLabelA11y: "Voir le panier",
-			onActionPress: () => navigation.navigate("Catalog"),
+			onActionPress: () => navigation.navigate("Cart"),
 		});
 	};
 
@@ -335,6 +270,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 			tone: "info",
 			title: "Produit en rupture",
 			message: `${productName} n'est pas disponible actuellement`,
+		});
+	};
+
+	const handleRetryHomeData = (): void => {
+		if (isReloading) {
+			return;
+		}
+
+		setIsReloading(true);
+		void loadHomeData().finally(() => {
+			setIsReloading(false);
 		});
 	};
 
@@ -347,7 +293,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 				cartCount={5}
 				onPressProfile={() => navigation.navigate("Profile")}
 				onPressNotifications={() => navigation.navigate("Orders")}
-				onPressCart={() => navigation.navigate("Catalog")}
+				onPressCart={() => navigation.navigate("Cart")}
 			/>
 
 			<ScrollView
@@ -379,16 +325,25 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 				</View>
 
 				<View style={[styles.section, styles.productsSection]}>
-					<HomeProductsSection
-						items={displayedProducts}
-						isLoadingInitial={isLoadingInitial}
-						isLoadingMore={isLoadingMore}
-						skeletonCount={skeletonCount}
-						onPressProduct={handleOpenProduct}
-						onAddToCart={handleAddToCart}
-						onCartToggle={handleCartToggle}
-						onOutOfStockPress={handleOutOfStockPress}
-					/>
+					{apiError ? (
+						<ErrorState
+							title='Accueil indisponible'
+							description={apiError}
+							actionLabel={isReloading ? 'Rechargement...' : 'Reessayer'}
+							onActionPress={handleRetryHomeData}
+						/>
+					) : (
+						<HomeProductsSection
+							items={displayedProducts}
+							isLoadingInitial={isLoadingInitial}
+							isLoadingMore={isLoadingMore}
+							skeletonCount={skeletonCount}
+							onPressProduct={handleOpenProduct}
+							onAddToCart={handleAddToCart}
+							onCartToggle={handleCartToggle}
+							onOutOfStockPress={handleOutOfStockPress}
+						/>
+					)}
 				</View>
 			</ScrollView>
 

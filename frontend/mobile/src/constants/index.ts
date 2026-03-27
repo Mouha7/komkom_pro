@@ -13,3 +13,6 @@ export {
 	getStockStatusLabel,
 	type StockStatus,
 } from './stockStatuses';
+
+export { COMMON_PASSWORD_PATTERNS } from './auth';
+export { DAKAR_DEFAULT_REGION } from './maps';

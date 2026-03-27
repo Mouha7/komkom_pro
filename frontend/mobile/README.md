@@ -28,6 +28,35 @@ Si l'erreur persiste:
 - Si le QR vient d'un mode dev client, relancer en Expo Go standard avec `npm start`
 - Si `npm run start:tunnel` echoue avec `ERR_NGROK_4018`, verifier le compte ngrok et l'email sur ngrok.com avant de reutiliser le tunnel
 
+## Mock backend json-server (dev rapide mobile)
+
+Le frontend mobile utilise maintenant un mini backend local json-server comme source unique des donnees en dev.
+
+1. Copier l'exemple d'environnement: `cp .env.example .env.local`
+2. Ajuster `EXPO_PUBLIC_API_BASE_URL`:
+- Simulateur local: `http://localhost:3001`
+- Appareil physique (Expo Go): `http://<IP_LAN_MACHINE>:3001`
+3. Lancer le backend mock dans un terminal: `npm run mock:server`
+4. Lancer Expo dans un second terminal: `npm run start:lan`
+
+Source principale exposee par json-server:
+- `/api`
+
+La couche `src/api/` mappe ce payload vers des fonctions metier equivalentes aux routes logiques suivantes:
+- `/api/v1/products`
+- `/api/v1/products/:id`
+- `/api/v1/catalog/categories`
+- `/api/v1/home/categories`
+- `/api/v1/home/promos`
+- `/api/v1/cart`
+- `/api/v1/orders`
+
+Fichiers du mock-server:
+- `mock-server/db.json`
+
+Politique de fallback en dev:
+- Si json-server est indisponible, l'app affiche les etats d'erreur et reutilise la derniere donnee recemment chargee quand elle existe.
+
 ---
 
 ## 🌳 Structure des fichiers

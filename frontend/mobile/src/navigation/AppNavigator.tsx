@@ -12,6 +12,7 @@ import { SignupScreen } from "../screens/Auth/SignupScreen";
 import { TermsOfUseScreen } from "../screens/Legal/TermsOfUseScreen";
 import { PrivacyPolicyScreen } from "../screens/Legal/PrivacyPolicyScreen";
 import { ProductDetailScreen } from "../screens/Catalog/ProductDetailScreen";
+import { CartScreen } from "../screens/Cart/CartScreen";
 import { useAuth } from "../hooks/useAuth";
 import { BottomTabNavigator } from "./BottomTabNavigator";
 
@@ -25,6 +26,7 @@ export type RootStackParamList = {
 	ProductDetail: {
 		productId: string;
 	};
+	Cart: undefined;
 	UIStateLibrary: undefined;
 };
 
@@ -71,6 +73,7 @@ export const AppNavigator: React.FC = () => {
 					<>
 						<Stack.Screen name="MainTabs" component={BottomTabNavigator} />
 						<Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
+						<Stack.Screen name="Cart" component={CartScreen} />
 					</>
 				)}
 				<Stack.Screen

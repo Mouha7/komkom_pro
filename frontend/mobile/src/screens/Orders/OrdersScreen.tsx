@@ -1,25 +1,71 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { CompositeScreenProps } from '@react-navigation/native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { AppBar, Button, Text } from '../../components';
+import { AppBar, ErrorState, OrderList, Text } from '../../components';
+import type { MainTabParamList } from '../../navigation/BottomTabNavigator';
+import type { RootStackParamList } from '../../navigation/AppNavigator';
+import { useOrders } from '../../hooks/useOrders';
+import { useToast } from '../../hooks/useToast';
 import { lightColors } from '../../styles/colors';
 import { spacing } from '../../styles/spacing';
 
-export const OrdersScreen: React.FC = () => {
+type OrdersScreenProps = CompositeScreenProps<
+	BottomTabScreenProps<MainTabParamList, 'Orders'>,
+	NativeStackScreenProps<RootStackParamList>
+>;
+
+export const OrdersScreen: React.FC<OrdersScreenProps> = ({ navigation }) => {
+	const { orders, isLoading, errorMessage, reload } = useOrders();
+	const { showToast } = useToast();
+	const [isReloading, setIsReloading] = useState(false);
+
+	const handleReload = (): void => {
+		if (isReloading) {
+			return;
+		}
+
+		setIsReloading(true);
+		void reload().finally(() => {
+			setIsReloading(false);
+		});
+	};
+
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
 			<AppBar title='Commandes' titleAlign='left' />
 			<ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
-				<View style={styles.card}>
-					<Text variant='h3' textColorOverride={lightColors.text.primary}>
-						Commandes
-					</Text>
-					<Text variant='body' textColorOverride={lightColors.text.secondary}>
-						Espace de simulation des commandes pour buyer/employee.
-					</Text>
-					<Button title='Afficher commandes mock' variant='secondary' onPress={() => undefined} />
-				</View>
+				{errorMessage ? (
+					<ErrorState
+						title='Commandes indisponibles'
+						description={errorMessage}
+						actionLabel={isReloading ? 'Rechargement...' : 'Reessayer'}
+						onActionPress={handleReload}
+					/>
+				) : (
+					<View style={styles.card}>
+						<Text variant='h3' textColorOverride={lightColors.text.primary}>
+							Historique de commandes
+						</Text>
+						<OrderList
+							orders={orders}
+							isLoading={isLoading}
+							onPressOrder={(orderId) => {
+								showToast({
+									tone: 'info',
+									title: 'Detail commande',
+									message: `Commande ${orderId} selectionnee`,
+									actionLabel: 'Voir',
+									actionLabelA11y: 'Voir le panier',
+									onActionPress: () => navigation.navigate('Cart'),
+								});
+							}}
+						/>
+					</View>
+				)}
 			</ScrollView>
 		</SafeAreaView>
 	);

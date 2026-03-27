@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 import { spacing } from '../../../styles/spacing';
 import { ProductCardList } from './ProductCardList';
+import type { ProductListItemData } from '../../../components';
+import { listProducts } from '../../../api/products';
 
 const meta = {
 	title: 'Organisms/ProductCardList',
@@ -11,39 +13,48 @@ const meta = {
 
 export default meta;
 
-const sampleProducts = [
-	{
-		productId: 'product-1',
-		name: 'Perceuse Visseuse sans fil 18V',
-		price: 3500,
-		description: 'Unite',
-		stockStatus: 'in_stock' as const,
-	},
-	{
-		productId: 'product-2',
-		name: 'Ciment Portland CPJ 35',
-		price: 4500,
-		description: 'Sac de 50 kg',
-		stockStatus: 'low_stock' as const,
-	},
-	{
-		productId: 'product-3',
-		name: 'Cable Electrique U1000 R2V 3G1.5',
-		price: 18500,
-		description: 'Rouleau de 50m',
-		stockStatus: 'out_of_stock' as const,
-	},
-];
+const ApiProductCardListStory: React.FC<{ variant?: 'portrait' | 'landscape' }> = ({ variant = 'portrait' }) => {
+	const [products, setProducts] = useState<ProductListItemData[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
 
-export const Default = {
-	render: () => (
+	useEffect(() => {
+		let isMounted = true;
+		void listProducts({ perPage: 6 })
+			.then((nextProducts) => {
+				if (isMounted) {
+					setProducts(nextProducts.slice(0, 3));
+				}
+			})
+			.catch(() => {
+				if (isMounted) {
+					setProducts([]);
+				}
+			})
+			.finally(() => {
+				if (isMounted) {
+					setIsLoading(false);
+				}
+			});
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
+
+	return (
 		<ProductCardList
-			items={sampleProducts}
+			items={products}
+			variant={variant}
+			isLoadingInitial={isLoading}
 			onPressProduct={() => undefined}
 			onAddToCart={() => undefined}
 			onCartToggle={() => undefined}
 		/>
-	),
+	);
+};
+
+export const Default = {
+	render: () => <ApiProductCardListStory />,
 };
 
 export const LoadingInitial = {
@@ -53,7 +64,7 @@ export const LoadingInitial = {
 export const LoadingMore = {
 	render: () => (
 		<ProductCardList
-			items={sampleProducts}
+			items={[]}
 			isLoadingMore
 			skeletonCount={2}
 			onPressProduct={() => undefined}
@@ -66,13 +77,7 @@ export const LoadingMore = {
 export const Landscape = {
 	render: () => (
 		<View style={{ rowGap: spacing.s3 }}>
-			<ProductCardList
-				items={sampleProducts}
-				variant="landscape"
-				onPressProduct={() => undefined}
-				onAddToCart={() => undefined}
-				onCartToggle={() => undefined}
-			/>
+			<ApiProductCardListStory variant='landscape' />
 		</View>
 	),
 };
