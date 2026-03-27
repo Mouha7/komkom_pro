@@ -40,6 +40,7 @@ export const ProductDetailActionBar: React.FC<ProductDetailActionBarProps> = ({
 					disabled={disabled}
 					leftIcon={<Icon name='cart' size={20} color='#FFFFFF' />}
 					containerStyle={styles.addButton}
+					textStyle={{ fontSize: 16, fontWeight: '700' }}
 				/>
 			</View>
 		</View>

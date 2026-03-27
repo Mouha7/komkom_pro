@@ -37,6 +37,7 @@ import {
 	Heart,
 	Share2,
 	Truck,
+	ArrowRight,
 } from 'lucide-react-native';
 
 import type { CommonIconName, IconProps } from './Icon.types';
@@ -56,6 +57,7 @@ const ICON_MAP: Record<CommonIconName, LucideIcon> = {
 	info: Info,
 	wifiOff: WifiOff,
 	arrowLeft: ArrowLeft,
+	arrowRight: ArrowRight,
 	trash: Trash2,
 	hammer: Hammer,
 	lock: Lock,

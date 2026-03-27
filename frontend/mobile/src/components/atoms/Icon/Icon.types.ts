@@ -13,6 +13,7 @@ export type CommonIconName =
 	| 'info'
 	| 'wifiOff'
 	| 'arrowLeft'
+	| 'arrowRight'
 	| 'trash'
 	| 'hammer'
 	| 'lock'
@@ -34,7 +35,8 @@ export type CommonIconName =
 	| 'sliderFilter'
 	| 'share'
 	| 'heart'
-	| 'truck';
+	| 'truck'
+	;
 
 export type IconProps = {
 	name: CommonIconName;

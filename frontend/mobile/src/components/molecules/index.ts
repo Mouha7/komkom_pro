@@ -10,6 +10,9 @@ export type { HomeAppBarProps } from './HomeAppBar';
 export { CatalogAppBar } from './CatalogAppBar';
 export type { CatalogAppBarProps, CatalogCategory, ViewMode } from './CatalogAppBar';
 
+export { CartAppBar } from './CartAppBar';
+export type { CartAppBarProps } from './CartAppBar';
+
 export { CatalogFilterModal } from './CatalogFilterModal';
 export type { CatalogFilterModalProps, FilterOptions } from './CatalogFilterModal';
 

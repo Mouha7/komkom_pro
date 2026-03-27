@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, View } from "react-native";
 
 import { Text } from "../../atoms";
-import { CartItem } from "../../molecules";
+import { CartItem } from "../../molecules/CartItem";
 import { styles } from "./CartList.styles";
 import type { CartListProps } from "./CartList.types";
 
