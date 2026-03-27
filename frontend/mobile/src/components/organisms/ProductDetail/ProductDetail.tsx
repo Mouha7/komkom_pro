@@ -3,16 +3,14 @@ import { Image, ScrollView, View, useWindowDimensions } from 'react-native';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ErrorState, Icon, Text } from '../../atoms';
 import {
 	ExpandableSection,
-	Icon,
 	ProductDetailActionBar,
 	ProductDetailAppBar,
 	ScrollToTopButton,
-	Text,
-	ErrorState,
 	useScrollToTopButton,
-} from '../..';
+} from '../../molecules';
 import { useToast } from '../../../hooks/useToast';
 import { formatAmount } from '../../../utils/formatPrice';
 import { getProductDetail } from '../../../api/products';

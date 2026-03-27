@@ -1,6 +1,7 @@
 import type { CatalogCategory, ProductListItemData, ProductDetailData } from '../components';
 import type { ProductType, StockStatus } from '../constants';
 import type { HomeCategoryItem, HomePromoItem } from '../screens/Home/components';
+import { getJson } from './httpClient';
 import { getDevApiV1 } from './devApi';
 
 type ProductApiModel = {
@@ -13,6 +14,8 @@ type ProductApiModel = {
 	stockStatus?: StockStatus;
 	categoryId?: ProductType;
 };
+
+type ProductDetailApiModel = ProductApiModel & Partial<Omit<ProductDetailData, 'id' | 'name' | 'price'>>;
 
 let cachedProducts: ProductApiModel[] = [];
 let cachedCatalogCategories: CatalogCategory[] = [];
@@ -40,6 +43,26 @@ const toProductListItem = (model: ProductApiModel): ProductListItemData => ({
 	stockStatus: model.stockStatus,
 	categoryId: model.categoryId,
 });
+
+const toProductDetailData = (model: ProductDetailApiModel): ProductDetailData => {
+	const imageUrls = Array.isArray(model.imageUrls) ? model.imageUrls.filter(Boolean) : [];
+	const fallbackImage = model.imageUrl ?? '';
+
+	return {
+		id: model.id,
+		brand: model.brand ?? 'KomKom',
+		reference: model.reference ?? model.id,
+		name: model.name,
+		price: model.price,
+		currency: model.currency ?? 'FCFA',
+		unitLabel: model.unitLabel ?? 'Unite',
+		stockStatus: model.stockStatus ?? 'in_stock',
+		imageUrls: imageUrls.length > 0 ? imageUrls : fallbackImage ? [fallbackImage] : [],
+		description: model.description ?? '',
+		specifications: Array.isArray(model.specifications) ? model.specifications : [],
+		highlights: Array.isArray(model.highlights) ? model.highlights : [],
+	};
+};
 
 const getProductsSource = async (): Promise<ProductApiModel[]> => {
 	try {
@@ -97,12 +120,24 @@ export const listProducts = async (params: ListProductsParams = {}): Promise<Pro
 
 export const getProductDetail = async (productId: string): Promise<ProductDetailData> => {
 	try {
-		const sourceProducts = await getProductsSource();
-		const detail = (sourceProducts as ProductDetailData[]).find((item) => item.id === productId);
+		const detail = await getJson<Partial<ProductDetailApiModel>>(`/api/v1/products/${productId}`);
+		if (detail && typeof detail === 'object' && typeof detail.id === 'string') {
+			const normalizedDetail = toProductDetailData(detail as ProductDetailApiModel);
+			cachedProductDetails.set(productId, normalizedDetail);
+			return normalizedDetail;
+		}
+	} catch {
+		// Fall through to aggregated source and cache fallback.
+	}
 
-		if (detail) {
-			cachedProductDetails.set(productId, detail);
-			return detail;
+	try {
+		const sourceProducts = await getProductsSource();
+		const fallbackModel = sourceProducts.find((item) => item.id === productId);
+
+		if (fallbackModel) {
+			const normalizedDetail = toProductDetailData(fallbackModel);
+			cachedProductDetails.set(productId, normalizedDetail);
+			return normalizedDetail;
 		}
 	} catch {
 		const cachedDetail = cachedProductDetails.get(productId);
