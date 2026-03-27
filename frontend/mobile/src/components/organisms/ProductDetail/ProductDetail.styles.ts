@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
-import { lightColors, withOpacity } from '../../styles/colors';
-import { spacing } from '../../styles/spacing';
+import { lightColors, withOpacity } from '../../../styles/colors';
+import { spacing } from '../../../styles/spacing';
 
 export const styles = StyleSheet.create({
 	safeArea: {
@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
 	},
 	imagePager: {
 		flex: 1,
-        marginTop: spacing.s12,
+		marginTop: spacing.s12,
 	},
 	image: {
 		width: '100%',

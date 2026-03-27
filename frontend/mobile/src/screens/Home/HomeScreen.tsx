@@ -222,8 +222,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 		navigation.navigate("Catalog");
 	};
 
-	const handleOpenProduct = (_productId: string): void => {
-		navigation.navigate("Catalog");
+	const handleOpenProduct = (productId: string): void => {
+		navigation.navigate("ProductDetail", { productId });
 	};
 
 	const handleAddToCart = (_productId: string): void => {

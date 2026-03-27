@@ -1,5 +1,5 @@
-import type { StockStatus } from '../../components';
-import type { CommonIconName } from '../../components';
+import type { StockStatus } from '../../atoms/StatusChip';
+import type { CommonIconName } from '../../atoms/Icon';
 
 export type ProductDetailSpecification = {
 	label: string;
@@ -25,4 +25,18 @@ export type ProductDetailData = {
 	description: string;
 	specifications: ProductDetailSpecification[];
 	highlights: ProductDetailHighlight[];
+};
+
+export type ProductDetailAddToCartPayload = {
+	productId: string;
+	name: string;
+	quantity: number;
+};
+
+export type ProductDetailProps = {
+	productId: string;
+	onPressBack: () => void;
+	onOpenCart?: () => void;
+	onShare?: () => void;
+	onAddToCart?: (payload: ProductDetailAddToCartPayload) => void;
 };

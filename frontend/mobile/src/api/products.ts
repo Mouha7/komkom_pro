@@ -1,7 +1,6 @@
-import type { CatalogCategory, ProductListItemData } from '../components';
+import type { CatalogCategory, ProductListItemData, ProductDetailData } from '../components';
 import type { ProductType, StockStatus } from '../constants';
 import type { HomeCategoryItem, HomePromoItem } from '../screens/Home/components';
-import type { ProductDetailData } from '../screens/Catalog/ProductDetailScreen.types';
 import { getDevApiV1 } from './devApi';
 
 type ProductApiModel = {

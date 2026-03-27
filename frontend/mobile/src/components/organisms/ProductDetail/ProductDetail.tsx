@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Image, ScrollView, View, useWindowDimensions } from 'react-native';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import {
 	ExpandableSection,
@@ -13,19 +12,22 @@ import {
 	Text,
 	ErrorState,
 	useScrollToTopButton,
-} from '../../components';
-import type { RootStackParamList } from '../../navigation/AppNavigator';
-import { useToast } from '../../hooks/useToast';
-import { formatAmount } from '../../utils/formatPrice';
-import { styles } from './ProductDetailScreen.styles';
-import type { ProductDetailData } from './ProductDetailScreen.types';
-import { getProductDetail } from '../../api/products';
-
-type ProductDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'ProductDetail'>;
+} from '../..';
+import { useToast } from '../../../hooks/useToast';
+import { formatAmount } from '../../../utils/formatPrice';
+import { getProductDetail } from '../../../api/products';
+import type { ProductDetailData, ProductDetailProps } from './ProductDetail.types';
+import { styles } from './ProductDetail.styles';
 
 const SCROLL_TO_TOP_VISIBILITY_THRESHOLD = 240;
 
-export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({ navigation, route }) => {
+export const ProductDetail: React.FC<ProductDetailProps> = ({
+	productId,
+	onPressBack,
+	onOpenCart,
+	onShare,
+	onAddToCart,
+}) => {
 	const { width } = useWindowDimensions();
 	const { showToast } = useToast();
 	const [product, setProduct] = useState<ProductDetailData | null>(null);
@@ -34,12 +36,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({ naviga
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [quantity, setQuantity] = useState(1);
 	const [isFavorite, setIsFavorite] = useState(false);
-	const galleryHeight = useMemo(
-		() => Math.min(460, Math.max(300, Math.round(width * 0.95))),
-		[width],
-	);
-
-	const productId = route.params?.productId;
+	const galleryHeight = useMemo(() => Math.min(460, Math.max(300, Math.round(width * 0.95))), [width]);
 
 	const loadProduct = useCallback(async (): Promise<void> => {
 		if (!productId) {
@@ -56,7 +53,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({ naviga
 			const detail = await getProductDetail(productId);
 			setProduct(detail);
 		} catch {
-			setLoadError('Impossible de charger les details produit depuis json-server.');
+			setLoadError('Impossible de charger les details produit.');
 			setProduct(null);
 		} finally {
 			setIsLoadingProduct(false);
@@ -81,17 +78,24 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({ naviga
 			return;
 		}
 
+		onAddToCart?.({ productId: product.id, name: product.name, quantity });
+
 		showToast({
 			tone: 'success',
 			title: 'Produit ajoute',
 			message: `${quantity} x ${product.name} ajoute au panier`,
-			actionLabel: 'Voir',
-			actionLabelA11y: 'Voir le panier',
-			onActionPress: () => navigation.navigate('Cart'),
+			actionLabel: onOpenCart ? 'Voir' : undefined,
+			actionLabelA11y: onOpenCart ? 'Voir le panier' : undefined,
+			onActionPress: onOpenCart,
 		});
 	};
 
 	const handleShare = (): void => {
+		if (onShare) {
+			onShare();
+			return;
+		}
+
 		showToast({
 			tone: 'info',
 			title: 'Partage',
@@ -105,7 +109,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({ naviga
 		<SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
 			<View style={styles.appBarOverlay}>
 				<ProductDetailAppBar
-					onPressBack={() => navigation.goBack()}
+					onPressBack={onPressBack}
 					onPressShare={handleShare}
 					onPressFavorite={() => setIsFavorite((current) => !current)}
 					isFavorite={isFavorite}
@@ -204,10 +208,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({ naviga
 						<ExpandableSection title='Caracteristiques techniques' defaultExpanded>
 							<View style={styles.specTable}>
 								{product.specifications.map((spec, index) => (
-									<View
-										key={spec.label}
-										style={[styles.specRow, index % 2 === 0 && styles.specRowAlt]}
-									>
+									<View key={spec.label} style={[styles.specRow, index % 2 === 0 && styles.specRowAlt]}>
 										<Text variant='body' style={styles.specLabel}>
 											{spec.label}
 										</Text>
@@ -259,5 +260,3 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({ naviga
 		</SafeAreaView>
 	);
 };
-
-export default ProductDetailScreen;

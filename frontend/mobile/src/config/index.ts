@@ -64,7 +64,24 @@ const resolveApiBaseUrl = (): string => {
 	const isBundleTunnel = Boolean(bundleHost && isExpoTunnelHost(bundleHost));
 	const devFallbackApiBaseUrl = getDevFallbackApiBaseUrl();
 
+	if (__DEV__) {
+		// eslint-disable-next-line no-console
+		console.log('[config] === API Configuration Debug ===');
+		// eslint-disable-next-line no-console
+		console.log(`[config] Bundle host: ${bundleHost || '(none)'}`);
+		// eslint-disable-next-line no-console
+		console.log(`[config] Is Expo tunnel: ${isBundleTunnel}`);
+		// eslint-disable-next-line no-console
+		console.log(`[config] EXPO_PUBLIC_API_BASE_URL: ${envApiBaseUrl || '(not set)'}`);
+		// eslint-disable-next-line no-console
+		console.log(`[config] EXPO_PUBLIC_API_TUNNEL_BASE_URL: ${envApiTunnelBaseUrl || '(not set)'}`);
+	}
+
 	if (__DEV__ && isBundleTunnel && envApiTunnelBaseUrl) {
+		if (__DEV__) {
+			// eslint-disable-next-line no-console
+			console.log(`[config] ✓ Using tunnel URL: ${envApiTunnelBaseUrl}`);
+		}
 		return envApiTunnelBaseUrl;
 	}
 
@@ -76,12 +93,20 @@ const resolveApiBaseUrl = (): string => {
 			if (isBundleTunnel && envHost && isLoopbackHost(envHost)) {
 				// eslint-disable-next-line no-console
 				console.warn(
-					'[config] Expo tunnel detected but EXPO_PUBLIC_API_BASE_URL targets localhost. Set EXPO_PUBLIC_API_TUNNEL_BASE_URL to your ngrok URL.'
+					'[config] ⚠️ Expo tunnel detected but EXPO_PUBLIC_API_BASE_URL targets localhost. ' +
+						'Set EXPO_PUBLIC_API_TUNNEL_BASE_URL to your ngrok URL for physical device access.'
 				);
 			}
 
 			if (envHost && isLoopbackHost(envHost) && fallbackHost && !isLoopbackHost(fallbackHost)) {
+				// eslint-disable-next-line no-console
+				console.log(`[config] ✓ Using LAN fallback: ${devFallbackApiBaseUrl}`);
 				return devFallbackApiBaseUrl;
+			}
+
+			if (envHost && !isLoopbackHost(envHost)) {
+				// eslint-disable-next-line no-console
+				console.log(`[config] ✓ Using env URL: ${envApiBaseUrl}`);
 			}
 		}
 
@@ -94,9 +119,16 @@ const resolveApiBaseUrl = (): string => {
 
 	if (isBundleTunnel) {
 		// eslint-disable-next-line no-console
-		console.warn(
-			'[config] Expo tunnel detected without API tunnel URL. Define EXPO_PUBLIC_API_TUNNEL_BASE_URL for physical device access to json-server.'
+		console.error(
+			'[config] ❌ Expo tunnel detected but EXPO_PUBLIC_API_TUNNEL_BASE_URL is empty. ' +
+				'Physical device cannot reach json-server. ' +
+				'Steps: (1) npm run mock:server:tunnel (2) copy https://xxxx.ngrok.app (3) set EXPO_PUBLIC_API_TUNNEL_BASE_URL in .env.local'
 		);
+	}
+
+	if (__DEV__) {
+		// eslint-disable-next-line no-console
+		console.log(`[config] ✓ Using dev fallback: ${devFallbackApiBaseUrl}`);
 	}
 
 	return devFallbackApiBaseUrl;

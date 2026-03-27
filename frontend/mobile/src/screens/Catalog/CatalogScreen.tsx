@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useCallback, useRef, useState } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView } from 'react-native';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -18,11 +18,11 @@ import {
 } from '../../components';
 import type { CatalogCategory, ViewMode, FilterOptions, ProductListItemData } from '../../components';
 import { lightColors } from '../../styles/colors';
-import { spacing } from '../../styles/spacing';
 import type { MainTabParamList } from '../../navigation/BottomTabNavigator';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 import { useToast } from '../../hooks/useToast';
 import { listCatalogCategories, listProducts } from '../../api/products';
+import { styles } from './CatalogScreen.styles';
 
 type CatalogScreenProps = CompositeScreenProps<
 	BottomTabScreenProps<MainTabParamList, 'Catalog'>,
@@ -345,21 +345,6 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 		</SafeAreaView>
 	);
 };
-
-const styles = StyleSheet.create({
-	safeArea: {
-		flex: 1,
-		backgroundColor: lightColors.background.default,
-	},
-	scrollView: {
-		flex: 1,
-	},
-	contentContainer: {
-		paddingHorizontal: spacing.s4,
-		paddingTop: spacing.s4,
-		paddingBottom: spacing.s5,
-	},
-});
 
 export default CatalogScreen;
 
