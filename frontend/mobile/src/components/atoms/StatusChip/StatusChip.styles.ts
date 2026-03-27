@@ -12,6 +12,18 @@ export const styles = StyleSheet.create({
 		borderRadius: 999,
 		borderWidth: 1,
 	},
+	sizeSm: {
+		paddingHorizontal: spacing.s1,
+		paddingVertical: 2,
+	},
+	sizeMd: {
+		paddingHorizontal: spacing.s2,
+		paddingVertical: spacing.s1,
+	},
+	sizeLg: {
+		paddingHorizontal: spacing.s3,
+		paddingVertical: spacing.s2,
+	},
 	compact: {
 		paddingHorizontal: spacing.s1,
 		paddingVertical: 2,

@@ -1,21 +1,24 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Image, ScrollView, View, useWindowDimensions } from 'react-native';
-import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Image, ScrollView, View, useWindowDimensions } from "react-native";
+import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { ErrorState, Icon, Text } from '../../atoms';
+import { ErrorState, Icon, StatusBadge, Text } from "../../atoms";
 import {
 	ExpandableSection,
 	ProductDetailActionBar,
 	ProductDetailAppBar,
 	ScrollToTopButton,
 	useScrollToTopButton,
-} from '../../molecules';
-import { useToast } from '../../../hooks/useToast';
-import { formatAmount } from '../../../utils/formatPrice';
-import { getProductDetail } from '../../../api/products';
-import type { ProductDetailData, ProductDetailProps } from './ProductDetail.types';
-import { styles } from './ProductDetail.styles';
+} from "../../molecules";
+import { useToast } from "../../../hooks/useToast";
+import { formatAmount } from "../../../utils/formatPrice";
+import { getProductDetail } from "../../../api/products";
+import type {
+	ProductDetailData,
+	ProductDetailProps,
+} from "./ProductDetail.types";
+import { styles } from "./ProductDetail.styles";
 
 const SCROLL_TO_TOP_VISIBILITY_THRESHOLD = 240;
 
@@ -34,13 +37,16 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [quantity, setQuantity] = useState(1);
 	const [isFavorite, setIsFavorite] = useState(false);
-	const galleryHeight = useMemo(() => Math.min(460, Math.max(300, Math.round(width * 0.95))), [width]);
+	const galleryHeight = useMemo(
+		() => Math.min(460, Math.max(300, Math.round(width * 0.95))),
+		[width],
+	);
 
 	const loadProduct = useCallback(async (): Promise<void> => {
 		if (!productId) {
 			setProduct(null);
 			setIsLoadingProduct(false);
-			setLoadError('Produit introuvable.');
+			setLoadError("Produit introuvable.");
 			return;
 		}
 
@@ -51,7 +57,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 			const detail = await getProductDetail(productId);
 			setProduct(detail);
 		} catch {
-			setLoadError('Impossible de charger les details produit.');
+			setLoadError("Impossible de charger les details produit.");
 			setProduct(null);
 		} finally {
 			setIsLoadingProduct(false);
@@ -62,12 +68,23 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 		void loadProduct();
 	}, [loadProduct]);
 
-	const handleDetailScroll = (event: NativeSyntheticEvent<NativeScrollEvent>): void => {
-		const nextIndex = Math.round(event.nativeEvent.contentOffset.x / Math.max(width, 1));
-		setCurrentImageIndex((current) => (current === nextIndex ? current : nextIndex));
+	const handleDetailScroll = (
+		event: NativeSyntheticEvent<NativeScrollEvent>,
+	): void => {
+		const nextIndex = Math.round(
+			event.nativeEvent.contentOffset.x / Math.max(width, 1),
+		);
+		setCurrentImageIndex((current) =>
+			current === nextIndex ? current : nextIndex,
+		);
 	};
 
-	const { scrollViewRef, isScrollTopVisible, handleScroll, handleScrollToTop } = useScrollToTopButton({
+	const {
+		scrollViewRef,
+		isScrollTopVisible,
+		handleScroll,
+		handleScrollToTop,
+	} = useScrollToTopButton({
 		visibilityThreshold: SCROLL_TO_TOP_VISIBILITY_THRESHOLD,
 	});
 
@@ -79,11 +96,11 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 		onAddToCart?.({ productId: product.id, name: product.name, quantity });
 
 		showToast({
-			tone: 'success',
-			title: 'Produit ajoute',
+			tone: "success",
+			title: "Produit ajoute",
 			message: `${quantity} x ${product.name} ajoute au panier`,
-			actionLabel: onOpenCart ? 'Voir' : undefined,
-			actionLabelA11y: onOpenCart ? 'Voir le panier' : undefined,
+			actionLabel: onOpenCart ? "Voir" : undefined,
+			actionLabelA11y: onOpenCart ? "Voir le panier" : undefined,
 			onActionPress: onOpenCart,
 		});
 	};
@@ -95,16 +112,20 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 		}
 
 		showToast({
-			tone: 'info',
-			title: 'Partage',
-			message: 'Le partage produit sera active dans une prochaine version.',
+			tone: "info",
+			title: "Partage",
+			message:
+				"Le partage produit sera active dans une prochaine version.",
 		});
 	};
 
-	const priceAmount = product ? formatAmount(product.price) : '0';
+	const priceAmount = product ? formatAmount(product.price) : "0";
 
 	return (
-		<SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
+		<SafeAreaView
+			style={styles.safeArea}
+			edges={["left", "right", "bottom"]}
+		>
 			<View style={styles.appBarOverlay}>
 				<ProductDetailAppBar
 					onPressBack={onPressBack}
@@ -124,9 +145,11 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 			>
 				{loadError ? (
 					<ErrorState
-						title='Detail produit indisponible'
+						title="Detail produit indisponible"
 						description={loadError}
-						actionLabel={isLoadingProduct ? 'Rechargement...' : 'Reessayer'}
+						actionLabel={
+							isLoadingProduct ? "Rechargement..." : "Reessayer"
+						}
 						onActionPress={() => {
 							void loadProduct();
 						}}
@@ -135,7 +158,12 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 
 				{product ? (
 					<>
-						<View style={[styles.galleryWrap, { height: galleryHeight }]}>
+						<View
+							style={[
+								styles.galleryWrap,
+								{ height: galleryHeight },
+							]}
+						>
 							<ScrollView
 								horizontal
 								pagingEnabled
@@ -148,69 +176,112 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 										key={imageUrl}
 										source={{ uri: imageUrl }}
 										style={[styles.image, { width }]}
-										resizeMode='contain'
+										resizeMode="cover"
 									/>
 								))}
 							</ScrollView>
-							<View style={styles.dotsWrap}>
-								{product.imageUrls.map((imageUrl, index) => (
-									<View
-										key={`${imageUrl}-${index}`}
-										style={[styles.dot, index === currentImageIndex && styles.dotActive]}
-									/>
-								))}
+							<View style={styles.galleryFooter}>
+								<StatusBadge
+									stockStatus={product.stockStatus}
+									size="lg"
+									compact
+									solid
+									borderRadius={4}
+									textTransform="capitalize"
+								/>
+								<View style={styles.dotsWrap}>
+									{product.imageUrls.map((imageUrl, index) => (
+										<View
+											key={`${imageUrl}-${index}`}
+											style={[
+												styles.dot,
+												index === currentImageIndex &&
+													styles.dotActive,
+											]}
+										/>
+									))}
+								</View>
 							</View>
 						</View>
 
 						<View style={styles.mainBlock}>
-							<View style={styles.stockChip}>
-								<Text variant='small' style={styles.stockLabel}>
-									EN STOCK
-								</Text>
-							</View>
-
 							<View style={styles.brandRow}>
-								<Text variant='small' style={styles.brandLabel}>
+								<Text variant="small" style={styles.brandLabel}>
 									{product.brand}
 								</Text>
-								<Text variant='small' style={styles.referenceLabel}>
+								<Text
+									variant="small"
+									style={styles.referenceLabel}
+								>
 									Ref: {product.reference}
 								</Text>
 							</View>
 
-							<Text variant='h1' style={styles.productName}>
+							<Text variant="h1" style={styles.productName}>
 								{product.name}
 							</Text>
 
 							<View style={styles.priceRow}>
-								<Text style={styles.priceValue}>{priceAmount}</Text>
-								<Text variant='h2' style={styles.priceCurrency}>
+								<Text style={styles.priceValue}>
+									{priceAmount}
+								</Text>
+								<Text variant="h2" style={styles.priceCurrency}>
 									{product.currency}
 								</Text>
 							</View>
 
 							<View style={styles.unitChip}>
-								<Icon name='package' size={16} color='#4B5563' />
-								<Text variant='body' style={styles.unitLabel}>
+								<Icon
+									name="package"
+									size={16}
+									color="#4B5563"
+								/>
+								<Text variant="body" style={styles.unitLabel}>
 									{product.unitLabel}
 								</Text>
 							</View>
 						</View>
 
-						<ExpandableSection title='Description' defaultExpanded>
-							<Text variant='bodyLarge' style={styles.descriptionText}>
+						<ExpandableSection
+							title="Description"
+							defaultExpanded
+							containerStyle={styles.descriptionBlock}
+                            titleStyle={styles.specsTitle}
+						>
+							<Text
+								variant="bodyLarge"
+								style={styles.descriptionText}
+							>
 								{product.description}
 							</Text>
 						</ExpandableSection>
 
-						<ExpandableSection title='Caracteristiques techniques' defaultExpanded>
+						<ExpandableSection
+							title="Caracteristiques techniques"
+							defaultExpanded
+							containerStyle={styles.specsBlock}
+							titleStyle={styles.specsTitle}
+						>
 							<View style={styles.specTable}>
 								{product.specifications.map((spec, index) => (
-									<View key={spec.label} style={[styles.specRow, index % 2 === 0 && styles.specRowAlt]}>
-										<Text variant='body' style={styles.specLabel}>
+									<View
+										key={spec.label}
+										style={[
+											styles.specRow,
+											index % 2 === 0 &&
+												styles.specRowAlt,
+										]}
+									>
+										<Text
+											variant="body"
+											style={styles.specLabel}
+										>
 											{spec.label}
 										</Text>
-										<Text variant='body' style={styles.specValue}>
+										<Text
+											variant="body"
+											style={styles.specValue}
+										>
 											{spec.value}
 										</Text>
 									</View>
@@ -220,15 +291,28 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 
 						<View style={styles.highlightBlock}>
 							{product.highlights.map((highlight) => (
-								<View key={highlight.title} style={styles.highlightRow}>
+								<View
+									key={highlight.title}
+									style={styles.highlightRow}
+								>
 									<View style={styles.highlightIconWrap}>
-										<Icon name={highlight.iconName} size={20} color='#ED762F' />
+										<Icon
+											name={highlight.iconName}
+											size={20}
+											color="#ED762F"
+										/>
 									</View>
 									<View style={styles.highlightTexts}>
-										<Text variant='h3' style={styles.highlightTitle}>
+										<Text
+											variant="h3"
+											style={styles.highlightTitle}
+										>
 											{highlight.title}
 										</Text>
-										<Text variant='body' style={styles.highlightDescription}>
+										<Text
+											variant="body"
+											style={styles.highlightDescription}
+										>
 											{highlight.description}
 										</Text>
 									</View>
@@ -242,14 +326,16 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 			<ScrollToTopButton
 				visible={isScrollTopVisible}
 				onPress={handleScrollToTop}
-				accessibilityLabel='Retour en haut de la fiche produit'
+				accessibilityLabel="Retour en haut de la fiche produit"
 				bottomOffset={92}
 			/>
 
 			<View style={styles.actionBarDock}>
 				<ProductDetailActionBar
 					quantity={quantity}
-					onDecrease={() => setQuantity((current) => Math.max(1, current - 1))}
+					onDecrease={() =>
+						setQuantity((current) => Math.max(1, current - 1))
+					}
 					onIncrease={() => setQuantity((current) => current + 1)}
 					onAddToCart={handleAddToCart}
 					disabled={!product}

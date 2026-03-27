@@ -30,20 +30,35 @@ const toneToSolidStyle = {
 export const StatusChip: React.FC<StatusChipProps> = ({
 	label,
 	tone = 'neutral',
+	size = 'md',
 	compact = false,
 	solid = false,
+	borderRadius,
+	textTransform,
 	containerStyle,
+	labelStyle,
 	testID,
 }) => {
 	const [containerToneStyle, textToneStyle] = solid ? toneToSolidStyle[tone] : toneToStyle[tone];
+	const sizeStyle = size === 'sm' ? styles.sizeSm : size === 'lg' ? styles.sizeLg : styles.sizeMd;
 
 	return (
 		<View
-			style={[styles.base, containerToneStyle, compact && styles.compact, containerStyle]}
+			style={[
+				styles.base,
+				sizeStyle,
+				containerToneStyle,
+				compact && styles.compact,
+				borderRadius !== undefined && { borderRadius },
+				containerStyle,
+			]}
 			accessibilityRole="text"
 			testID={testID}
 		>
-			<Text variant="small" style={[styles.label, textToneStyle]}>
+			<Text
+				variant="small"
+				style={[styles.label, textToneStyle, textTransform && { textTransform }, labelStyle]}
+			>
 				{label}
 			</Text>
 		</View>
@@ -83,8 +98,13 @@ const orderToLabelTone = (status: OrderStatus): { label: string; tone: StatusTon
 export const StatusBadge: React.FC<StatusBadgeProps> = ({
 	stockStatus,
 	orderStatus,
+	size = 'md',
 	compact = false,
 	solid = false,
+	borderRadius,
+	textTransform,
+	containerStyle,
+	labelStyle,
 	testID,
 }) => {
 	const resolved = stockStatus
@@ -97,8 +117,13 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
 		<StatusChip
 			label={resolved.label}
 			tone={resolved.tone}
+			size={size}
 			compact={compact}
 			solid={solid}
+			borderRadius={borderRadius}
+			textTransform={textTransform}
+			containerStyle={containerStyle}
+			labelStyle={labelStyle}
 			testID={testID}
 		/>
 	);

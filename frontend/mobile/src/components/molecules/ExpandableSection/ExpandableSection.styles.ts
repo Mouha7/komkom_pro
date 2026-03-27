@@ -5,8 +5,6 @@ import { spacing } from '../../../styles/spacing';
 
 export const styles = StyleSheet.create({
 	container: {
-		borderTopWidth: 1,
-		borderTopColor: lightColors.border.default,
 		paddingHorizontal: spacing.s3,
 		paddingVertical: spacing.s3,
 		backgroundColor: lightColors.background.default,

@@ -6,7 +6,7 @@ import { spacing } from '../../../styles/spacing';
 export const styles = StyleSheet.create({
 	safeArea: {
 		flex: 1,
-		backgroundColor: lightColors.background.default,
+		backgroundColor: lightColors.neutral100,
 	},
 	appBarOverlay: {
 		position: 'absolute',
@@ -20,27 +20,38 @@ export const styles = StyleSheet.create({
 		flex: 1,
 	},
 	contentContainer: {
-		paddingBottom: 188,
+		paddingBottom: 66,
 	},
 	galleryWrap: {
-		backgroundColor: lightColors.background.default,
+		backgroundColor: '#FFFFFF',
+		position: 'relative',
+		overflow: 'hidden',
+		paddingTop: spacing.s12,
+		paddingBottom: spacing.s0,
+	},
+	galleryFooter: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingHorizontal: spacing.s3,
+		paddingVertical: spacing.s2,
+		backgroundColor: '#FFFFFF',
+		position: 'relative',
 	},
 	imagePager: {
 		flex: 1,
-		marginTop: spacing.s12,
 	},
 	image: {
 		width: '100%',
 		height: '100%',
+		backgroundColor: withOpacity('#9CA3AF', 0.12),
 	},
 	dotsWrap: {
 		position: 'absolute',
 		left: 0,
 		right: 0,
-		bottom: -spacing.s6,
+		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		flexDirection: 'row',
 		columnGap: spacing.s1,
 	},
 	dot: {
@@ -54,39 +65,51 @@ export const styles = StyleSheet.create({
 		backgroundColor: lightColors.primary,
 	},
 	mainBlock: {
+        backgroundColor: "#FFFFFF",
 		paddingHorizontal: spacing.s3,
-		paddingTop: spacing.s2,
 		paddingBottom: spacing.s4,
 		rowGap: spacing.s2,
+        borderBottomWidth: 1,
+        borderBottomColor: lightColors.border.default,
 	},
-	stockChip: {
-		alignSelf: 'flex-start',
-		backgroundColor: lightColors.success,
-		borderRadius: 8,
-		paddingHorizontal: spacing.s2,
-		paddingVertical: spacing.s1,
-	},
-	stockLabel: {
-		color: lightColors.text.onPrimary,
+    descriptionBlock: {
+        backgroundColor: "#FFFFFF",
+        marginTop: spacing.s1,
+		borderTopWidth: 1,
+		borderTopColor: lightColors.border.default,
+        borderBottomWidth: 1,
+        borderBottomColor: lightColors.border.default,
+    },
+    specsBlock: {
+        backgroundColor: "#FFFFFF",
+        marginTop: spacing.s1,
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderTopColor: lightColors.border.default,
+        borderBottomColor: lightColors.border.default,
+    },
+	specsTitle: {
 		fontWeight: '700',
-		letterSpacing: 0.2,
 	},
 	brandRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
+        marginTop: spacing.s4,
 	},
 	brandLabel: {
+        fontSize: 16,
 		color: lightColors.primary,
 		fontWeight: '700',
 		textTransform: 'uppercase',
 	},
 	referenceLabel: {
+        fontSize: 12,
 		color: lightColors.text.secondary,
 	},
 	productName: {
+        fontSize: 22,
 		fontWeight: '700',
-		lineHeight: 40,
 	},
 	priceRow: {
 		flexDirection: 'row',
@@ -95,12 +118,13 @@ export const styles = StyleSheet.create({
 	},
 	priceValue: {
 		fontWeight: '700',
-		fontSize: 44,
-		lineHeight: 48,
+		fontSize: 28,
+        lineHeight: 44,
 		color: lightColors.text.primary,
 	},
 	priceCurrency: {
-		fontWeight: '700',
+        fontSize: 16,
+		fontWeight: '500',
 		color: lightColors.text.secondary,
 	},
 	unitChip: {
@@ -110,8 +134,8 @@ export const styles = StyleSheet.create({
 		columnGap: spacing.s1,
 		paddingHorizontal: spacing.s2,
 		paddingVertical: spacing.s1,
-		borderRadius: 8,
-		backgroundColor: withOpacity('#9CA3AF', 0.18),
+		borderRadius: 6,
+		backgroundColor: lightColors.neutral100,
 	},
 	unitLabel: {
 		color: lightColors.text.secondary,
@@ -146,11 +170,12 @@ export const styles = StyleSheet.create({
 		color: lightColors.text.primary,
 	},
 	highlightBlock: {
+        backgroundColor: "#FFFFFF",
 		marginTop: spacing.s1,
 		borderTopWidth: 1,
 		borderTopColor: lightColors.border.default,
 		paddingHorizontal: spacing.s3,
-		paddingTop: spacing.s3,
+		paddingVertical: spacing.s3,
 		rowGap: spacing.s3,
 	},
 	highlightRow: {
