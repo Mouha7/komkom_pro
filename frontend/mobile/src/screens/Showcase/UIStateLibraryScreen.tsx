@@ -79,6 +79,7 @@ const commonIcons: CommonIconName[] = [
 	"wifiOff",
 	"arrowLeft",
 	"trash",
+	
 ];
 
 const buildBottomActions = (): BottomBarAction[] => [
