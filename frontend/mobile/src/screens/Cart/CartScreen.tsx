@@ -161,10 +161,8 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	syncBadgeWrap: {
-		alignItems: 'center',
+		marginHorizontal: "auto",
 		paddingHorizontal: spacing.s4,
-		paddingTop: spacing.s2,
-		paddingBottom: spacing.s1,
 	},
 	syncBadge: {
 		borderRadius: 8,
