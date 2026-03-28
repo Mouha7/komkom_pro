@@ -64,11 +64,7 @@ export const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
 	};
 
 	const handleCheckout = (): void => {
-		showToast({
-			tone: 'success',
-			title: 'Validation',
-			message: 'Le checkout sera connecte dans une prochaine iteration.',
-		});
+		navigation.navigate('Checkout');
 	};
 
 	const handleClearCart = (): void => {

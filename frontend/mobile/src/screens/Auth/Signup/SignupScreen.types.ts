@@ -1,5 +1,10 @@
 import type { Region } from "react-native-maps";
 
+import type {
+	GeoCoordinates,
+	PickedLocation,
+} from "../../../features/location";
+
 export interface PasswordStrength {
 	minLength: boolean;
 	hasLowercase: boolean;
@@ -13,16 +18,9 @@ export interface PasswordStrength {
 	isAcceptable: boolean;
 }
 
-export interface StoreLocation {
-	latitude: number;
-	longitude: number;
-	address: string;
-}
+export type StoreLocation = PickedLocation;
 
-export interface DraftCoordinates {
-	latitude: number;
-	longitude: number;
-}
+export type DraftCoordinates = GeoCoordinates;
 
 export interface SignupLocationState {
 	storeLocation: StoreLocation | null;
