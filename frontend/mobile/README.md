@@ -2,6 +2,80 @@
 
 Ce document décrit en détail la structure du projet **frontend/mobile** (React Native/Expo), les écrans à implémenter, les menus de navigation, ainsi que la gestion des rôles utilisateurs (admin, buyer, employee). Il inclut également la représentation des fichiers et dossiers attendus dans chaque partie du projet.
 
+## Demarrage Expo Go (anti "Failed to download remote update")
+
+Utilise cette sequence dans `frontend/mobile`:
+
+1. `npm install`
+2. `npm run start:clear`
+3. Scanner le QR depuis l'app Expo Go (pas depuis l'app camera)
+   Scripts disponibles:
+
+- `npm start` : demarrage LAN (par defaut)
+- `npm run start:clear` : LAN + cache Metro vide
+- `npm run start:lan` : reseau local explicite
+- `npm run start:tunnel` : tunnel ngrok, uniquement si le compte ngrok est verifie
+- `npm run start:tunnel:clear` : tunnel + cache Metro vide
+- `npm run start:localhost` : emulateur local uniquement
+
+Si l'erreur persiste:
+
+- Verifier que le Mac et le telephone sont sur le meme reseau Wi-Fi
+- Lancer Expo depuis `frontend/mobile`, pas depuis la racine du monorepo
+- Verifier que le telephone a internet (4G/5G ou Wi-Fi)
+- Mettre a jour Expo Go sur le telephone
+- Redemarrer Metro avec `npm run start:clear`
+- Si le QR vient d'un mode dev client, relancer en Expo Go standard avec `npm start`
+- Si `npm run start:tunnel` echoue avec `ERR_NGROK_4018`, verifier le compte ngrok et l'email sur ngrok.com avant de reutiliser le tunnel
+
+## Mock backend json-server (dev rapide mobile)
+
+Le frontend mobile utilise maintenant un mini backend local json-server comme source unique des donnees en dev.
+
+1. Copier l'exemple d'environnement: `cp .env.example .env.local`
+2. Ajuster `EXPO_PUBLIC_API_BASE_URL`:
+- Simulateur local: `http://localhost:3001`
+- Appareil physique (Expo Go): `http://<IP_LAN_MACHINE>:3001`
+3. Lancer le backend mock dans un terminal: `npm run mock:server`
+4. Lancer Expo dans un second terminal: `npm run start:lan`
+
+### Cas specifique: Expo Go en mode tunnel (`start:tunnel`)
+
+Le tunnel Expo ne publie que le serveur Metro (bundle JS). Il ne publie pas ton API locale json-server.
+
+Pour que le telephone charge les donnees quand Expo tourne en tunnel:
+
+1. Terminal A: `npm run mock:server`
+2. Terminal B: `npm run mock:server:tunnel` puis copier l'URL HTTPS ngrok (ex: `https://xxxx.ngrok.app`)
+3. Mettre a jour `.env.local`:
+  - `EXPO_PUBLIC_API_TUNNEL_BASE_URL=https://xxxx.ngrok.app`
+  - (optionnel) garder `EXPO_PUBLIC_API_BASE_URL=http://localhost:3001` pour le simulateur local
+4. Terminal C: `npm run start:tunnel`
+5. Dans Expo Go: faire un reload complet (Dev menu -> Reload)
+
+Verification rapide:
+- Ouvrir `https://xxxx.ngrok.app/api` dans le navigateur du telephone: le JSON doit s'afficher.
+- Si tu vois encore des requetes vers `http://localhost:3001/api`, l'env n'a pas ete rechargee: relancer Expo et refaire un full reload.
+- Si ngrok retourne `ERR_NGROK_4018`, verifier le compte et configurer le token (`ngrok authtoken <token>`).
+
+Source principale exposee par json-server:
+- `/api`
+
+La couche `src/api/` mappe ce payload vers des fonctions metier equivalentes aux routes logiques suivantes:
+- `/api/v1/products`
+- `/api/v1/products/:id`
+- `/api/v1/catalog/categories`
+- `/api/v1/home/categories`
+- `/api/v1/home/promos`
+- `/api/v1/cart`
+- `/api/v1/orders`
+
+Fichiers du mock-server:
+- `mock-server/db.json`
+
+Politique de fallback en dev:
+- Si json-server est indisponible, l'app affiche les etats d'erreur et reutilise la derniere donnee recemment chargee quand elle existe.
+
 ---
 
 ## 🌳 Structure des fichiers
@@ -160,3 +234,81 @@ Ce document décrit en détail la structure du projet **frontend/mobile** (React
 7. Tester flows complets (login → browse → add to cart → checkout → orders).
 8. Ajouter tests unitaires (Jest) et e2e (Detox).
 9. Configurer CI/CD (Dockerfile + Expo EAS build).
+
+---
+
+## 🔧 Troubleshooting ngrok & Expo Tunnel
+
+### ✔️ Checklist pré-setup
+
+- [ ] ngrok CLI installé: `npx ngrok version`
+- [ ] Compte ngrok actif: https://dashboard.ngrok.com
+- [ ] Token ngrok disponible (Settings → Auth tokens)
+- [ ] json-server disponible: `npm run mock:server` marche au moins une fois
+- [ ] `.env.local` créé (copié depuis `.env.example`)
+
+### Setup ngrok (une fois, en local)
+
+```bash
+# 1. Récupérer le token depuis https://dashboard.ngrok.com/auth
+# 2. Configurer le token localement (recommandé: ~/.ngrok2/ngrok.yml)
+ngrok authtoken YOUR_TOKEN_HERE
+
+# 3. Vérifier que ça marche
+npx ngrok http 3001
+# Doit afficher: Forwarding https://xxxx.ngrok.app → http://localhost:3001
+```
+
+### Erreurs courantes
+
+| Erreur | Cause | Solution |
+|--------|-------|----------|
+| `ERR_NGROK_4018` | Token invalide/expiré | Régénérer le token depuis ngrok dashboard |
+| `ngrok: command not found` | CLI ngrok non installé | `npm install -g ngrok` ou utiliser `npx ngrok` |
+| `Connection refused: 127.0.0.1:3001` | json-server non lancé | Lancer `npm run mock:server` dans Terminal 1 |
+| `localhost:3001 works but 127.0.0.1 fails` | Issue localhost vs IP | Mettre en `.env.local`: `EXPO_PUBLIC_API_BASE_URL=http://127.0.0.1:3001` |
+| `Physical device gets 502 Bad Gateway` | ngrok tunnel interrompu | Redémarrer avec `npm run mock:server:tunnel` |
+| `Config logs show "❌ Expo tunnel detected but API tunnel URL empty"` | `EXPO_PUBLIC_API_TUNNEL_BASE_URL` vide | Remplir `.env.local` avec l'URL ngrok |
+
+### Flux complet (appareil physique)
+
+```bash
+# Terminal 1: Démarrer le serveur mock
+npm run mock:server
+
+# Terminal 2: Lancer ngrok (affiche https://xxxx.ngrok.app)
+npm run mock:server:tunnel
+
+# Terminal 3: Dans .env.local, ajouter
+# EXPO_PUBLIC_API_TUNNEL_BASE_URL=https://xxxx.ngrok.app
+
+# Terminal 3: Lancer Expo Tunnel
+npm run start:tunnel
+
+# Sur le téléphone: Scanner le QR, puis Dev menu → Reload
+```
+
+### Vérifications rapides
+
+```bash
+# Vérifier que ngrok tunnel est actif
+curl https://xxxx.ngrok.app/api
+
+# Vérifier que la config Expo est correcte (logs dans le terminal Expo)
+# Chercher: "✓ Using tunnel URL: https://xxxx.ngrok.app"
+
+# Sur le téléphone: Ouvrir Exponent debug menu (secouer ou Ctrl+M Cmd+M)
+# Chercher les logs API calls
+```
+
+### Nettoyer & Recommencer
+
+```bash
+# Vider Metro cache
+npm run start:tunnel:clear
+
+# Ou: Entièrement réinitialiser
+npm run start:tunnel:clear  # Terminal 1
+npm run mock:server:tunnel  # Terminal 2 (nouveau ngrok)
+# Relancer Expo Go sur le téléphone
+```

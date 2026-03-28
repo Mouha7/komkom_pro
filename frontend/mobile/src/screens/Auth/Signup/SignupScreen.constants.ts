@@ -1,0 +1,16 @@
+import type { Region } from "react-native-maps";
+import {
+	COMMON_PASSWORD_PATTERNS as DEFAULT_COMMON_PASSWORD_PATTERNS,
+	DAKAR_DEFAULT_REGION as DEFAULT_DAKAR_DEFAULT_REGION,
+} from "../../../constants";
+
+export const SENEGAL_COUNTRY_CODE = "+221";
+export const SENEGAL_LOCAL_DIGITS = 9;
+
+export const COMMON_PASSWORD_PATTERNS = [
+	...DEFAULT_COMMON_PASSWORD_PATTERNS,
+];
+
+export const DAKAR_DEFAULT_REGION: Region = {
+	...DEFAULT_DAKAR_DEFAULT_REGION,
+};
