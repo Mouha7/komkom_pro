@@ -10,15 +10,16 @@ import type { CartAppBarProps } from './CartAppBar.types';
 
 export const CartAppBar: React.FC<CartAppBarProps> = ({
 	title = 'Mon Panier',
-	itemCount = 0,
+	itemCount,
 	onPressBack,
 	onPressClear,
 	isClearDisabled = false,
+	hideRightButton = false,
 	testID,
 }) => {
 	const insets = useSafeAreaInsets();
 	const safeTop = Math.max(insets.top, spacing.s1);
-	const titleWithCount = title + ' (' + String(itemCount) + ')';
+	const titleWithCount = itemCount ? title + ' (' + String(itemCount) + ')' : title;
 
 	return (
 		<View style={[styles.container, { paddingTop: safeTop }]} testID={testID}>
@@ -38,16 +39,20 @@ export const CartAppBar: React.FC<CartAppBarProps> = ({
 					</Text>
 				</View>
 
-				<IconOnlyButton
-					iconName='trash'
-					onPress={onPressClear}
-					disabled={isClearDisabled}
-					size={CART_APP_BAR_BUTTON_SIZE}
-					borderRadius={CART_APP_BAR_BUTTON_SIZE / 2}
-					iconSize={24}
-					iconColor={colorTokens.danger}
-					accessibilityLabel='Vider le panier'
-				/>
+				{hideRightButton ? (
+					<View style={{ width: CART_APP_BAR_BUTTON_SIZE, height: CART_APP_BAR_BUTTON_SIZE }} />
+				) : (
+					<IconOnlyButton
+						iconName='trash'
+						onPress={onPressClear}
+						disabled={isClearDisabled}
+						size={CART_APP_BAR_BUTTON_SIZE}
+						borderRadius={CART_APP_BAR_BUTTON_SIZE / 2}
+						iconSize={24}
+						iconColor={colorTokens.danger}
+						accessibilityLabel='Vider le panier'
+					/>
+				)}
 			</View>
 		</View>
 	);

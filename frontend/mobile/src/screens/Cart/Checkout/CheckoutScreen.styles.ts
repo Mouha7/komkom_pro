@@ -11,24 +11,7 @@ export const styles = StyleSheet.create({
 	scrollView: {
 		flex: 1,
 	},
-	header: {
-		height: 56,
-		paddingHorizontal: spacing.s3,
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		backgroundColor: lightColors.surface.default,
-		borderBottomWidth: 1,
-		borderBottomColor: lightColors.border.default,
-	},
-	headerTitle: {
-		fontSize: 16,
-		fontWeight: '600',
-	},
-	headerPlaceholder: {
-		width: 40,
-		height: 40,
-	},
+
 	contentContainer: {
 		paddingHorizontal: spacing.s3,
 		paddingBottom: spacing.s4,

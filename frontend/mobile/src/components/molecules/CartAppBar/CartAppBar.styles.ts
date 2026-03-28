@@ -25,7 +25,7 @@ export const styles = StyleSheet.create({
 		pointerEvents: 'none',
 	},
 	title: {
-		fontSize: 22,
+		fontSize: 18,
 		fontWeight: '700',
 	},
 });

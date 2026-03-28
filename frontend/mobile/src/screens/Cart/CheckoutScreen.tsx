@@ -3,7 +3,8 @@ import { ScrollView, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { Button, ErrorState, Icon, IconOnlyButton, Input, Text } from '../../components';
+import { Button, CartAppBar, ErrorState, Icon, Input, ScrollToTopButton, Text } from '../../components';
+import { useScrollToTopButton } from '../../components/molecules/';
 import { LocationPickerModal, useLocationPicker } from '../../features/location';
 import { useCart } from '../../hooks/useCart';
 import { useToast } from '../../hooks/useToast';
@@ -58,6 +59,9 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({ navigation }) =>
 	const totals = useMemo(() => computeCheckoutTotals(items), [items]);
 	const bottomInsetPadding = Math.max(insets.bottom, spacing.s2);
 
+	const { scrollViewRef, isScrollTopVisible, handleScroll, handleScrollToTop } =
+		useScrollToTopButton({ visibilityThreshold: 180 });
+
 	const handleConfirmOrder = (): void => {
 		if (!hasPickedLocation) {
 			markLocationAsRequired();
@@ -84,27 +88,21 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({ navigation }) =>
 
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
-			<View style={styles.header}>
-				<IconOnlyButton
-					iconName='arrowLeft'
-					onPress={() => navigation.goBack()}
-					size={40}
-					borderRadius={20}
-					iconSize={22}
-					accessibilityLabel='Retour'
-				/>
-				<Text variant='h3' style={styles.headerTitle}>
-					Finaliser la commande
-				</Text>
-				<View style={styles.headerPlaceholder} />
-			</View>
+			<CartAppBar
+				title='Finaliser la commande'
+				onPressBack={() => navigation.goBack()}
+				hideRightButton
+			/>
 
 			<ScrollView
+				ref={scrollViewRef}
 				style={styles.scrollView}
 				contentContainerStyle={[
 					styles.contentContainer,
 					{ paddingBottom: 132 + bottomInsetPadding },
 				]}
+				onScroll={handleScroll}
+				scrollEventThrottle={16}
 			>
 				{errorMessage ? (
 					<ErrorState
@@ -183,6 +181,13 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({ navigation }) =>
 					Paiement securise. Ne cliquez qu'une seule fois.
 				</Text>
 			</View>
+
+			<ScrollToTopButton
+				visible={isScrollTopVisible}
+				onPress={handleScrollToTop}
+				bottomOffset={132}
+				accessibilityLabel='Retour en haut du checkout'
+			/>
 
 			<LocationPickerModal
 				visible={isLocationModalVisible}

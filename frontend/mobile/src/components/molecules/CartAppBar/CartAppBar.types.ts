@@ -4,5 +4,6 @@ export type CartAppBarProps = {
 	onPressBack: () => void;
 	onPressClear?: () => void;
 	isClearDisabled?: boolean;
+	hideRightButton?: boolean;
 	testID?: string;
 };
