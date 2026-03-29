@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
 
 	contentContainer: {
 		paddingHorizontal: spacing.s3,
-		paddingBottom: spacing.s4,
+		paddingVertical: spacing.s2,
 		gap: spacing.s4,
 	},
 	section: {

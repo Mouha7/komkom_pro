@@ -59,7 +59,6 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({ navigation }) =>
 
 	const totals = useMemo(() => computeCheckoutTotals(items), [items]);
 	const bottomInsetPadding = Math.max(insets.bottom, spacing.s2);
-	const contentContainerPaddingBottom = bottomBarHeight + spacing.s3;
 	const deliverySummaryText = totals.deliveryFee > 0 ? formatPrice(totals.deliveryFee) : 'A calculer';
 
 	const { scrollViewRef, isScrollTopVisible, handleScroll, handleScrollToTop } =
@@ -110,7 +109,6 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({ navigation }) =>
 				style={styles.scrollView}
 				contentContainerStyle={[
 					styles.contentContainer,
-					{ paddingBottom: contentContainerPaddingBottom },
 				]}
 				onScroll={handleScroll}
 				scrollEventThrottle={16}
@@ -208,16 +206,16 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({ navigation }) =>
 					textColorOverride={lightColors.text.secondary}
 					style={styles.idempotenceNote}
 				>
-					Paiement securise. Ne cliquez qu'une seule fois.
+					🔒 Paiement securise. Ne cliquez qu'une seule fois.
 				</Text>
 			</View>
 
-			<ScrollToTopButton
+			{/* <ScrollToTopButton
 				visible={isScrollTopVisible}
 				onPress={handleScrollToTop}
 				bottomOffset={bottomBarHeight}
 				accessibilityLabel='Retour en haut du checkout'
-			/>
+			/> */}
 
 			<LocationPickerModal
 				visible={isLocationModalVisible}

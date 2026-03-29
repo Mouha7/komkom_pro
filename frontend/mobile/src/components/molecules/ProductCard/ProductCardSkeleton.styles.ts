@@ -28,12 +28,28 @@ export const styles = StyleSheet.create({
 		padding: spacing.s2,
 		rowGap: spacing.s2,
 	},
+	portraitWrapRegular: {
+		padding: spacing.s3,
+	},
+	portraitWrapLarge: {
+		padding: spacing.s3,
+		rowGap: spacing.s3,
+	},
 	portraitImage: {
 		width: '100%',
 		height: 150,
 	},
+	portraitImageRegular: {
+		height: 170,
+	},
+	portraitImageLarge: {
+		height: 196,
+	},
 	portraitContent: {
 		rowGap: spacing.s1,
+	},
+	portraitContentRegular: {
+		rowGap: spacing.s2,
 	},
 	portraitTitle: {
 		height: 20,
@@ -61,6 +77,15 @@ export const styles = StyleSheet.create({
 		height: 56,
 		borderRadius: 12,
 	},
+	portraitButtonRegular: {
+		width: 60,
+		height: 60,
+	},
+	portraitButtonLarge: {
+		width: 64,
+		height: 64,
+		borderRadius: 14,
+	},
 	
 	landscapeWrap: {
 		flexDirection: 'row',
@@ -72,6 +97,14 @@ export const styles = StyleSheet.create({
 		borderRightWidth: 1,
 		borderColor: lightColors.border.default,
 	},
+	landscapeImageRegular: {
+		width: 156,
+		height: 170,
+	},
+	landscapeImageLarge: {
+		width: 180,
+		height: 190,
+	},
 	landscapeContent: {
 		flex: 1,
 		paddingVertical: spacing.s2,
@@ -79,8 +112,21 @@ export const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		rowGap: spacing.s1,
 	},
+	landscapeContentRegular: {
+		paddingVertical: spacing.s3,
+		paddingRight: spacing.s3,
+		rowGap: spacing.s2,
+	},
+	landscapeContentLarge: {
+		paddingVertical: spacing.s3,
+		paddingRight: spacing.s4,
+		rowGap: spacing.s3,
+	},
 	landscapeHeader: {
 		rowGap: spacing.s1,
+	},
+	landscapeHeaderRegular: {
+		rowGap: spacing.s2,
 	},
 	landscapeTitle: {
 		height: 20,
@@ -107,5 +153,14 @@ export const styles = StyleSheet.create({
 		width: 56,
 		height: 56,
 		borderRadius: 12,
+	},
+	landscapeButtonRegular: {
+		width: 60,
+		height: 60,
+	},
+	landscapeButtonLarge: {
+		width: 64,
+		height: 64,
+		borderRadius: 14,
 	},
 });

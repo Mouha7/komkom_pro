@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Image, Pressable, View } from "react-native";
+import { Image, Pressable, View, useWindowDimensions } from "react-native";
 
 import { Button, Icon, StatusBadge, Text } from "../../atoms";
 import { lightColors } from "../../../styles/colors";
@@ -29,6 +29,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 	testID,
 	containerStyle,
 }) => {
+	const { width: screenWidth } = useWindowDimensions();
+	const isRegularScreen = screenWidth >= 768 && screenWidth < 1024;
+	const isLargeScreen = screenWidth >= 1024;
+	const actionIconSize = isLargeScreen ? 28 : isRegularScreen ? 26 : 24;
+
 	if (loading) {
 		return (
 			<ProductCardSkeleton
@@ -87,16 +92,36 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 							source={{
 								uri: imageUrl || "https://via.placeholder.com/300x300?text=Produit",
 							}}
-							style={styles.landscapeImage}
+							style={[
+								styles.landscapeImage,
+								isRegularScreen && styles.landscapeImageRegular,
+								isLargeScreen && styles.landscapeImageLarge,
+							]}
 							resizeMode="cover"
 						/>
-						<View style={styles.landscapeImageBadge}>
+						<View
+							style={[
+								styles.landscapeImageBadge,
+								isLargeScreen && styles.landscapeImageBadgeLarge,
+							]}
+						>
 							<StatusBadge stockStatus={stockStatus} compact solid />
 						</View>
 					</View>
 
-					<View style={styles.landscapeContent}>
-						<View style={styles.landscapeHeader}>
+					<View
+						style={[
+							styles.landscapeContent,
+							isRegularScreen && styles.landscapeContentRegular,
+							isLargeScreen && styles.landscapeContentLarge,
+						]}
+					>
+						<View
+							style={[
+								styles.landscapeHeader,
+								isRegularScreen && styles.landscapeHeaderRegular,
+							]}
+						>
 							<Text variant="h3" maxLines={2}>
 								{name}
 							</Text>
@@ -107,7 +132,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 							) : null}
 						</View>
 
-						<View style={styles.landscapeBottom}>
+						<View
+							style={[
+								styles.landscapeBottom,
+								isLargeScreen && styles.landscapeBottomLarge,
+							]}
+						>
 							<View style={styles.landscapePriceWrap}>
 								<Text variant="h2" style={styles.priceAmount}>
 									{formatAmount(price)}
@@ -122,7 +152,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 								leftIcon={
 									<Icon
 										name={isAddedToCart ? "check" : "plus"}
-										size={24}
+										size={actionIconSize}
 										color={lightColors.text.onPrimary}
 										accessibilityLabel={isAddedToCart ? "check" : "plus"}
 									/>
@@ -138,7 +168,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 								}
 								containerStyle={[
 									styles.actionButtonBase,
+									isRegularScreen && styles.actionButtonBaseRegular,
+									isLargeScreen && styles.actionButtonBaseLarge,
 									styles.landscapeActionButton,
+									isRegularScreen && styles.landscapeActionButtonRegular,
+									isLargeScreen && styles.landscapeActionButtonLarge,
 									isAddedToCart && styles.actionButtonSuccess,
 									isCartActionDisabled && styles.actionButtonDisabled,
 								]}
@@ -167,12 +201,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 						source={{
 							uri: imageUrl || "https://via.placeholder.com/300x200?text=Produit",
 						}}
-						style={styles.portraitImage}
+						style={[
+							styles.portraitImage,
+							isRegularScreen && styles.portraitImageRegular,
+							isLargeScreen && styles.portraitImageLarge,
+						]}
 						resizeMode="cover"
 					/>
 				</View>
-				<View style={styles.portraitTouchable}>
-					<View style={styles.portraitContent}>
+				<View
+					style={[
+						styles.portraitTouchable,
+						isRegularScreen && styles.portraitTouchableRegular,
+						isLargeScreen && styles.portraitTouchableLarge,
+					]}
+				>
+					<View
+						style={[
+							styles.portraitContent,
+							isRegularScreen && styles.portraitContentRegular,
+						]}
+					>
 						<Text variant="h3" maxLines={2}>
 							{name}
 						</Text>
@@ -198,7 +247,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 							leftIcon={
 								<Icon
 									name={isAddedToCart ? "check" : "plus"}
-									size={24}
+									size={actionIconSize}
 									color={lightColors.text.onPrimary}
 									accessibilityLabel={isAddedToCart ? "check" : "plus"}
 								/>
@@ -214,7 +263,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 							}
 							containerStyle={[
 								styles.actionButtonBase,
+								isRegularScreen && styles.actionButtonBaseRegular,
+								isLargeScreen && styles.actionButtonBaseLarge,
 								styles.portraitActionButton,
+								isRegularScreen && styles.portraitActionButtonRegular,
+								isLargeScreen && styles.portraitActionButtonLarge,
 								isAddedToCart && styles.actionButtonSuccess,
 								isCartActionDisabled && styles.actionButtonDisabled,
 							]}

@@ -3,7 +3,7 @@ import { ActivityIndicator, FlatList, View } from "react-native";
 
 import { Text } from "../../atoms";
 import { CartItem } from "../../molecules/CartItem";
-import { OrderSummaryCard } from "../OrderSummaryCard";
+import { OrderSummaryCard } from "../../molecules";
 import { styles } from "./CartList.styles";
 import type { CartListProps } from "./CartList.types";
 

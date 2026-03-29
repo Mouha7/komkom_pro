@@ -44,3 +44,6 @@ export type {
 	UseScrollToTopButtonOptions,
 	UseScrollToTopButtonResult,
 } from './ScrollToTopButton';
+
+export { OrderSummaryCard } from './OrderSummaryCard';
+export type { OrderSummaryCardProps } from './OrderSummaryCard';

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, Easing, View } from "react-native";
+import { Animated, Easing, View, useWindowDimensions } from "react-native";
 
 import { styles } from "./ProductCardSkeleton.styles";
 import type { ProductCardSkeletonProps } from "./ProductCardSkeleton.types";
@@ -31,6 +31,9 @@ export const ProductCardSkeleton: React.FC<ProductCardSkeletonProps> = ({
 	containerStyle,
 	testID,
 }) => {
+	const { width: screenWidth } = useWindowDimensions();
+	const isRegularScreen = screenWidth >= 768 && screenWidth < 1024;
+	const isLargeScreen = screenWidth >= 1024;
 	const isLandscape = variant === "landscape";
 	const shimmerProgress = useRef(new Animated.Value(-1)).current;
 
@@ -62,10 +65,25 @@ export const ProductCardSkeleton: React.FC<ProductCardSkeletonProps> = ({
 				<View style={styles.landscapeWrap}>
 					<SkeletonBlock
 						shimmerOffset={shimmerOffset}
-						style={styles.landscapeImage}
+						style={[
+							styles.landscapeImage,
+							isRegularScreen && styles.landscapeImageRegular,
+							isLargeScreen && styles.landscapeImageLarge,
+						]}
 					/>
-					<View style={styles.landscapeContent}>
-						<View style={styles.landscapeHeader}>
+					<View
+						style={[
+							styles.landscapeContent,
+							isRegularScreen && styles.landscapeContentRegular,
+							isLargeScreen && styles.landscapeContentLarge,
+						]}
+					>
+						<View
+							style={[
+								styles.landscapeHeader,
+								isRegularScreen && styles.landscapeHeaderRegular,
+							]}
+						>
 							<SkeletonBlock
 								shimmerOffset={shimmerOffset}
 								style={styles.landscapeTitle}
@@ -82,7 +100,11 @@ export const ProductCardSkeleton: React.FC<ProductCardSkeletonProps> = ({
 							/>
 							<SkeletonBlock
 								shimmerOffset={shimmerOffset}
-								style={styles.landscapeButton}
+								style={[
+									styles.landscapeButton,
+									isRegularScreen && styles.landscapeButtonRegular,
+									isLargeScreen && styles.landscapeButtonLarge,
+								]}
 							/>
 						</View>
 					</View>
@@ -95,10 +117,25 @@ export const ProductCardSkeleton: React.FC<ProductCardSkeletonProps> = ({
 		<View style={[styles.container, containerStyle]} testID={testID}>
 			<SkeletonBlock
 				shimmerOffset={shimmerOffset}
-				style={styles.portraitImage}
+				style={[
+					styles.portraitImage,
+					isRegularScreen && styles.portraitImageRegular,
+					isLargeScreen && styles.portraitImageLarge,
+				]}
 			/>
-			<View style={styles.portraitWrap}>
-				<View style={styles.portraitContent}>
+			<View
+				style={[
+					styles.portraitWrap,
+					isRegularScreen && styles.portraitWrapRegular,
+					isLargeScreen && styles.portraitWrapLarge,
+				]}
+			>
+				<View
+					style={[
+						styles.portraitContent,
+						isRegularScreen && styles.portraitContentRegular,
+					]}
+				>
 					<SkeletonBlock
 						shimmerOffset={shimmerOffset}
 						style={styles.portraitTitle}
@@ -115,7 +152,11 @@ export const ProductCardSkeleton: React.FC<ProductCardSkeletonProps> = ({
 					/>
 					<SkeletonBlock
 						shimmerOffset={shimmerOffset}
-						style={styles.portraitButton}
+						style={[
+							styles.portraitButton,
+							isRegularScreen && styles.portraitButtonRegular,
+							isLargeScreen && styles.portraitButtonLarge,
+						]}
 					/>
 				</View>
 			</View>
