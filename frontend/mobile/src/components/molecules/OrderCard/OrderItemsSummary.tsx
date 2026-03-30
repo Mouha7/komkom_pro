@@ -14,7 +14,7 @@ export const OrderItemsSummary: React.FC<OrderItemsSummaryProps> = ({
 	containerStyle,
 }) => {
 	return (
-		<View style={[styles.itemsSummaryContainer, containerStyle]}>
+		<View style={[containerStyle]}>
 			<Text
 				variant="body"
 				color="secondary"

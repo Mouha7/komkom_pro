@@ -24,6 +24,7 @@ export const OrderCardAction: React.FC<OrderCardActionProps> = ({
 			onPress={onPress}
 			variant={variant}
 			disabled={disabled}
+            textStyle={styles.actionButtonText}
 			containerStyle={[styles.actionButton, containerStyle]}
 		/>
 	);

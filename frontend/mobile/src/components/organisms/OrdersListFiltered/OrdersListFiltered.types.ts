@@ -11,6 +11,10 @@ export interface OrderSummaryItem {
 	createdAt?: string;
 	itemsSummary?: string;
 	itemsCount?: number;
+	items?: Array<{
+		name: string;
+		quantity: number;
+	}>;
 }
 
 export type OrdersListFilteredProps = {
@@ -22,6 +26,7 @@ export type OrdersListFilteredProps = {
 	onFollowOrder?: (orderId: string) => void;
 	onRecommend?: (orderId: string) => void;
 	onRetry?: () => void;
+	onClearSearch?: () => void;
 	containerStyle?: StyleProp<ViewStyle>;
 	testID?: string;
 };

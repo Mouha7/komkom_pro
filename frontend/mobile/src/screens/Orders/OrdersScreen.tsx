@@ -11,7 +11,6 @@ import type { RootStackParamList } from '../../navigation/AppNavigator';
 import { useOrders } from '../../hooks/useOrders';
 import { useToast } from '../../hooks/useToast';
 import { lightColors } from '../../styles/colors';
-import { spacing } from '../../styles/spacing';
 
 type OrdersScreenProps = CompositeScreenProps<
 	BottomTabScreenProps<MainTabParamList, 'Orders'>,
@@ -51,6 +50,7 @@ export const OrdersScreen: React.FC<OrdersScreenProps> = ({ navigation }) => {
 						orders={orders}
 						searchQuery={searchQuery}
 						isLoading={isLoading}
+						onClearSearch={() => setSearchQuery('')}
 						onViewDetails={(orderId) => {
 							showToast({
 								tone: 'info',

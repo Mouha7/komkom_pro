@@ -9,12 +9,16 @@ export const styles = StyleSheet.create({
 	listContainer: {
 		paddingHorizontal: spacing.s4,
 		paddingTop: spacing.s3,
+		paddingBottom: spacing.s4,
 	},
 	emptyContainer: {
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
 		paddingHorizontal: spacing.s4,
+	},
+	emptyStateCard: {
+		marginTop: spacing.s4,
 	},
 	emptyText: {
 		fontSize: 16,

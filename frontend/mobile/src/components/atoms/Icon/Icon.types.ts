@@ -37,6 +37,7 @@ export type CommonIconName =
 	| 'heart'
 	| 'truck'
 	| 'map'
+	| 'clock'
 	;
 
 export type IconProps = {

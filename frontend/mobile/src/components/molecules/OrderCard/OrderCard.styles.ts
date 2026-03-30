@@ -4,24 +4,25 @@ import { spacing } from '../../../styles/spacing';
 
 export const styles = StyleSheet.create({
 	// OrderItemsSummary styles
-	itemsSummaryContainer: {
-		paddingVertical: spacing.s1,
-	},
 	itemsSummaryText: {
 		fontSize: 14,
-		lineHeight: 20,
 		color: lightColors.text.secondary,
 	},
 
 	// OrderCardAction styles
 	actionContainer: {
 		flex: 1,
-		minHeight: 36,
+		minHeight: 52,
 	},
 	actionButton: {
 		flex: 1,
-		minHeight: 36,
+		minHeight: 52,
+		borderRadius: 6,
 	},
+    actionButtonText: {
+        fontSize: 14,
+        fontWeight: '700',
+    },
 	actionButtonIcon: {
 		width: 16,
 		height: 16,
@@ -32,21 +33,19 @@ export const styles = StyleSheet.create({
 		backgroundColor: lightColors.surface.default,
 		borderWidth: 1,
 		borderColor: lightColors.border.default,
-		borderRadius: spacing.s2,
-		padding: spacing.s3,
-		marginBottom: spacing.s2,
+		borderRadius: 20,
+		padding: spacing.s4,
+		marginBottom: spacing.s3,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.02,
-		shadowRadius: 4,
+		shadowOpacity: 0.03,
+		shadowRadius: 8,
 		elevation: 1,
 	},
 	cardHeader: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'flex-start',
-		marginBottom: spacing.s2,
-		gap: spacing.s2,
 	},
 	cardHeaderLeft: {
 		flex: 1,
@@ -54,20 +53,51 @@ export const styles = StyleSheet.create({
 	},
 	cardReference: {
 		fontSize: 15,
-		fontWeight: '600',
+		fontWeight: '700',
 		color: lightColors.text.primary,
 	},
 	cardDate: {
 		fontSize: 12,
 		color: lightColors.text.secondary,
 	},
-	cardDivider: {
-		height: 1,
-		backgroundColor: 'rgba(209, 213, 219, 0.5)',
-		marginVertical: spacing.s2,
+	statusPill: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		columnGap: spacing.s1,
+		paddingHorizontal: spacing.s1,
+		paddingVertical: spacing.s0,
+		borderRadius: 4,
+		borderWidth: 1,
 	},
-	cardBody: {
-		marginBottom: spacing.s2,
+	statusPillLabel: {
+		fontSize: 12,
+		fontWeight: '700',
+	},
+	statusPillWarning: {
+		backgroundColor: '#FEF3E8',
+		borderColor: '#FCD7AA',
+	},
+	statusPillInfo: {
+		backgroundColor: '#EAF5FF',
+		borderColor: '#BFDBFE',
+	},
+	statusPillSuccess: {
+		backgroundColor: '#ECFDF3',
+		borderColor: '#BBF7D0',
+	},
+	statusPillDanger: {
+		backgroundColor: '#FEF2F2',
+		borderColor: '#FECACA',
+	},
+	statusPillNeutral: {
+		backgroundColor: '#F9FAFB',
+		borderColor: '#E5E7EB',
+	},
+	cardDivider: {
+		borderTopWidth: 1,
+		borderTopColor: '#D1D5DB',
+		borderStyle: 'dashed',
+		marginVertical: spacing.s2,
 	},
 	cardTotalRow: {
 		flexDirection: 'row',
@@ -77,7 +107,8 @@ export const styles = StyleSheet.create({
 	},
 	cardTotalLabel: {
 		fontSize: 14,
-		color: lightColors.text.secondary,
+		fontWeight: '700',
+		color: lightColors.text.primary,
 	},
 	cardTotalValue: {
 		fontSize: 16,
