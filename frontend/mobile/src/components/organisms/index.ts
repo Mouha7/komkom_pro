@@ -1,3 +1,6 @@
+
+export { OrdersListFiltered } from './OrdersListFiltered';
+export type { OrdersListFilteredProps, OrderSummaryItem as OrdersListFilteredItem } from './OrdersListFiltered';
 export { CartList } from './CartList';
 export type { CartListProps } from './CartList';
 

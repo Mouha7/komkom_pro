@@ -1,0 +1,669 @@
+<div
+	class="export-wrapper"
+	style="
+		width: 375px;
+		min-height: 812px;
+		position: relative;
+		font-family: var(--font-family-body);
+		background-color: var(--background);
+	"
+>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link
+		href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@100;200;300;400;500;600;700;800;900&family=Geist:wght@100;200;300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Nunito:wght@200;300;400;500;600;700;800;900&family=PT+Serif:wght@400;700&family=Roboto+Slab:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&family=Shantell+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+		rel="stylesheet"
+	/>
+	<html>
+		<head>
+			<style id="base-styles">
+				:root {
+					--primary: #ed762f;
+					--primary-dark: #c55a1f;
+					--primary-light: #f7e6d9;
+					--foreground: #0f1724;
+					--muted-foreground: #374151;
+					--border: #d1d5db;
+					--background: #f3f4f6;
+					--card: #ffffff;
+					--success: #16a34a;
+					--danger: #dc2626;
+					--warning: #f59e0b;
+					--info: #0ea5e9;
+					--radius-sm: 4px;
+					--radius-md: 8px;
+					--radius-lg: 12px;
+					--radius-xl: 99px;
+					--font-family-body:
+						"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+						Roboto, Helvetica, Arial, sans-serif;
+				}
+				* {
+					box-sizing: border-box;
+				}
+				.export-wrapper {
+					margin: 0;
+					font-family: var(--font-family-body);
+					background-color: var(--background);
+					color: var(--foreground);
+					-webkit-font-smoothing: antialiased;
+				}
+				.app-container {
+					display: flex;
+					flex-direction: column;
+					min-height: 812px;
+					height: 100vh;
+					position: relative;
+					background-color: var(--background);
+					overflow: hidden;
+				}
+			</style>
+			<style id="header-styles">
+				.app-header {
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+					height: 56px;
+					padding: 0 16px;
+					background-color: var(--card);
+					border-bottom: 1px solid var(--border);
+					position: sticky;
+					top: 0;
+					z-index: 10;
+				}
+				.header-title {
+					font-size: 18px;
+					font-weight: 600;
+					color: var(--foreground);
+					margin: 0;
+				}
+				.header-btn {
+					width: 40px;
+					height: 40px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					color: var(--foreground);
+					border-radius: 50%;
+					background: transparent;
+					border: none;
+				}
+			</style>
+			<style id="filter-styles">
+				.filters-container {
+					display: flex;
+					gap: 8px;
+					padding: 16px;
+					overflow-x: auto;
+					scrollbar-width: none;
+					background-color: var(--background);
+				}
+				.filters-container::-webkit-scrollbar {
+					display: none;
+				}
+				.filter-chip {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					padding: 8px 16px;
+					border-radius: var(--radius-xl);
+					font-size: 14px;
+					font-weight: 500;
+					white-space: nowrap;
+					cursor: pointer;
+					border: 1px solid var(--border);
+					background-color: var(--card);
+					color: var(--muted-foreground);
+				}
+				.filter-chip.active {
+					background-color: var(--primary);
+					border-color: var(--primary);
+					color: #ffffff;
+				}
+			</style>
+			<style id="order-list-styles">
+				.main-content {
+					flex: 1;
+					overflow-y: auto;
+					padding: 0 16px 80px;
+					display: flex;
+					flex-direction: column;
+					gap: 16px;
+				}
+
+				.order-card {
+					background: var(--card);
+					border: 1px solid var(--border);
+					border-radius: var(--radius-lg);
+					padding: 16px;
+					display: flex;
+					flex-direction: column;
+					gap: 12px;
+					box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+				}
+
+				.order-header {
+					display: flex;
+					justify-content: space-between;
+					align-items: flex-start;
+				}
+				.order-id-date {
+					display: flex;
+					flex-direction: column;
+					gap: 4px;
+				}
+				.order-id {
+					font-size: 15px;
+					font-weight: 600;
+					color: var(--foreground);
+				}
+				.order-date {
+					font-size: 12px;
+					color: var(--muted-foreground);
+				}
+
+				.status-badge {
+					display: inline-flex;
+					align-items: center;
+					gap: 4px;
+					padding: 4px 8px;
+					border-radius: var(--radius-sm);
+					font-size: 12px;
+					font-weight: 600;
+					white-space: nowrap;
+				}
+				.status-badge.warning {
+					background-color: rgba(245, 158, 11, 0.1);
+					color: var(--warning);
+				}
+				.status-badge.success {
+					background-color: rgba(22, 163, 74, 0.1);
+					color: var(--success);
+				}
+				.status-badge.danger {
+					background-color: rgba(220, 38, 38, 0.1);
+					color: var(--danger);
+				}
+
+				.order-body {
+					padding: 12px 0;
+					border-top: 1px dashed var(--border);
+					border-bottom: 1px dashed var(--border);
+					display: flex;
+					flex-direction: column;
+					gap: 8px;
+				}
+				.order-items-summary {
+					font-size: 14px;
+					color: var(--muted-foreground);
+					line-height: 1.4;
+					display: -webkit-box;
+					-webkit-line-clamp: 2;
+					-webkit-box-orient: vertical;
+					overflow: hidden;
+				}
+				.order-total-row {
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					margin-top: 4px;
+				}
+				.order-total-label {
+					font-size: 14px;
+					color: var(--foreground);
+					font-weight: 500;
+				}
+				.order-total-value {
+					font-size: 16px;
+					font-weight: 700;
+					color: var(--primary-dark);
+				}
+
+				.order-footer {
+					display: flex;
+					justify-content: flex-end;
+					gap: 8px;
+					padding-top: 4px;
+				}
+				.btn-outline {
+					height: 36px;
+					padding: 0 16px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					font-size: 13px;
+					font-weight: 600;
+					border-radius: var(--radius-md);
+					border: 1px solid var(--border);
+					background-color: transparent;
+					color: var(--foreground);
+				}
+				.btn-solid {
+					height: 36px;
+					padding: 0 16px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					font-size: 13px;
+					font-weight: 600;
+					border-radius: var(--radius-md);
+					border: none;
+					background-color: var(--primary-light);
+					color: var(--primary-dark);
+				}
+				.btn-solid.primary-style {
+					background-color: var(--primary);
+					color: #ffffff;
+				}
+			</style>
+			<style id="bottom-nav-styles">
+				.bottom-nav {
+					position: absolute;
+					bottom: 0;
+					left: 0;
+					right: 0;
+					height: 64px;
+					background-color: var(--card);
+					border-top: 1px solid var(--border);
+					display: flex;
+					justify-content: space-around;
+					align-items: center;
+					padding-bottom: env(safe-area-inset-bottom, 0);
+					z-index: 20;
+				}
+				.nav-item {
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					justify-content: center;
+					gap: 4px;
+					color: var(--muted-foreground);
+					width: 64px;
+					height: 100%;
+					text-decoration: none;
+				}
+				.nav-item.active {
+					color: var(--primary);
+				}
+				.nav-icon {
+					width: 24px;
+					height: 24px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+				}
+				.nav-label {
+					font-size: 10px;
+					font-weight: 500;
+				}
+			</style>
+		</head>
+		<body>
+			<div class="app-container">
+				<header class="app-header">
+					<div class="header-btn" data-media-type="banani-button">
+						<div
+							style="
+								width: 24px;
+								height: 24px;
+								display: flex;
+								align-items: center;
+								justify-content: center;
+							"
+						>
+							<iconify-icon
+								icon="lucide:chevron-left"
+								style="font-size: 24px; color: inherit"
+							></iconify-icon>
+						</div>
+					</div>
+					<h1 class="header-title">Mes commandes</h1>
+					<div class="header-btn" data-media-type="banani-button">
+						<div
+							style="
+								width: 24px;
+								height: 24px;
+								display: flex;
+								align-items: center;
+								justify-content: center;
+							"
+						>
+							<iconify-icon
+								icon="lucide:search"
+								style="font-size: 24px; color: inherit"
+							></iconify-icon>
+						</div>
+					</div>
+				</header>
+
+				<div class="filters-container">
+					<div
+						class="filter-chip active"
+						data-media-type="banani-button"
+					>
+						Toutes
+					</div>
+					<div class="filter-chip" data-media-type="banani-button">
+						En cours
+					</div>
+					<div class="filter-chip" data-media-type="banani-button">
+						Livrées
+					</div>
+					<div class="filter-chip" data-media-type="banani-button">
+						Annulées
+					</div>
+				</div>
+
+				<main class="main-content">
+					<!-- Order Card: In Progress -->
+					<div class="order-card" data-media-type="banani-button">
+						<div class="order-header">
+							<div class="order-id-date">
+								<span class="order-id">#KK-84920</span>
+								<span class="order-date"
+									>Aujourd'hui, 09:41</span
+								>
+							</div>
+							<div class="status-badge warning">
+								<div
+									style="
+										width: 14px;
+										height: 14px;
+										display: flex;
+										align-items: center;
+										justify-content: center;
+									"
+								>
+									<iconify-icon
+										icon="lucide:clock"
+										style="font-size: 14px; color: inherit"
+									></iconify-icon>
+								</div>
+								En préparation
+							</div>
+						</div>
+						<div class="order-body">
+							<div class="order-items-summary">
+								Ciment Portland CEM II x50, Peinture Acrylique
+								Blanche 15L x10, Fer à béton 10mm x100
+							</div>
+							<div class="order-total-row">
+								<span class="order-total-label"
+									>3 articles</span
+								>
+								<span class="order-total-value"
+									>127 500 FCFA</span
+								>
+							</div>
+						</div>
+						<div class="order-footer">
+							<button
+								class="btn-outline"
+								data-media-type="banani-button"
+							>
+								Voir détails
+							</button>
+							<button
+								class="btn-solid primary-style"
+								data-media-type="banani-button"
+							>
+								Suivre
+							</button>
+						</div>
+					</div>
+
+					<!-- Order Card: Delivered -->
+					<div class="order-card" data-media-type="banani-button">
+						<div class="order-header">
+							<div class="order-id-date">
+								<span class="order-id">#KK-84815</span>
+								<span class="order-date"
+									>12 Oct 2023, 14:20</span
+								>
+							</div>
+							<div class="status-badge success">
+								<div
+									style="
+										width: 14px;
+										height: 14px;
+										display: flex;
+										align-items: center;
+										justify-content: center;
+									"
+								>
+									<iconify-icon
+										icon="lucide:check-circle"
+										style="font-size: 14px; color: inherit"
+									></iconify-icon>
+								</div>
+								Livrée
+							</div>
+						</div>
+						<div class="order-body">
+							<div class="order-items-summary">
+								Disque diamant 230mm x5, Perceuse à percussion
+								Bosch x2, Mètre ruban 5m x20
+							</div>
+							<div class="order-total-row">
+								<span class="order-total-label"
+									>4 articles</span
+								>
+								<span class="order-total-value"
+									>85 000 FCFA</span
+								>
+							</div>
+						</div>
+						<div class="order-footer">
+							<button
+								class="btn-outline"
+								data-media-type="banani-button"
+							>
+								Voir détails
+							</button>
+							<button
+								class="btn-solid"
+								data-media-type="banani-button"
+							>
+								Recommander
+							</button>
+						</div>
+					</div>
+
+					<!-- Order Card: Delivered -->
+					<div class="order-card" data-media-type="banani-button">
+						<div class="order-header">
+							<div class="order-id-date">
+								<span class="order-id">#KK-84790</span>
+								<span class="order-date"
+									>05 Oct 2023, 08:15</span
+								>
+							</div>
+							<div class="status-badge success">
+								<div
+									style="
+										width: 14px;
+										height: 14px;
+										display: flex;
+										align-items: center;
+										justify-content: center;
+									"
+								>
+									<iconify-icon
+										icon="lucide:check-circle"
+										style="font-size: 14px; color: inherit"
+									></iconify-icon>
+								</div>
+								Livrée
+							</div>
+						</div>
+						<div class="order-body">
+							<div class="order-items-summary">
+								Vis à bois 4x40mm (Boîte de 500) x10, Cheville
+								nylon 8mm x20
+							</div>
+							<div class="order-total-row">
+								<span class="order-total-label"
+									>2 articles</span
+								>
+								<span class="order-total-value"
+									>32 000 FCFA</span
+								>
+							</div>
+						</div>
+						<div class="order-footer">
+							<button
+								class="btn-outline"
+								data-media-type="banani-button"
+							>
+								Voir détails
+							</button>
+							<button
+								class="btn-solid"
+								data-media-type="banani-button"
+							>
+								Recommander
+							</button>
+						</div>
+					</div>
+
+					<!-- Order Card: Cancelled -->
+					<div class="order-card" data-media-type="banani-button">
+						<div class="order-header">
+							<div class="order-id-date">
+								<span class="order-id">#KK-84650</span>
+								<span class="order-date"
+									>28 Sep 2023, 11:30</span
+								>
+							</div>
+							<div class="status-badge danger">
+								<div
+									style="
+										width: 14px;
+										height: 14px;
+										display: flex;
+										align-items: center;
+										justify-content: center;
+									"
+								>
+									<iconify-icon
+										icon="lucide:x-circle"
+										style="font-size: 14px; color: inherit"
+									></iconify-icon>
+								</div>
+								Annulée
+							</div>
+						</div>
+						<div class="order-body">
+							<div class="order-items-summary">
+								Tôle ondulée galvanisée 2m x50
+							</div>
+							<div class="order-total-row">
+								<span class="order-total-label">1 article</span>
+								<span class="order-total-value"
+									>150 000 FCFA</span
+								>
+							</div>
+						</div>
+						<div class="order-footer">
+							<button
+								class="btn-outline"
+								data-media-type="banani-button"
+							>
+								Voir détails
+							</button>
+						</div>
+					</div>
+				</main>
+
+				<nav class="bottom-nav">
+					<a
+						href="#"
+						class="nav-item"
+						data-media-type="banani-button"
+					>
+						<div class="nav-icon">
+							<iconify-icon
+								icon="lucide:home"
+								style="font-size: 24px"
+							></iconify-icon>
+						</div>
+						<span class="nav-label">Accueil</span>
+					</a>
+					<a
+						href="#"
+						class="nav-item"
+						data-media-type="banani-button"
+					>
+						<div class="nav-icon">
+							<iconify-icon
+								icon="lucide:package"
+								style="font-size: 24px"
+							></iconify-icon>
+						</div>
+						<span class="nav-label">Produits</span>
+					</a>
+					<a
+						href="#"
+						class="nav-item active"
+						data-media-type="banani-button"
+					>
+						<div class="nav-icon">
+							<iconify-icon
+								icon="lucide:clipboard-list"
+								style="font-size: 24px"
+							></iconify-icon>
+						</div>
+						<span class="nav-label">Commandes</span>
+					</a>
+					<a
+						href="#"
+						class="nav-item"
+						data-media-type="banani-button"
+					>
+						<div class="nav-icon">
+							<iconify-icon
+								icon="lucide:user"
+								style="font-size: 24px"
+							></iconify-icon>
+						</div>
+						<span class="nav-label">Profil</span>
+					</a>
+				</nav>
+			</div>
+		</body>
+	</html>
+	<script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+	<style>
+		:root {
+			--background: #f3f4f6;
+			--foreground: #0f1724;
+			--border: #d1d5db;
+			--input: #ffffff;
+			--primary: #ed762f;
+			--primary-foreground: #ffffff;
+			--secondary: #f7e6d9;
+			--secondary-foreground: #0f1724;
+			--muted: #f3f4f6;
+			--muted-foreground: #374151;
+			--success: #16a34a;
+			--success-foreground: #ffffff;
+			--accent: #0ea5e9;
+			--accent-foreground: #ffffff;
+			--destructive: #dc2626;
+			--destructive-foreground: #ffffff;
+			--warning: #f59e0b;
+			--warning-foreground: #0f1724;
+			--card: #ffffff;
+			--card-foreground: #0f1724;
+			--sidebar: #ffffff;
+			--sidebar-foreground: #374151;
+			--sidebar-primary: #ed762f;
+			--sidebar-primary-foreground: #ffffff;
+			--radius-sm: 4px;
+			--radius-md: 6px;
+			--radius-lg: 8px;
+			--radius-xl: 12px;
+			--font-family-body: Inter;
+		}
+	</style>
+</div>
