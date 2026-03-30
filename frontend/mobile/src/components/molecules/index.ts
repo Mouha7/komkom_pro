@@ -47,3 +47,18 @@ export type {
 
 export { OrderSummaryCard } from './OrderSummaryCard';
 export type { OrderSummaryCardProps } from './OrderSummaryCard';
+
+export {
+	OrderConfirmationHeaderIcon,
+	OrderConfirmationSummaryCard,
+	OrderConfirmationActionBar,
+} from './OrderConfirmation';
+export type {
+	OrderConfirmationHeaderIconProps,
+	OrderConfirmationSummaryCardProps,
+	OrderConfirmationActionBarProps,
+	OrderConfirmationSummaryItem,
+	OrderConfirmationStatusType,
+	OrderConfirmationScreenData,
+} from './OrderConfirmation';
+export { MOCK_ORDER_CONFIRMATION_DATA } from './OrderConfirmation';

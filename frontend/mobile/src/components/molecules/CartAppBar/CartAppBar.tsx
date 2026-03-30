@@ -15,6 +15,10 @@ export const CartAppBar: React.FC<CartAppBarProps> = ({
 	onPressClear,
 	isClearDisabled = false,
 	hideRightButton = false,
+	hideLeftButton = false,
+	rightIconName = 'trash',
+	onPressRight,
+	rightButtonAccessibilityLabel,
 	testID,
 }) => {
 	const insets = useSafeAreaInsets();
@@ -24,14 +28,18 @@ export const CartAppBar: React.FC<CartAppBarProps> = ({
 	return (
 		<View style={[styles.container, { paddingTop: safeTop }]} testID={testID}>
 			<View style={styles.content}>
-				<IconOnlyButton
-					iconName='arrowLeft'
-					onPress={onPressBack}
-					size={CART_APP_BAR_BUTTON_SIZE}
-					borderRadius={CART_APP_BAR_BUTTON_SIZE / 2}
-					iconSize={24}
-					accessibilityLabel='Retour'
-				/>
+				{hideLeftButton ? (
+					<View style={{ width: CART_APP_BAR_BUTTON_SIZE, height: CART_APP_BAR_BUTTON_SIZE }} />
+				) : (
+					<IconOnlyButton
+						iconName='arrowLeft'
+						onPress={onPressBack}
+						size={CART_APP_BAR_BUTTON_SIZE}
+						borderRadius={CART_APP_BAR_BUTTON_SIZE / 2}
+						iconSize={24}
+						accessibilityLabel='Retour'
+					/>
+				)}
 
 				<View style={styles.titleWrap}>
 					<Text variant='h1' style={styles.title} maxLines={1} align='center'>
@@ -43,14 +51,17 @@ export const CartAppBar: React.FC<CartAppBarProps> = ({
 					<View style={{ width: CART_APP_BAR_BUTTON_SIZE, height: CART_APP_BAR_BUTTON_SIZE }} />
 				) : (
 					<IconOnlyButton
-						iconName='trash'
-						onPress={onPressClear}
-						disabled={isClearDisabled}
+						iconName={rightIconName}
+						onPress={onPressRight ?? onPressClear}
+						disabled={isClearDisabled && rightIconName === 'trash'}
 						size={CART_APP_BAR_BUTTON_SIZE}
 						borderRadius={CART_APP_BAR_BUTTON_SIZE / 2}
 						iconSize={24}
-						iconColor={colorTokens.danger}
-						accessibilityLabel='Vider le panier'
+						iconColor={rightIconName === 'trash' ? colorTokens.danger : colorTokens.neutral700}
+						accessibilityLabel={
+							rightButtonAccessibilityLabel ??
+							(rightIconName === 'trash' ? 'Vider le panier' : 'Action')
+						}
 					/>
 				)}
 			</View>

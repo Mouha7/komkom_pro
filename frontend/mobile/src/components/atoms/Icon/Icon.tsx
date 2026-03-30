@@ -38,6 +38,8 @@ import {
 	Share2,
 	Truck,
 	ArrowRight,
+	Map,
+	ShieldCheckIcon,
 } from 'lucide-react-native';
 
 import type { CommonIconName, IconProps } from './Icon.types';
@@ -80,6 +82,7 @@ const ICON_MAP: Record<CommonIconName, LucideIcon> = {
 	share: Share2,
 	heart: Heart,
 	truck: Truck,
+	map: Map,
 };
 
 export const Icon: React.FC<IconProps> = ({

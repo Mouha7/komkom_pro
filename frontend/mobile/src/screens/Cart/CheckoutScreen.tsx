@@ -92,7 +92,8 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({ navigation }) =>
 
 		setTimeout(() => {
 			setIsSubmitting(false);
-			navigation.navigate('Cart');
+			// Mock order ID for now
+			navigation.navigate('OrderConfirmation', { orderId: 'KK-84920' });
 		}, 400);
 	};
 
