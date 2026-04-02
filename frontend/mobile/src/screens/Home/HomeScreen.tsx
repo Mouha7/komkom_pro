@@ -19,6 +19,7 @@ import {
 	useScrollToTopButton,
 } from "../../components";
 import { useAuth } from "../../hooks/useAuth";
+import { useCart } from "../../hooks/useCart";
 import { useNotifications } from "../../hooks/useNotifications";
 import { useToast } from "../../hooks/useToast";
 import { styles } from "./HomeScreen.styles";
@@ -84,6 +85,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 	const isLoadMoreLockedRef = useRef(false);
 
 	const { roles, user } = useAuth();
+	const { addItem, removeItem, totalItemsCount } = useCart();
 	const { unreadCount } = useNotifications();
 	const { showToast } = useToast();
 	const isEmployee = roles.includes("employee");
@@ -228,42 +230,37 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 		navigation.navigate("ProductDetail", { productId });
 	};
 
-	const handleAddToCart = (_productId: string): void => {
-		showToast({
-			tone: "success",
-			title: "Produit ajoute",
-			message: "Article ajoute au panier",
-			actionLabel: "Voir",
-			actionLabelA11y: "Voir le panier",
-			onActionPress: () => navigation.navigate("Cart"),
-		});
-		return;
-	};
-
-	const handleCartToggle = (
-		_productId: string,
-		isSelected: boolean,
-		productName: string,
-	): void => {
-		if (isSelected) {
+	const handleAddToCart = (productId: string): void => {
+		void addItem(productId, 1).then(() => {
 			showToast({
 				tone: "success",
 				title: "Produit ajoute",
-				message: `${productName} a ete ajoute au panier`,
+				message: "Article ajoute au panier",
 				actionLabel: "Voir",
 				actionLabelA11y: "Voir le panier",
 				onActionPress: () => navigation.navigate("Cart"),
 			});
+		});
+	};
+
+	const handleCartToggle = (
+		productId: string,
+		isSelected: boolean,
+		productName: string,
+	): void => {
+		if (isSelected) {
 			return;
 		}
 
-		showToast({
-			tone: "info",
-			title: "Produit retire",
-			message: `${productName} a ete retire du panier`,
-			actionLabel: "Voir",
-			actionLabelA11y: "Voir le panier",
-			onActionPress: () => navigation.navigate("Cart"),
+		void removeItem(productId).then(() => {
+			showToast({
+				tone: "info",
+				title: "Produit retire",
+				message: `${productName} a ete retire du panier`,
+				actionLabel: "Voir",
+				actionLabelA11y: "Voir le panier",
+				onActionPress: () => navigation.navigate("Cart"),
+			});
 		});
 	};
 
@@ -292,7 +289,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 				userName={userName}
 				storeName={storeName}
 				notificationCount={unreadCount}
-				cartCount={5}
+				cartCount={totalItemsCount}
 				onPressProfile={() => navigation.navigate("Profile")}
 				onPressNotifications={() => navigation.navigate("Notifications")}
 				onPressCart={() => navigation.navigate("Cart")}

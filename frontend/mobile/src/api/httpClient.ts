@@ -101,6 +101,24 @@ const getMockResponse = async <T>(path: string): Promise<T> => {
 			return (await mockServiceApi.getCart()) as T;
 		}
 
+		// GET /api/v1/cart/add/:productId/:quantity
+		const cartAddMatch = normalizedPath.match(/^api\/v1\/cart\/add\/([^/]+)\/(\d+)$/);
+		if (cartAddMatch) {
+			return (await mockServiceApi.addProductToCart(cartAddMatch[1], Number(cartAddMatch[2]))) as T;
+		}
+
+		// GET /api/v1/cart/update/:productId/:quantity
+		const cartUpdateMatch = normalizedPath.match(/^api\/v1\/cart\/update\/([^/]+)\/(-?\d+)$/);
+		if (cartUpdateMatch) {
+			return (await mockServiceApi.updateCartItemQuantity(cartUpdateMatch[1], Number(cartUpdateMatch[2]))) as T;
+		}
+
+		// GET /api/v1/cart/remove/:productId
+		const cartRemoveMatch = normalizedPath.match(/^api\/v1\/cart\/remove\/([^/]+)$/);
+		if (cartRemoveMatch) {
+			return (await mockServiceApi.removeCartItem(cartRemoveMatch[1])) as T;
+		}
+
 		// GET /api/v1/orders
 		if (normalizedPath === 'api/v1/orders') {
 			return (await mockServiceApi.getOrders()) as T;
@@ -161,6 +179,18 @@ const getMockResponse = async <T>(path: string): Promise<T> => {
 	}
 	if (normalizedPath === 'cart') {
 		return (await mockServiceApi.getCart()) as T;
+	}
+	const cartLegacyAddMatch = normalizedPath.match(/^cart\/add\/([^/]+)\/(\d+)$/);
+	if (cartLegacyAddMatch) {
+		return (await mockServiceApi.addProductToCart(cartLegacyAddMatch[1], Number(cartLegacyAddMatch[2]))) as T;
+	}
+	const cartLegacyUpdateMatch = normalizedPath.match(/^cart\/update\/([^/]+)\/(-?\d+)$/);
+	if (cartLegacyUpdateMatch) {
+		return (await mockServiceApi.updateCartItemQuantity(cartLegacyUpdateMatch[1], Number(cartLegacyUpdateMatch[2]))) as T;
+	}
+	const cartLegacyRemoveMatch = normalizedPath.match(/^cart\/remove\/([^/]+)$/);
+	if (cartLegacyRemoveMatch) {
+		return (await mockServiceApi.removeCartItem(cartLegacyRemoveMatch[1])) as T;
 	}
 	if (normalizedPath === 'orders') {
 		return (await mockServiceApi.getOrders()) as T;

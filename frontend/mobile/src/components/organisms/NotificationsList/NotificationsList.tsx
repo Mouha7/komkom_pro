@@ -61,9 +61,6 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
 			showsVerticalScrollIndicator={false}
 			testID={testID}
 		>
-			<Text variant='small' color='secondary' style={styles.sectionHeader}>
-				Liste In-App
-			</Text>
 			<View style={styles.listWrap}>
 				{notifications.map((notification: NotificationModel) => (
 					<NotificationCard

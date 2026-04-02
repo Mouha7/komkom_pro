@@ -17,7 +17,7 @@ let hasShownCartSyncBadgeThisSession = false;
 
 export const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
 	const insets = useSafeAreaInsets();
-	const { items, isLoading, errorMessage, reload } = useCart();
+	const { items, isLoading, errorMessage, reload, setItemQuantity, removeItem } = useCart();
 	const { showToast } = useToast();
 	const [isReloading, setIsReloading] = useState(false);
 	const [isSyncBadgeVisible, setIsSyncBadgeVisible] = useState(
@@ -67,6 +67,46 @@ export const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
 		navigation.navigate('Checkout');
 	};
 
+	const handleIncreaseQty = (productId: string): void => {
+		const cartItem = items.find((item) => item.productId === productId);
+		if (!cartItem) {
+			return;
+		}
+
+		void setItemQuantity(productId, cartItem.quantity + 1);
+	};
+
+	const handleDecreaseQty = (productId: string): void => {
+		const cartItem = items.find((item) => item.productId === productId);
+		if (!cartItem) {
+			return;
+		}
+
+		if (cartItem.quantity <= 1) {
+			void removeItem(productId).then(() => {
+				showToast({
+					tone: 'warning',
+					title: 'Article retire',
+					message: `${cartItem.name} retire du panier`,
+				});
+			});
+			return;
+		}
+
+		void setItemQuantity(productId, cartItem.quantity - 1);
+	};
+
+	const handleRemoveItem = (productId: string): void => {
+		const cartItem = items.find((item) => item.productId === productId);
+		void removeItem(productId).then(() => {
+			showToast({
+				tone: 'warning',
+				title: 'Article retire',
+				message: `${cartItem?.name ?? productId} retire du panier`,
+			});
+		});
+	};
+
 	const handleClearCart = (): void => {
 		showToast({
 			tone: 'warning',
@@ -108,19 +148,9 @@ export const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
 					<CartList
 						items={items}
 						isLoading={isLoading}
-						onIncreaseQty={() => {
-							// Notification desactivee pour augmentation de quantite
-						}}
-						onDecreaseQty={() => {
-							// Notification desactivee pour diminution de quantite
-						}}
-						onRemoveItem={(productId) => {
-							showToast({
-								tone: 'warning',
-								title: 'Article retire',
-								message: `Produit ${productId} retire du panier`,
-							});
-						}}
+						onIncreaseQty={handleIncreaseQty}
+						onDecreaseQty={handleDecreaseQty}
+						onRemoveItem={handleRemoveItem}
 						onCheckout={handleCheckout}
 					/>
 				)}

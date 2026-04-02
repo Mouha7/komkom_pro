@@ -20,6 +20,7 @@ import type { CatalogCategory, ViewMode, FilterOptions, ProductListItemData } fr
 import { lightColors } from '../../styles/colors';
 import type { MainTabParamList } from '../../navigation/BottomTabNavigator';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
+import { useCart } from '../../hooks/useCart';
 import { useToast } from '../../hooks/useToast';
 import { listCatalogCategories, listProducts } from '../../api/products';
 import { styles } from './CatalogScreen.styles';
@@ -36,6 +37,7 @@ const SCROLL_TO_TOP_VISIBILITY_THRESHOLD = 260;
 
 export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation }) => {
 	// Hooks
+	const { addItem, removeItem } = useCart();
 	const { showToast } = useToast();
 	const loadMoreTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const isLoadMoreLockedRef = useRef(false);
@@ -217,38 +219,34 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 	}, [navigation]);
 
 	const handleAddToCart = useCallback((productId: string) => {
-		showToast({
-			tone: 'success',
-			title: 'Produit ajoute',
-			message: `Produit ${productId} ajoute au panier`,
-			actionLabel: 'Voir',
-			actionLabelA11y: 'Voir le panier',
-			onActionPress: () => navigation.navigate('Cart'),
-		});
-	}, [navigation, showToast]);
-
-	const handleCartToggle = useCallback((productId: string, isSelected: boolean, productName: string) => {
-		if (isSelected) {
+		void addItem(productId, 1).then(() => {
 			showToast({
 				tone: 'success',
 				title: 'Produit ajoute',
-				message: `${productName} a ete ajoute au panier`,
+				message: `Produit ${productId} ajoute au panier`,
 				actionLabel: 'Voir',
 				actionLabelA11y: 'Voir le panier',
 				onActionPress: () => navigation.navigate('Cart'),
 			});
+		});
+	}, [addItem, navigation, showToast]);
+
+	const handleCartToggle = useCallback((productId: string, isSelected: boolean, productName: string) => {
+		if (isSelected) {
 			return;
 		}
 
-		showToast({
-			tone: 'info',
-			title: 'Produit retire',
-			message: `${productName} a ete retire du panier`,
-			actionLabel: 'Voir',
-			actionLabelA11y: 'Voir le panier',
-			onActionPress: () => navigation.navigate('Cart'),
+		void removeItem(productId).then(() => {
+			showToast({
+				tone: 'info',
+				title: 'Produit retire',
+				message: `${productName} a ete retire du panier`,
+				actionLabel: 'Voir',
+				actionLabelA11y: 'Voir le panier',
+				onActionPress: () => navigation.navigate('Cart'),
+			});
 		});
-	}, [navigation, showToast]);
+	}, [navigation, removeItem, showToast]);
 
 	const handleOutOfStockPress = useCallback((productName: string) => {
 		showToast({

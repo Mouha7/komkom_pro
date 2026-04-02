@@ -99,6 +99,80 @@ export const mockServiceApi = {
 	},
 
 	/**
+	 * GET /api/v1/cart/add/:productId/:quantity
+	 * Add product to cart by productId (or increment quantity if already present)
+	 */
+	async addProductToCart(productId: string, quantity: number): Promise<CartItemModel[]> {
+		await sleep(NETWORK_DELAY_MS);
+
+		const safeQuantity = Number.isFinite(quantity) ? Math.max(1, Math.floor(quantity)) : 1;
+		const existingItem = CART.find((item) => item.productId === productId);
+
+		if (existingItem) {
+			existingItem.quantity += safeQuantity;
+			return clone(CART);
+		}
+
+		const product = PRODUCTS.find((item) => item.id === productId);
+		if (!product) {
+			return clone(CART);
+		}
+
+		const productDetail = PRODUCT_DETAILS.find((item) => item.id === productId);
+		const nextCartItem: CartItemModel = {
+			id: product.id,
+			productId: product.id,
+			brand: productDetail?.brand ?? 'KOMKOM',
+			name: product.name,
+			price: product.price,
+			currency: product.currency,
+			quantity: safeQuantity,
+			description: productDetail?.unitLabel ?? product.description,
+			stockStatus: product.stockStatus,
+			imageUrl: product.imageUrl,
+		};
+
+		CART.push(nextCartItem);
+		return clone(CART);
+	},
+
+	/**
+	 * GET /api/v1/cart/update/:productId/:quantity
+	 * Set an absolute quantity for one cart item
+	 */
+	async updateCartItemQuantity(productId: string, quantity: number): Promise<CartItemModel[]> {
+		await sleep(NETWORK_DELAY_MS);
+
+		const nextQuantity = Number.isFinite(quantity) ? Math.max(0, Math.floor(quantity)) : 0;
+		const cartItemIndex = CART.findIndex((item) => item.productId === productId);
+
+		if (cartItemIndex === -1) {
+			return clone(CART);
+		}
+
+		if (nextQuantity <= 0) {
+			CART.splice(cartItemIndex, 1);
+			return clone(CART);
+		}
+
+		CART[cartItemIndex].quantity = nextQuantity;
+		return clone(CART);
+	},
+
+	/**
+	 * GET /api/v1/cart/remove/:productId
+	 * Remove one cart item by productId
+	 */
+	async removeCartItem(productId: string): Promise<CartItemModel[]> {
+		await sleep(NETWORK_DELAY_MS);
+		const cartItemIndex = CART.findIndex((item) => item.productId === productId);
+		if (cartItemIndex !== -1) {
+			CART.splice(cartItemIndex, 1);
+		}
+		return clone(CART);
+	},
+
+	/**
 	 * POST /api/v1/cart
 	 * Add item to cart (mock: append to array, no persistence)
 	 */
@@ -256,6 +330,27 @@ export const mockServiceLegacy = {
 	async getCart(): Promise<CartItemModel[]> {
 		await sleep(NETWORK_DELAY_MS);
 		return clone(CART);
+	},
+
+	/**
+	 * GET /cart/add/:productId/:quantity
+	 */
+	async addProductToCart(productId: string, quantity: number): Promise<CartItemModel[]> {
+		return mockServiceApi.addProductToCart(productId, quantity);
+	},
+
+	/**
+	 * GET /cart/update/:productId/:quantity
+	 */
+	async updateCartItemQuantity(productId: string, quantity: number): Promise<CartItemModel[]> {
+		return mockServiceApi.updateCartItemQuantity(productId, quantity);
+	},
+
+	/**
+	 * GET /cart/remove/:productId
+	 */
+	async removeCartItem(productId: string): Promise<CartItemModel[]> {
+		return mockServiceApi.removeCartItem(productId);
 	},
 
 	/**

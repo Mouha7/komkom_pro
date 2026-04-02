@@ -11,14 +11,6 @@ export const styles = StyleSheet.create({
 		paddingTop: spacing.s4,
 		paddingBottom: spacing.s5,
 	},
-	sectionHeader: {
-		fontSize: 12,
-		fontWeight: '700',
-		letterSpacing: 0.5,
-		textTransform: 'uppercase',
-		paddingHorizontal: spacing.s3,
-		marginBottom: spacing.s2,
-	},
 	listWrap: {
 		borderTopWidth: 1,
 		borderTopColor: lightColors.border.default,
