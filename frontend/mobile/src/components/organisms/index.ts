@@ -12,3 +12,6 @@ export type { ProductCardListProps, ProductListItemData } from './ProductCardLis
 
 export { ProductDetail } from './ProductDetail';
 export type { ProductDetailProps, ProductDetailData, ProductDetailAddToCartPayload } from './ProductDetail';
+
+export { NotificationsList } from './NotificationsList';
+export type { NotificationsListProps } from './NotificationsList';

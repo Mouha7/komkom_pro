@@ -62,6 +62,9 @@ export type {
 export { OrderSummaryCard } from './OrderSummaryCard';
 export type { OrderSummaryCardProps } from './OrderSummaryCard';
 
+export { NotificationCard } from './NotificationCard';
+export type { NotificationCardProps } from './NotificationCard';
+
 export {
 	OrderConfirmationHeaderIcon,
 	OrderConfirmationSummaryCard,

@@ -19,6 +19,7 @@ import {
 	useScrollToTopButton,
 } from "../../components";
 import { useAuth } from "../../hooks/useAuth";
+import { useNotifications } from "../../hooks/useNotifications";
 import { useToast } from "../../hooks/useToast";
 import { styles } from "./HomeScreen.styles";
 import type { MainTabParamList } from "../../navigation/BottomTabNavigator";
@@ -83,6 +84,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 	const isLoadMoreLockedRef = useRef(false);
 
 	const { roles, user } = useAuth();
+	const { unreadCount } = useNotifications();
 	const { showToast } = useToast();
 	const isEmployee = roles.includes("employee");
 	const userName = getDisplayNameFromEmail(user?.email);
@@ -289,10 +291,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 			<HomeAppBar
 				userName={userName}
 				storeName={storeName}
-				notificationCount={2}
+				notificationCount={unreadCount}
 				cartCount={5}
 				onPressProfile={() => navigation.navigate("Profile")}
-				onPressNotifications={() => navigation.navigate("Orders")}
+				onPressNotifications={() => navigation.navigate("Notifications")}
 				onPressCart={() => navigation.navigate("Cart")}
 			/>
 

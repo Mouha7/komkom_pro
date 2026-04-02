@@ -6,6 +6,7 @@ import { OrderCard } from '../../molecules/OrderCard';
 import { OrderFiltersBar } from '../../molecules/OrderFilters';
 import { ORDER_FILTERS } from '../../molecules/OrderFilters/OrderFilters.constants';
 import type { OrderFilterType } from '../../molecules/OrderFilters/OrderFilters.types';
+import { FALLBACK_ORDER_ITEMS_BY_STATUS } from '../../../mocks/orders';
 import { styles } from './OrdersListFiltered.styles';
 import type { OrdersListFilteredProps, OrderSummaryItem } from './OrdersListFiltered.types';
 
@@ -57,24 +58,6 @@ const formatOrderDate = (isoDate?: string): string => {
 	return `${dayLabel}, ${timeLabel}`;
 };
 
-const fallbackItemsByStatus = {
-	pending: [
-		{ name: 'Ciment Portland CEM II x50', quantity: 1 },
-		{ name: 'Peinture Acrylique Blanche 15L', quantity: 10 },
-		{ name: 'Fer a beton 10m', quantity: 8 },
-	],
-	confirmed: [
-		{ name: 'Agglos 15 x 20', quantity: 40 },
-		{ name: 'Sable de chantier', quantity: 6 },
-		{ name: 'Ciment Portland CEM II x50', quantity: 4 },
-	],
-	delivered: [
-		{ name: 'Tube PVC 32mm', quantity: 12 },
-		{ name: 'Robinet Mitigeur', quantity: 2 },
-	],
-	cancelled: [{ name: 'Commande annulee', quantity: 1 }],
-};
-
 const resolveOrderItems = (order: OrderSummaryItem) => {
 	if (order.items && order.items.length > 0) {
 		return order.items;
@@ -86,16 +69,16 @@ const resolveOrderItems = (order: OrderSummaryItem) => {
 
 	switch (order.status) {
 		case 'pending':
-			return [...fallbackItemsByStatus.pending];
+			return [...FALLBACK_ORDER_ITEMS_BY_STATUS.pending];
 		case 'confirmed':
-			return [...fallbackItemsByStatus.confirmed];
+			return [...FALLBACK_ORDER_ITEMS_BY_STATUS.confirmed];
 		case 'delivered':
-			return [...fallbackItemsByStatus.delivered];
+			return [...FALLBACK_ORDER_ITEMS_BY_STATUS.delivered];
 		case 'cancelled':
-			return [...fallbackItemsByStatus.cancelled];
+			return [...FALLBACK_ORDER_ITEMS_BY_STATUS.cancelled];
 		case 'draft':
 		default:
-			return [...fallbackItemsByStatus.pending];
+			return [...FALLBACK_ORDER_ITEMS_BY_STATUS.pending];
 	}
 };
 

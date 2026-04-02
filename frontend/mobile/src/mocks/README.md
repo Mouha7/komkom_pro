@@ -74,6 +74,12 @@ Open Expo DevTools to see mock service logs:
 - `GET /api/v1/orders` — List orders
 - `POST /api/v1/orders` — Create new order
 
+### Notifications
+
+- `GET /api/v1/notifications` — List in-app notifications
+- `GET /api/v1/notifications/:id/read` — Mark one notification as read
+- `GET /api/v1/notifications/mark-all-read` — Mark all notifications as read
+
 ### Auth
 
 - `GET /api/v1/auth/defaults` — Get default country, region

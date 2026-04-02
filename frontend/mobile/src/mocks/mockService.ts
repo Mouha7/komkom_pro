@@ -22,6 +22,7 @@ import {
 	type OrderModel,
 	type AuthDefaultsModel,
 } from './data';
+import { NOTIFICATIONS, type NotificationModel } from './notifications';
 
 /**
  * Simulated network delay (ms)
@@ -142,6 +143,51 @@ export const mockServiceApi = {
 	},
 
 	/**
+	 * GET /api/v1/notifications
+	 * Returns list of notifications
+	 */
+	async getNotifications(): Promise<NotificationModel[]> {
+		await sleep(NETWORK_DELAY_MS);
+		return clone(NOTIFICATIONS);
+	},
+
+	/**
+	 * GET /api/v1/notifications/:id/read
+	 * Marks a notification as read
+	 */
+	async markNotificationAsRead(notificationId: string): Promise<NotificationModel | null> {
+		await sleep(NETWORK_DELAY_MS);
+		const notification = NOTIFICATIONS.find((nextNotification) => nextNotification.id === notificationId);
+		if (!notification) {
+			return null;
+		}
+		notification.isRead = true;
+		return clone(notification);
+	},
+
+	/**
+	 * GET /api/v1/notifications/mark-all-read
+	 * Marks all notifications as read
+	 */
+	async markAllNotificationsAsRead(): Promise<NotificationModel[]> {
+		await sleep(NETWORK_DELAY_MS);
+		NOTIFICATIONS.forEach((notification) => {
+			notification.isRead = true;
+		});
+		return clone(NOTIFICATIONS);
+	},
+
+	/**
+	 * GET /api/v1/orders/:id
+	 * Returns one order by ID
+	 */
+	async getOrderById(orderId: string): Promise<OrderModel | null> {
+		await sleep(NETWORK_DELAY_MS);
+		const order = ORDERS.find((nextOrder) => nextOrder.id === orderId);
+		return order ? clone(order) : null;
+	},
+
+	/**
 	 * POST /api/v1/orders
 	 * Create new order (mock: append to array, no persistence)
 	 */
@@ -218,6 +264,14 @@ export const mockServiceLegacy = {
 	async getOrders(): Promise<OrderModel[]> {
 		await sleep(NETWORK_DELAY_MS);
 		return clone(ORDERS);
+	},
+
+	/**
+	 * GET /notifications
+	 */
+	async getNotifications(): Promise<NotificationModel[]> {
+		await sleep(NETWORK_DELAY_MS);
+		return clone(NOTIFICATIONS);
 	},
 
 	/**

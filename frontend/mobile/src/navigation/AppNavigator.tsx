@@ -1,5 +1,5 @@
 import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, type NavigatorScreenParams } from "@react-navigation/native";
 import {
 	createNativeStackNavigator,
 	type NativeStackNavigationOptions,
@@ -15,7 +15,9 @@ import { ProductDetailScreen } from "../screens/Catalog/ProductDetailScreen";
 import { CartScreen } from "../screens/Cart/CartScreen";
 import { CheckoutScreen } from "../screens/Cart/CheckoutScreen";
 import { OrderConfirmationScreen } from "../screens/Cart/OrderConfirmation";
+import type { MainTabParamList } from "./BottomTabNavigator";
 import { OrderDetailScreen } from "../screens/Orders/OrderDetailScreen";
+import { NotificationsScreen } from "../screens/Notifications/NotificationsScreen";
 import { useAuth } from "../hooks/useAuth";
 import { BottomTabNavigator } from "./BottomTabNavigator";
 
@@ -25,12 +27,13 @@ export type RootStackParamList = {
 	Signup: undefined;
 	TermsOfUse: undefined;
 	PrivacyPolicy: undefined;
-	MainTabs: undefined;
+	MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
 	ProductDetail: {
 		productId: string;
 	};
 	Cart: undefined;
 	Checkout: undefined;
+	Notifications: undefined;
 	OrderConfirmation: {
 		orderId: string;
 	};
@@ -85,6 +88,7 @@ export const AppNavigator: React.FC = () => {
 						<Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
 						<Stack.Screen name="Cart" component={CartScreen} />
 						<Stack.Screen name="Checkout" component={CheckoutScreen} />
+						<Stack.Screen name="Notifications" component={NotificationsScreen} />
 						<Stack.Screen name="OrderConfirmation" component={OrderConfirmationScreen} />
 						<Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
 					</>

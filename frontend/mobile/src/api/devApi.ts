@@ -11,6 +11,7 @@ export type DevApiV1 = {
 	};
 	cart: unknown[];
 	orders: unknown[];
+	notifications: unknown[];
 };
 
 type DevApiRoot = {

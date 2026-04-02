@@ -45,13 +45,14 @@ const getMockResponse = async <T>(path: string): Promise<T> => {
 
 	// GET /api - aggregated endpoint for devApi compatibility
 	if (normalizedPath === 'api') {
-		const [products, catalogCategories, homeCategories, homePromos, cart, orders] = await Promise.all([
+		const [products, catalogCategories, homeCategories, homePromos, cart, orders, notifications] = await Promise.all([
 			mockServiceApi.getProducts(),
 			mockServiceApi.getCatalogCategories(),
 			mockServiceApi.getHomeCategories(),
 			mockServiceApi.getHomePromos(),
 			mockServiceApi.getCart(),
 			mockServiceApi.getOrders(),
+			mockServiceApi.getNotifications(),
 		]);
 
 		return {
@@ -61,6 +62,7 @@ const getMockResponse = async <T>(path: string): Promise<T> => {
 				home: { categories: homeCategories, promos: homePromos },
 				cart,
 				orders,
+				notifications,
 			},
 		} as T;
 	}
@@ -104,6 +106,40 @@ const getMockResponse = async <T>(path: string): Promise<T> => {
 			return (await mockServiceApi.getOrders()) as T;
 		}
 
+		// GET /api/v1/notifications
+		if (normalizedPath === 'api/v1/notifications') {
+			return (await mockServiceApi.getNotifications()) as T;
+		}
+
+		// GET /api/v1/notifications/mark-all-read
+		if (normalizedPath === 'api/v1/notifications/mark-all-read') {
+			return (await mockServiceApi.markAllNotificationsAsRead()) as T;
+		}
+
+		// GET /api/v1/notifications/:id/read
+		const notificationReadMatch = normalizedPath.match(
+			/^api\/v1\/notifications\/([^/]+)\/read$/,
+		);
+		if (notificationReadMatch) {
+			const updatedNotification = await mockServiceApi.markNotificationAsRead(
+				notificationReadMatch[1],
+			);
+			if (!updatedNotification) {
+				throw new HttpError(404, `Notification not found: ${notificationReadMatch[1]}`);
+			}
+			return updatedNotification as T;
+		}
+
+		// GET /api/v1/orders/:id
+		const orderMatch = normalizedPath.match(/^api\/v1\/orders\/(.+)$/);
+		if (orderMatch) {
+			const order = await mockServiceApi.getOrderById(orderMatch[1]);
+			if (!order) {
+				throw new HttpError(404, `Order not found: ${orderMatch[1]}`);
+			}
+			return order as T;
+		}
+
 		// GET /api/v1/auth/defaults
 		if (normalizedPath === 'api/v1/auth/defaults') {
 			return (await mockServiceApi.getAuthDefaults()) as T;
@@ -128,6 +164,9 @@ const getMockResponse = async <T>(path: string): Promise<T> => {
 	}
 	if (normalizedPath === 'orders') {
 		return (await mockServiceApi.getOrders()) as T;
+	}
+	if (normalizedPath === 'notifications') {
+		return (await mockServiceApi.getNotifications()) as T;
 	}
 	if (normalizedPath === 'authDefaults') {
 		return (await mockServiceApi.getAuthDefaults()) as T;

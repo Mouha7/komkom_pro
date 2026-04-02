@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
 	ActivityIndicator,
 	Image,
@@ -20,8 +20,14 @@ import {
 	Text,
 	type OrderStatus,
 } from "../../components";
-import { useOrders } from "../../hooks/useOrders";
+import { getOrderById } from "../../api/orders";
 import { useToast } from "../../hooks/useToast";
+import type { OrderSummaryItem } from "../../components";
+import {
+	FALLBACK_ORDER_DETAILS,
+	ORDER_DETAILS_BY_ID,
+	type OrderDetailMetaMock,
+} from "../../mocks/orders";
 import type { RootStackParamList } from "../../navigation/AppNavigator";
 import { lightColors, withOpacity } from "../../styles/colors";
 import { spacing } from "../../styles/spacing";
@@ -32,27 +38,6 @@ type OrderDetailScreenProps = NativeStackScreenProps<
 	"OrderDetail"
 >;
 
-type OrderLineItem = {
-	id: string;
-	name: string;
-	quantity: number;
-	unitPrice: number;
-	imageUrl: string;
-};
-
-type OrderDetailMeta = {
-	items: OrderLineItem[];
-	deliveryFee: number;
-	paymentLabel: string;
-	deliveryAddress: string;
-	contactName: string;
-	contactPhone: string;
-	coordinates: {
-		latitude: number;
-		longitude: number;
-	};
-};
-
 type TimelineStep = {
 	id: string;
 	label: string;
@@ -60,82 +45,6 @@ type TimelineStep = {
 };
 
 const BOTTOM_ACTION_BAR_MIN_HEIGHT = 45;
-
-const FALLBACK_DETAILS: OrderDetailMeta = {
-	items: [
-		{
-			id: "item-default-1",
-			name: "Ciment Portland CEM II 50kg",
-			quantity: 4,
-			unitPrice: 4500,
-			imageUrl:
-				"https://storage.googleapis.com/banani-generated-images/generated-images/98be0bb0-cfb1-47d0-860a-d579b30211d9.jpg",
-		},
-	],
-	deliveryFee: 5000,
-	paymentLabel: "Mobile Money - Payé",
-	deliveryAddress: "Quincaillerie ABC, Treichville, Abidjan, Cote d'Ivoire",
-	contactName: "Contact Chantier",
-	contactPhone: "+225 01 23 45 67 89",
-	coordinates: {
-		latitude: 5.3167,
-		longitude: -4.0333,
-	},
-};
-
-const ORDER_DETAILS_BY_ID: Record<string, OrderDetailMeta> = {
-	"cmd-1029": {
-		items: [
-			{
-				id: "cmd-1029-1",
-				name: "Ciment Portland CEM II 50kg",
-				quantity: 5,
-				unitPrice: 4500,
-				imageUrl:
-					"https://storage.googleapis.com/banani-generated-images/generated-images/98be0bb0-cfb1-47d0-860a-d579b30211d9.jpg",
-			},
-			{
-				id: "cmd-1029-2",
-				name: "Peinture Acrylique Blanche 15L",
-				quantity: 2,
-				unitPrice: 35000,
-				imageUrl:
-					"https://storage.googleapis.com/banani-generated-images/generated-images/7ee19046-19e3-49c0-a8b3-f9949b69ffb2.jpg",
-			},
-		],
-		deliveryFee: 5000,
-		paymentLabel: "Mobile Money (Wave) - Payé",
-		deliveryAddress:
-			"Quincaillerie ABC, Boulevard Giscard d'Estaing, Treichville, Abidjan",
-		contactName: "Mamadou Diaby",
-		contactPhone: "+225 01 23 45 67 89",
-		coordinates: {
-			latitude: 5.3048,
-			longitude: -4.0155,
-		},
-	},
-	"cmd-1030": {
-		items: [
-			{
-				id: "cmd-1030-1",
-				name: "Fer a beton 10mm (Barre 12m)",
-				quantity: 10,
-				unitPrice: 3500,
-				imageUrl:
-					"https://storage.googleapis.com/banani-generated-images/generated-images/aa539e0f-e83d-4709-8718-e451323b6704.jpg",
-			},
-		],
-		deliveryFee: 7000,
-		paymentLabel: "Mobile Money (Orange) - Payé",
-		deliveryAddress: "Depot chantier Rivera 2, Cocody, Abidjan",
-		contactName: "Kone Yacouba",
-		contactPhone: "+225 05 11 22 33 44",
-		coordinates: {
-			latitude: 5.3562,
-			longitude: -3.9894,
-		},
-	},
-};
 
 const formatOrderDateTime = (isoDate?: string): string => {
 	if (!isoDate) {
@@ -201,19 +110,42 @@ export const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({
 	navigation,
 	route,
 }) => {
-	const { orders, isLoading, errorMessage, reload } = useOrders();
 	const { showToast } = useToast();
 	const insets = useSafeAreaInsets();
+	const [selectedOrder, setSelectedOrder] = useState<OrderSummaryItem | null>(
+		null,
+	);
+	const [isLoading, setIsLoading] = useState(true);
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const [isReloading, setIsReloading] = useState(false);
 
 	const orderId = route.params.orderId;
-	const selectedOrder = useMemo(
-		() => orders.find((order) => order.id === orderId),
-		[orders, orderId],
-	);
 
-	const detail = selectedOrder
-		? (ORDER_DETAILS_BY_ID[selectedOrder.id] ?? FALLBACK_DETAILS)
+	const loadOrder = useCallback(async (): Promise<void> => {
+		setErrorMessage(null);
+		setIsLoading(true);
+		try {
+			const order = await getOrderById(orderId);
+			setSelectedOrder(order);
+		} catch (error) {
+			const baseMessage = "Impossible de charger cette commande.";
+			if (__DEV__ && error instanceof Error) {
+				setErrorMessage(`${baseMessage} ${error.message}`);
+			} else {
+				setErrorMessage(baseMessage);
+			}
+			setSelectedOrder(null);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [orderId]);
+
+	useEffect(() => {
+		void loadOrder();
+	}, [loadOrder]);
+
+	const detail: OrderDetailMetaMock | null = selectedOrder
+		? (ORDER_DETAILS_BY_ID[selectedOrder.id] ?? FALLBACK_ORDER_DETAILS)
 		: null;
 	const timeline = selectedOrder
 		? buildTimeline(selectedOrder.createdAt)
@@ -238,8 +170,8 @@ export const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({
 				longitudeDelta: 0.02,
 			}
 		: {
-				latitude: FALLBACK_DETAILS.coordinates.latitude,
-				longitude: FALLBACK_DETAILS.coordinates.longitude,
+				latitude: FALLBACK_ORDER_DETAILS.coordinates.latitude,
+				longitude: FALLBACK_ORDER_DETAILS.coordinates.longitude,
 				latitudeDelta: 0.02,
 				longitudeDelta: 0.02,
 			};
@@ -255,7 +187,7 @@ export const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({
 		}
 
 		setIsReloading(true);
-		void reload().finally(() => {
+		void loadOrder().finally(() => {
 			setIsReloading(false);
 		});
 	};
