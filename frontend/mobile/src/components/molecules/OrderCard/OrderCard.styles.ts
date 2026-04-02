@@ -74,8 +74,8 @@ export const styles = StyleSheet.create({
 		fontWeight: '700',
 	},
 	statusPillWarning: {
-		backgroundColor: '#FEF3E8',
-		borderColor: '#FCD7AA',
+		backgroundColor: 'rgba(245, 158, 11, 0.1)',
+		borderColor: '#fde68a',
 	},
 	statusPillInfo: {
 		backgroundColor: '#EAF5FF',

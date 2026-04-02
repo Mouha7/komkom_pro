@@ -38,6 +38,9 @@ export type CommonIconName =
 	| 'truck'
 	| 'map'
 	| 'clock'
+	| 'smartphone'
+	| 'headphones'
+	| 'fileText'
 	;
 
 export type IconProps = {

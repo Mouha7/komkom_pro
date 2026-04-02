@@ -18,9 +18,9 @@ const getStatusMeta = (
 	switch (status) {
 		case 'pending':
 			return {
-				label: 'En preparation',
+				label: 'En préparation',
 				iconName: 'clock',
-				iconColor: '#D97706',
+				iconColor: '#f59e0b',
 				pillStyle: styles.statusPillWarning,
 			};
 		case 'confirmed':

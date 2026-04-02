@@ -40,7 +40,9 @@ import {
 	ArrowRight,
 	Map,
 	Clock3,
-	ShieldCheckIcon,
+	Smartphone,
+	Headphones,
+	FileText,
 } from 'lucide-react-native';
 
 import type { CommonIconName, IconProps } from './Icon.types';
@@ -85,6 +87,9 @@ const ICON_MAP: Record<CommonIconName, LucideIcon> = {
 	truck: Truck,
 	map: Map,
 	clock: Clock3,
+	smartphone: Smartphone,
+	headphones: Headphones,
+	fileText: FileText,
 };
 
 export const Icon: React.FC<IconProps> = ({

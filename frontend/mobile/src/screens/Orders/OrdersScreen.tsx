@@ -52,14 +52,7 @@ export const OrdersScreen: React.FC<OrdersScreenProps> = ({ navigation }) => {
 						isLoading={isLoading}
 						onClearSearch={() => setSearchQuery('')}
 						onViewDetails={(orderId) => {
-							showToast({
-								tone: 'info',
-								title: 'Detail commande',
-								message: `Commande ${orderId} selectionnee`,
-								actionLabel: 'Voir',
-								actionLabelA11y: 'Voir les details',
-								onActionPress: () => navigation.navigate('Cart'),
-							});
+							navigation.navigate('OrderDetail', { orderId });
 						}}
 						onFollowOrder={(orderId) => {
 							showToast({
