@@ -12,11 +12,15 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'stretch',
 		padding: spacing.s2,
-		// columnGap: spacing.s2,
+		columnGap: spacing.s1,
 		shadowColor: '#0F1724',
 		shadowOpacity: 0.05,
 		shadowRadius: 5,
 		shadowOffset: { width: 0, height: 1 },
+	},
+	containerCompact: {
+		padding: spacing.s1,
+		columnGap: spacing.s1,
 	},
 	containerRegular: {
 		borderRadius: 10,
@@ -29,6 +33,9 @@ export const styles = StyleSheet.create({
 	imageWrap: {
 		width: 100,
 	},
+	imageWrapCompact: {
+		width: 82,
+	},
 	imageWrapRegular: {
 		width: 118,
 	},
@@ -40,6 +47,10 @@ export const styles = StyleSheet.create({
 		height: 80,
 		borderRadius: 4,
 		backgroundColor: lightColors.background.subtle,
+	},
+	imageCompact: {
+		width: 72,
+		height: 72,
 	},
 	imageRegular: {
 		width: 96,
@@ -54,6 +65,10 @@ export const styles = StyleSheet.create({
 	body: {
 		flex: 1,
 		rowGap: spacing.s2,
+		minWidth: 0,
+	},
+	bodyCompact: {
+		rowGap: spacing.s1,
 	},
 	bodyRegular: {
 		rowGap: spacing.s3,
@@ -64,12 +79,19 @@ export const styles = StyleSheet.create({
 		alignItems: 'flex-end',
 		columnGap: spacing.s1,
 	},
+	topRowCompact: {
+		alignItems: 'center',
+	},
 	topRowRegular: {
 		columnGap: spacing.s2,
 	},
 	brand: {
 		color: lightColors.primary,
 		fontWeight: '700',
+		flexShrink: 1,
+	},
+	brandCompact: {
+		fontSize: 10,
 	},
 	brandRegular: {
 		fontSize: 12,
@@ -85,6 +107,10 @@ export const styles = StyleSheet.create({
 		lineHeight: 18,
 		fontWeight: '500',
 	},
+	titleCompact: {
+		fontSize: 12,
+		lineHeight: 16,
+	},
 	titleRegular: {
 		fontSize: 14,
 		lineHeight: 20,
@@ -95,6 +121,8 @@ export const styles = StyleSheet.create({
 	},
 	priceWrap: {
 		rowGap: 2,
+		flexShrink: 1,
+		minWidth: 0,
 	},
 	priceWrapRegular: {
 		rowGap: spacing.s1,
@@ -102,6 +130,10 @@ export const styles = StyleSheet.create({
 	totalPrice: {
 		fontSize: 15,
 		fontWeight: '700',
+		flexShrink: 1,
+	},
+	totalPriceCompact: {
+		fontSize: 13,
 	},
 	totalPriceRegular: {
 		fontSize: 16,
@@ -111,30 +143,45 @@ export const styles = StyleSheet.create({
 	},
 	unitPrice: {
 		fontWeight: '400',
+		flexShrink: 1,
+	},
+	unitPriceCompact: {
+		fontSize: 11,
 	},
 	unitPriceRegular: {
 		fontSize: 12,
 	},
 	footer: {
 		flexDirection: 'row',
-		justifyContent: 'space-between',
 		alignItems: 'flex-end',
+		flexWrap: 'wrap',
 		columnGap: spacing.s2,
+		rowGap: spacing.s1,
 	},
 	footerRegular: {
 		columnGap: spacing.s3,
+	},
+	footerCompact: {
+		columnGap: spacing.s1,
 	},
 	qtyControl: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		width: 120,
+		maxWidth: '100%',
 		height: 45,
 		paddingHorizontal: spacing.s1,
 		borderWidth: 1,
 		borderColor: lightColors.neutral100,
 		borderRadius: 12,
 		backgroundColor: lightColors.neutral100,
+		marginLeft: 'auto',
+	},
+	qtyControlCompact: {
+		width: 108,
+		height: 40,
+		paddingHorizontal: spacing.s0,
 	},
 	qtyControlRegular: {
 		width: 132,
@@ -158,6 +205,10 @@ export const styles = StyleSheet.create({
 		shadowRadius: 2,
 		shadowOffset: { width: 0, height: 2 },
 	},
+	qtyActionCompact: {
+		width: 24,
+		height: 24,
+	},
 	qtyActionRegular: {
 		width: 30,
 		height: 30,
@@ -168,6 +219,9 @@ export const styles = StyleSheet.create({
 	},
 	qtyValue: {
 		fontWeight: '600',
+	},
+	qtyValueCompact: {
+		fontSize: 12,
 	},
 	qtyValueRegular: {
 		fontSize: 13,

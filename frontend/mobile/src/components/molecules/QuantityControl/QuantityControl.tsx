@@ -20,15 +20,17 @@ export const QuantityControl: React.FC<QuantityControlProps> = ({
 	testID,
 }) => {
 	const { width: screenWidth } = useWindowDimensions();
+	const isCompactScreen = screenWidth < 360;
 	const isRegularScreen = screenWidth >= 768 && screenWidth < 1024;
 	const isLargeScreen = screenWidth >= 1024;
-	const iconSize = isLargeScreen ? 24 : isRegularScreen ? 22 : 20;
+	const iconSize = isCompactScreen ? 18 : isLargeScreen ? 24 : isRegularScreen ? 22 : 20;
 	const isDecreaseDisabled = disabled || quantity <= minQuantity;
 
 	return (
 		<View
 			style={[
 				styles.container,
+				isCompactScreen && styles.containerCompact,
 				isRegularScreen && styles.containerRegular,
 				isLargeScreen && styles.containerLarge,
 				containerStyle,
@@ -42,6 +44,7 @@ export const QuantityControl: React.FC<QuantityControlProps> = ({
 				accessibilityLabel={decreaseAccessibilityLabel}
 				iconSize={iconSize}
 				containerStyle={[
+					isCompactScreen && styles.buttonCompact,
 					isRegularScreen && styles.buttonRegular,
 					isLargeScreen && styles.buttonLarge,
 					buttonStyle,
@@ -50,6 +53,7 @@ export const QuantityControl: React.FC<QuantityControlProps> = ({
 			<Text
 				variant={valueVariant}
 				style={[
+					isCompactScreen && styles.valueCompact,
 					isRegularScreen && styles.valueRegular,
 					isLargeScreen && styles.valueLarge,
 					valueStyle,
@@ -64,6 +68,7 @@ export const QuantityControl: React.FC<QuantityControlProps> = ({
 				accessibilityLabel={increaseAccessibilityLabel}
 				iconSize={iconSize}
 				containerStyle={[
+					isCompactScreen && styles.buttonCompact,
 					isRegularScreen && styles.buttonRegular,
 					isLargeScreen && styles.buttonLarge,
 					buttonStyle,

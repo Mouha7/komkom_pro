@@ -60,7 +60,10 @@ export const OrderConfirmationScreen: React.FC<OrderConfirmationScreenProps> = (
 	};
 
 	const handleClose = (): void => {
-		navigation.navigate('Cart');
+		navigation.reset({
+			index: 0,
+			routes: [{ name: 'MainTabs' }],
+		});
 	};
 
 	const bottomInsetPadding = Math.max(insets.bottom, spacing.s2);
