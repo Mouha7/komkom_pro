@@ -109,7 +109,7 @@ export const CatalogAppBar: React.FC<CatalogAppBarProps> = ({
 							leftElement={
 								<Icon
 									name="search"
-									size={20}
+									size={22}
 									color={lightColors.text.secondary}
 								/>
 							}

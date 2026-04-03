@@ -29,6 +29,8 @@ export const styles = StyleSheet.create({
 	title: {
 		fontSize: 24,
 		fontWeight: '700',
+		color: lightColors.text.primary,
+		marginBottom: spacing.s1,
 	},
 	searchRow: {
 		flexDirection: 'row',
@@ -36,10 +38,13 @@ export const styles = StyleSheet.create({
 		paddingHorizontal: spacing.s2,
 		borderRadius: 12,
 		marginHorizontal: -spacing.s2,
-		marginBottom: spacing.s1,
 	},
 	searchInputContainer: {
 		backgroundColor: lightColors.neutral100,
+		borderRadius: 14,
+		borderColor: lightColors.border.default,
+		paddingHorizontal: spacing.s3,
+		minHeight: 52,
 	},
 	searchInputWrapper: {
 		flex: 1,

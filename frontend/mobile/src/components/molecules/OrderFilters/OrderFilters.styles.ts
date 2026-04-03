@@ -30,7 +30,7 @@ export const styles = StyleSheet.create({
 	// OrderFiltersBar styles
 	barContainer: {
 		paddingHorizontal: spacing.s4,
-		paddingVertical: spacing.s2,
+		paddingBottom: spacing.s2,
         backgroundColor: lightColors.surface.default,
 		borderBottomWidth: 1,
 		borderBottomColor: lightColors.border.default,
