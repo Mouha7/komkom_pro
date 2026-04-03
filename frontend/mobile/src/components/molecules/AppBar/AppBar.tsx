@@ -1,27 +1,11 @@
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Icon, Text } from '../../atoms';
+import { IconOnlyButton, Text } from '../../atoms';
 import { spacing } from '../../../styles/spacing';
-import { APP_BAR_ACTION_SIZE, styles } from './AppBar.styles';
+import { styles, APP_BAR_BUTTON_SIZE } from './AppBar.styles';
 import type { AppBarAction, AppBarProps } from './AppBar.types';
-
-const renderActionButton = (action: AppBarAction): React.ReactElement => {
-	return (
-		<Pressable
-			key={action.id}
-			onPress={action.onPress}
-			disabled={action.disabled}
-			style={({ pressed }) => [styles.sideButton, pressed && styles.sideButtonPressed]}
-			accessibilityRole="button"
-			accessibilityLabel={action.accessibilityLabel}
-			testID={action.testID}
-		>
-			<Icon name={action.iconName} size={24} color="#0F1724" />
-		</Pressable>
-	);
-};
 
 export const AppBar: React.FC<AppBarProps> = ({
 	title,
@@ -43,32 +27,55 @@ export const AppBar: React.FC<AppBarProps> = ({
 		<View style={[styles.container, { paddingTop: safeTop }, containerStyle]} testID={testID}>
 			<View style={[styles.content, contentStyle]}>
 				{leftAction ? (
-					<View style={styles.sideSlot}>{leftAction}</View>
+					<View style={{ width: APP_BAR_BUTTON_SIZE, height: APP_BAR_BUTTON_SIZE }}>
+						{leftAction}
+					</View>
 				) : leftIconName && onPressLeft ? (
-					<Pressable
+					<IconOnlyButton
+						iconName={leftIconName}
 						onPress={onPressLeft}
-						style={({ pressed }) => [styles.sideButton, pressed && styles.sideButtonPressed]}
-						accessibilityRole="button"
+						size={APP_BAR_BUTTON_SIZE}
+						borderRadius={APP_BAR_BUTTON_SIZE / 2}
+						iconSize={24}
 						accessibilityLabel={leftAccessibilityLabel}
-					>
-						<Icon name={leftIconName} size={24} color="#0F1724" />
-					</Pressable>
+					/>
 				) : (
-					<View style={styles.sideSlot} />
+					<View style={{ width: APP_BAR_BUTTON_SIZE, height: APP_BAR_BUTTON_SIZE }} />
 				)}
 
 				<View style={styles.titleWrap}>
-					<Text variant="h2" style={titleAlign === 'left' ? styles.titleLeft : styles.titleCenter}>
+					<Text
+						variant='h1'
+						style={styles.title}
+						maxLines={1}
+						align={titleAlign === 'left' ? 'left' : 'center'}
+					>
 						{title}
 					</Text>
 				</View>
 
 				{rightActionSlot ? (
-					<View style={[styles.rightActions, { minWidth: APP_BAR_ACTION_SIZE }]}>{rightActionSlot}</View>
+					<View style={{ minWidth: APP_BAR_BUTTON_SIZE, height: APP_BAR_BUTTON_SIZE, alignItems: 'flex-end', justifyContent: 'center' }}>
+						{rightActionSlot}
+					</View>
 				) : rightActions && rightActions.length > 0 ? (
-					<View style={styles.rightActions}>{rightActions.map(renderActionButton)}</View>
+					<View style={{ flexDirection: 'row', alignItems: 'center', columnGap: spacing.s1 }}>
+						{rightActions.map((action: AppBarAction) => (
+							<IconOnlyButton
+								key={action.id}
+								iconName={action.iconName}
+								onPress={action.onPress}
+								disabled={action.disabled}
+								size={APP_BAR_BUTTON_SIZE}
+								borderRadius={APP_BAR_BUTTON_SIZE / 2}
+								iconSize={24}
+								accessibilityLabel={action.accessibilityLabel}
+								testID={action.testID}
+							/>
+						))}
+					</View>
 				) : (
-					<View style={styles.sideSlot} />
+					<View style={{ width: APP_BAR_BUTTON_SIZE, height: APP_BAR_BUTTON_SIZE }} />
 				)}
 			</View>
 		</View>

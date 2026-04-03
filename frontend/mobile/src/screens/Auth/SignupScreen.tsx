@@ -9,9 +9,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import {
+	AppBar,
 	Button,
 	Icon,
-	IconOnlyButton,
 	Input,
 	ScrollToTopButton,
 	Text,
@@ -133,7 +133,12 @@ export const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
 	}, [navigation]);
 
 	return (
-		<SafeAreaView style={styles.safeArea}>
+		<SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
+			<AppBar
+				title=""
+				leftIconName="arrowLeft"
+				onPressLeft={() => navigation.goBack()}
+			/>
 			<ScrollView
 				ref={scrollViewRef}
 				style={styles.scrollView}
@@ -141,14 +146,7 @@ export const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
 				onScroll={handleScroll}
 				scrollEventThrottle={16}
 			>
-				<View style={[styles.container, { paddingHorizontal: horizontalPadding }] }>
-					<IconOnlyButton
-						iconName="arrowLeft"
-						onPress={() => navigation.goBack()}
-						accessibilityLabel="Retour"
-						containerStyle={styles.backButton}
-					/>
-
+				<View style={[styles.container, { paddingHorizontal: horizontalPadding }]}>
 					<View style={styles.headerBlock}>
 						<View style={styles.brandMark}>
 							<Icon

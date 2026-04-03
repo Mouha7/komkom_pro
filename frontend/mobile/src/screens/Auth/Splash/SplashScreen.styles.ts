@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
 	},
 	backgroundImage: {
 		...StyleSheet.absoluteFillObject,
-		width: '100%',
+		width: '120%',
 		height: '100%',
 	},
 	loaderContainer: {

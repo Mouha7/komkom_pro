@@ -16,9 +16,6 @@ export const styles = StyleSheet.create({
 		paddingTop: spacing.s2,
 		paddingBottom: spacing.s4,
 	},
-	backButton: {
-		alignSelf: "flex-start",
-	},
 	headerBlock: {
 		marginTop: spacing.s5,
 		alignItems: "center",
@@ -32,10 +29,10 @@ export const styles = StyleSheet.create({
 		backgroundColor: lightColors.primary,
 		alignItems: "center",
 		justifyContent: "center",
-		shadowColor: withOpacity("#ED762F", 0.2),
+		shadowColor: "#ED762F",
 		shadowOffset: { width: 0, height: 8 },
 		shadowRadius: 18,
-		shadowOpacity: 1,
+		shadowOpacity: 0.2,
 		elevation: 6,
 	},
 	formCard: {
@@ -43,10 +40,10 @@ export const styles = StyleSheet.create({
 		borderRadius: 8,
 		padding: spacing.s4,
 		rowGap: spacing.s3,
-		shadowColor: withOpacity("#000000", 0.08),
+		shadowColor: "#000000",
 		shadowOffset: { width: 0, height: 4 },
 		shadowRadius: 14,
-		shadowOpacity: 1,
+		shadowOpacity: 0.08,
 		elevation: 2,
 		marginBottom: spacing.s4,
 	},
@@ -122,7 +119,7 @@ export const styles = StyleSheet.create({
 	},
 	checkboxRowChecked: {
 		backgroundColor: withOpacity(lightColors.primary, 0.05),
-		paddingHorizontal: spacing.s2,
+		// paddingHorizontal: spacing.s2,
 		borderRadius: 8,
 	},
 	checkbox: {
@@ -157,7 +154,6 @@ export const styles = StyleSheet.create({
 		marginTop: spacing.s3,
 	},
 	separatorRow: {
-		marginTop: spacing.s1,
 		flexDirection: "row",
 		alignItems: "center",
 		columnGap: spacing.s2,

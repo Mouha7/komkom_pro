@@ -33,8 +33,10 @@ export const IconOnlyButton: React.FC<IconOnlyButtonProps> = ({
 			accessibilityRole="button"
 			accessibilityLabel={accessibilityLabel ?? iconName}
 		>
-			<BlurView intensity={20} tint="light" style={[styles.blurLayer, { borderRadius }]} />
-			<View style={[styles.whiteOverlay, { borderRadius }]} />
+			<View style={[styles.surfaceLayer, { borderRadius }]}>
+				<BlurView intensity={20} tint='light' style={styles.blurLayer} />
+				<View style={styles.surfaceTint} />
+			</View>
 			<Icon name={iconName} size={iconSize} color={iconColor} accessibilityLabel={undefined} />
 		</TouchableOpacity>
 	);

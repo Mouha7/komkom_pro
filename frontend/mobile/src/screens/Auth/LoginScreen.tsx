@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { Icon, IconOnlyButton, Text } from '../../components';
+import { AppBar, Icon, Text } from '../../components';
 import { useAuth } from '../../hooks/useAuth';
 import { useResponsive } from '../../hooks/useResponsive';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
@@ -24,15 +24,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 	const horizontalPadding = isExpanded ? clamp(width * 0.08, spacing.s4, spacing.s8) : isMedium ? spacing.s5 : spacing.s3;
 
 	return (
-		<SafeAreaView style={styles.safeArea}>
-			<View style={[styles.container, { paddingHorizontal: horizontalPadding }] }>
-				<IconOnlyButton
-					iconName="arrowLeft"
-					onPress={() => navigation.goBack()}
-					accessibilityLabel="Retour"
-					containerStyle={styles.backButton}
-				/>
-
+		<SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
+			<AppBar
+				title=""
+				leftIconName="arrowLeft"
+				onPressLeft={() => navigation.goBack()}
+			/>
+			<View style={[styles.container, { paddingHorizontal: horizontalPadding }]}>
 				<LoginHeader />
 
 				<LoginFormCard

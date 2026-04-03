@@ -39,7 +39,7 @@ export const BottomBar: React.FC<BottomBarProps> = ({
 							testID={action.testID}
 						>
 							<Icon name={action.iconName} size={22} color={iconColor} />
-							<Text variant="small" textColorOverride={iconColor} align="center">
+							<Text variant="small" style={{ fontWeight: isActive ? '700' : '400' }} textColorOverride={iconColor} align="center">
 								{action.label}
 							</Text>
 							{action.badge && action.badge > 0 ? (
