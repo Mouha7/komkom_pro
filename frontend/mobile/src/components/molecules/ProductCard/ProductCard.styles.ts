@@ -43,20 +43,26 @@ export const styles = StyleSheet.create({
 	},
 	portraitPriceRow: {
 		flexDirection: 'row',
-		justifyContent: 'space-between',
 		alignItems: 'flex-end',
+		flexWrap: 'wrap',
 		columnGap: spacing.s2,
+		rowGap: spacing.s1,
 	},
 	portraitPriceWrap: {
 		flexDirection: 'row',
 		alignItems: 'baseline',
 		columnGap: 4,
+		flexGrow: 1,
+		flexShrink: 1,
+		minWidth: 0,
 	},
 	priceAmount: {
 		fontWeight: '700',
+		flexShrink: 1,
 	},
 	priceCurrency: {
 		fontWeight: '400',
+		flexShrink: 0,
 	},
 	actionButtonBase: {
 		width: 56,
@@ -83,6 +89,9 @@ export const styles = StyleSheet.create({
 	},
 	actionButtonDisabled: {
 		opacity: 0.45,
+	},
+	actionButtonAlignEnd: {
+		marginLeft: 'auto',
 	},
 	portraitActionButton: {
 		width: 56,
@@ -161,9 +170,10 @@ export const styles = StyleSheet.create({
 	},
 	landscapeBottom: {
 		flexDirection: 'row',
-		justifyContent: 'space-between',
 		alignItems: 'flex-end',
+		flexWrap: 'wrap',
 		columnGap: spacing.s2,
+		rowGap: spacing.s1,
 	},
 	landscapeBottomLarge: {
 		columnGap: spacing.s3,
@@ -172,6 +182,9 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'baseline',
 		columnGap: 4,
+		flexGrow: 1,
+		flexShrink: 1,
+		minWidth: 0,
 	},
 	landscapeActionButton: {
 		width: 56,

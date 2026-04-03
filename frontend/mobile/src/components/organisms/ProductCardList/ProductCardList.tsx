@@ -10,6 +10,7 @@ import type { ProductCardListProps } from './ProductCardList.types';
 const MOBILE_COLUMNS = 2;
 const TABLET_COLUMNS = 3;
 const DESKTOP_COLUMNS = 4;
+const MIN_CARD_WIDTH = 140;
 
 export const ProductCardList: React.FC<ProductCardListProps> = ({
 	items,
@@ -41,7 +42,7 @@ export const ProductCardList: React.FC<ProductCardListProps> = ({
 	const effectiveListWidth = listWidth > 0 ? listWidth : Math.max(screenWidth - spacing.s4 * 2, 0);
 	const cardWidthPx = Math.max(
 		(effectiveListWidth - horizontalGap * (columns - 1)) / columns,
-		0,
+		MIN_CARD_WIDTH,
 	);
 	const cardWidth: DimensionValue = cardWidthPx;
 

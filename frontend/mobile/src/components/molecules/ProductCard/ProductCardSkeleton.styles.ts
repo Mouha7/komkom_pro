@@ -63,19 +63,24 @@ export const styles = StyleSheet.create({
 	},
 	portraitPriceRow: {
 		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
+		alignItems: 'flex-end',
+		flexWrap: 'wrap',
 		columnGap: spacing.s2,
+		rowGap: spacing.s1,
 	},
 	portraitPrice: {
 		height: 22,
 		borderRadius: 6,
 		width: '36%',
+		flexGrow: 1,
+		flexShrink: 1,
+		minWidth: 0,
 	},
 	portraitButton: {
 		width: 56,
 		height: 56,
 		borderRadius: 12,
+		marginLeft: 'auto',
 	},
 	portraitButtonRegular: {
 		width: 60,
@@ -140,19 +145,24 @@ export const styles = StyleSheet.create({
 	},
 	landscapeBottom: {
 		flexDirection: 'row',
-		justifyContent: 'space-between',
 		alignItems: 'flex-end',
+		flexWrap: 'wrap',
 		columnGap: spacing.s2,
+		rowGap: spacing.s1,
 	},
 	landscapePrice: {
 		height: 22,
 		borderRadius: 6,
 		width: '42%',
+		flexGrow: 1,
+		flexShrink: 1,
+		minWidth: 0,
 	},
 	landscapeButton: {
 		width: 56,
 		height: 56,
 		borderRadius: 12,
+		marginLeft: 'auto',
 	},
 	landscapeButtonRegular: {
 		width: 60,

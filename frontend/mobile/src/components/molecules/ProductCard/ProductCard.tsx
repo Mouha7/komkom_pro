@@ -122,11 +122,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 								isRegularScreen && styles.landscapeHeaderRegular,
 							]}
 						>
-							<Text variant="h3" maxLines={2}>
+							<Text variant="h3" style={{ fontWeight: isLargeScreen ? '700' : isRegularScreen ? '600' : '500' }} maxLines={2} ellipsizeMode="tail">
 								{name}
 							</Text>
 							{description ? (
-								<Text variant="body" color="secondary" maxLines={1}>
+								<Text variant="body" color="secondary" maxLines={1} ellipsizeMode="tail">
 									{description}
 								</Text>
 							) : null}
@@ -139,10 +139,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 							]}
 						>
 							<View style={styles.landscapePriceWrap}>
-								<Text variant="h2" style={styles.priceAmount}>
+								<Text variant="h2" style={styles.priceAmount} maxLines={1} ellipsizeMode="tail">
 									{formatAmount(price)}
 								</Text>
-								<Text variant="small" style={styles.priceCurrency}>
+								<Text variant="small" style={styles.priceCurrency} maxLines={1} ellipsizeMode="tail">
 									{currency}
 								</Text>
 							</View>
@@ -173,6 +173,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 									styles.landscapeActionButton,
 									isRegularScreen && styles.landscapeActionButtonRegular,
 									isLargeScreen && styles.landscapeActionButtonLarge,
+									styles.actionButtonAlignEnd,
 									isAddedToCart && styles.actionButtonSuccess,
 									isCartActionDisabled && styles.actionButtonDisabled,
 								]}
@@ -222,11 +223,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 							isRegularScreen && styles.portraitContentRegular,
 						]}
 					>
-						<Text variant="h3" maxLines={2}>
+						<Text variant="h3" maxLines={2} ellipsizeMode="tail">
 							{name}
 						</Text>
 						{description ? (
-							<Text variant="body" color="secondary" maxLines={1}>
+							<Text variant="body" color="secondary" maxLines={1} ellipsizeMode="tail">
 								{description}
 							</Text>
 						) : null}
@@ -234,10 +235,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
 					<View style={styles.portraitPriceRow}>
 						<View style={styles.portraitPriceWrap}>
-							<Text variant="h2" style={styles.priceAmount}>
+							<Text variant="h2" style={styles.priceAmount} maxLines={1} ellipsizeMode="tail">
 								{formatAmount(price)}
 							</Text>
-							<Text variant="small" style={styles.priceCurrency}>
+							<Text variant="small" style={styles.priceCurrency} maxLines={1} ellipsizeMode="tail">
 								{currency}
 							</Text>
 						</View>
@@ -268,6 +269,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 								styles.portraitActionButton,
 								isRegularScreen && styles.portraitActionButtonRegular,
 								isLargeScreen && styles.portraitActionButtonLarge,
+								styles.actionButtonAlignEnd,
 								isAddedToCart && styles.actionButtonSuccess,
 								isCartActionDisabled && styles.actionButtonDisabled,
 							]}
