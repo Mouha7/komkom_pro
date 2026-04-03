@@ -9,6 +9,8 @@ import {
 	OrderConfirmationSummaryCard,
 	Text,
 } from '../../components';
+import { useResponsive } from '../../hooks/useResponsive';
+import { clamp } from '../../styles/responsive';
 import { spacing } from '../../styles/spacing';
 import { formatPrice } from '../../utils/formatPrice';
 import { MOCK_ORDER_CONFIRMATION_DATA } from '../../components/molecules/OrderConfirmation/OrderConfirmation.constants';
@@ -21,6 +23,7 @@ export const OrderConfirmationScreen: React.FC<OrderConfirmationScreenProps> = (
 	route,
 }) => {
 	const insets = useSafeAreaInsets();
+	const { width, isMedium, isExpanded } = useResponsive();
 	const { orderId: paramOrderId } = route.params;
 
 	// Use mock data for now, will be replaced with API call later
@@ -67,6 +70,8 @@ export const OrderConfirmationScreen: React.FC<OrderConfirmationScreenProps> = (
 	};
 
 	const bottomInsetPadding = Math.max(insets.bottom, spacing.s2);
+	const horizontalPadding = isExpanded ? clamp(width * 0.08, spacing.s4, spacing.s8) : isMedium ? spacing.s5 : spacing.s3;
+	const subtitleMaxWidth = isExpanded ? clamp(width * 0.44, 300, 460) : clamp(width * 0.78, 250, 340);
 
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
@@ -81,7 +86,7 @@ export const OrderConfirmationScreen: React.FC<OrderConfirmationScreenProps> = (
 
 			<ScrollView
 				style={styles.scrollView}
-				contentContainerStyle={[styles.contentContainer]}
+				contentContainerStyle={[styles.contentContainer, { paddingHorizontal: horizontalPadding }]}
 				scrollEnabled={true}
 			>
 				<View style={styles.mainContent}>
@@ -90,7 +95,7 @@ export const OrderConfirmationScreen: React.FC<OrderConfirmationScreenProps> = (
 
 					{/* Title & Subtitle */}
 					<Text style={styles.title}>Commande confirmée !</Text>
-					<Text style={styles.subtitle}>
+					<Text style={[styles.subtitle, { maxWidth: subtitleMaxWidth }]}> 
 						Votre commande a été traitée avec succès et est en cours de préparation.
 					</Text>
 
@@ -106,7 +111,7 @@ export const OrderConfirmationScreen: React.FC<OrderConfirmationScreenProps> = (
 				</View>
 			</ScrollView>
 
-			<View style={[styles.bottomBar, { paddingBottom: bottomInsetPadding }]}>
+			<View style={[styles.bottomBar, { paddingBottom: bottomInsetPadding, paddingHorizontal: horizontalPadding }]}>
 				<OrderConfirmationActionBar
 					onFollowOrder={handleFollowOrder}
 					onReturnHome={handleReturnHome}

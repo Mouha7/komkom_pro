@@ -1,7 +1,8 @@
 import React from 'react';
-import { Image, Pressable, View, useWindowDimensions } from 'react-native';
+import { Image, Pressable, View } from 'react-native';
 
 import { Icon, Text } from '../../atoms';
+import { useResponsive } from '../../../hooks/useResponsive';
 import { QuantityControl } from '../QuantityControl';
 import { styles } from './CartItem.styles';
 import type { CartItemProps } from './CartItem.types';
@@ -24,10 +25,8 @@ export const CartItem: React.FC<CartItemProps> = ({
 	testID,
 	containerStyle,
 }) => {
-	const { width: screenWidth } = useWindowDimensions();
-	const isCompactScreen = screenWidth < 360;
-	const isRegularScreen = screenWidth >= 768 && screenWidth < 1024;
-	const isLargeScreen = screenWidth >= 1024;
+	const { isCompactPhone: isCompactScreen, isMedium: isRegularScreen, isExpanded: isLargeScreen } =
+		useResponsive();
 	const removeIconSize = isLargeScreen ? 26 : isRegularScreen ? 25 : 24;
 
 	return (

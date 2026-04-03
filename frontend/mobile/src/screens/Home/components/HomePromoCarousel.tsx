@@ -14,7 +14,9 @@ import Svg, {
 } from "react-native-svg";
 
 import { Text } from "../../../components";
+import { useResponsive } from "../../../hooks/useResponsive";
 import { lightColors } from "../../../styles/colors";
+import { clamp } from "../../../styles/responsive";
 import { spacing } from "../../../styles/spacing";
 import type { HomePromoItem } from "./HomeSections.types";
 
@@ -36,6 +38,7 @@ export const HomePromoCarousel: React.FC<HomePromoCarouselProps> = ({
 	autoPlayIntervalMs = 6000,
 	onPressItem,
 }) => {
+	const { isExpanded } = useResponsive();
 	const listRef = useRef<FlatList<HomePromoItem>>(null);
 	const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const [containerWidth, setContainerWidth] = useState(0);
@@ -75,16 +78,20 @@ export const HomePromoCarousel: React.FC<HomePromoCarouselProps> = ({
 	}, [containerWidth, items.length]);
 
 	const bannerHeight = useMemo(() => {
-		if (containerWidth === 0) {
+		if (bannerWidth === 0) {
 			return 0;
 		}
 
-		if (items.length <= 1) {
-			return containerWidth;
+		return isExpanded ? clamp(bannerWidth * 0.28, 96, 138) : clamp(bannerWidth * 0.26, 88, 120);
+	}, [bannerWidth, isExpanded]);
+
+	const ctaWidth = useMemo(() => {
+		if (bannerWidth === 0) {
+			return 132;
 		}
 
-		return containerWidth - BANNER_GAP;
-	}, [containerWidth, items.length]);
+		return isExpanded ? clamp(bannerWidth * 0.24, 136, 168) : clamp(bannerWidth * 0.3, 104, 144);
+	}, [bannerWidth, isExpanded]);
 
 	const itemSpan = useMemo(() => {
 		if (bannerWidth === 0) {
@@ -172,6 +179,7 @@ export const HomePromoCarousel: React.FC<HomePromoCarouselProps> = ({
 						style={[
 							styles.banner,
 							{ width: bannerWidth || undefined },
+							bannerHeight > 0 ? { height: bannerHeight } : null,
 							item.backgroundColor
 								? { backgroundColor: item.backgroundColor }
 								: null,
@@ -236,7 +244,7 @@ export const HomePromoCarousel: React.FC<HomePromoCarouselProps> = ({
 								) : null}
 							</View>
 							{item.ctaLabel ? (
-								<View style={styles.ctaPill}>
+								<View style={[styles.ctaPill, { width: ctaWidth }]}>
 									<Text
 										variant="body"
                                         style={{ fontSize: 13, fontWeight: "bold" }}
@@ -290,7 +298,7 @@ const styles = StyleSheet.create({
 	},
 	ctaPill: {
 		backgroundColor: lightColors.surface.default,
-		paddingHorizontal: spacing.s3,
+		paddingHorizontal: spacing.s2,
 		paddingVertical: spacing.s1,
 		borderRadius: 6,
 		width: 132,

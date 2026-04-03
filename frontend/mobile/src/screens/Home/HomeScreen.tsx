@@ -21,11 +21,14 @@ import {
 import { useAuth } from "../../hooks/useAuth";
 import { useCart } from "../../hooks/useCart";
 import { useNotifications } from "../../hooks/useNotifications";
+import { useResponsive } from "../../hooks/useResponsive";
 import { useToast } from "../../hooks/useToast";
 import { styles } from "./HomeScreen.styles";
 import type { MainTabParamList } from "../../navigation/BottomTabNavigator";
 import type { RootStackParamList } from "../../navigation/AppNavigator";
 import { listHomeCategories, listHomePromos, listProducts } from "../../api/products";
+import { clamp } from "../../styles/responsive";
+import { spacing } from "../../styles/spacing";
 import {
 	HomeCategoriesSection,
 	HomeProductsSection,
@@ -85,6 +88,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 	const isLoadMoreLockedRef = useRef(false);
 
 	const { roles, user } = useAuth();
+	const { width, isMedium, isExpanded } = useResponsive();
 	const { addItem, removeItem, totalItemsCount } = useCart();
 	const { unreadCount } = useNotifications();
 	const { showToast } = useToast();
@@ -93,6 +97,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 	const storeName = isEmployee
 		? "Magasin Partenaire KomKom"
 		: "Quincaillerie Centrale";
+
+	const contentContainerStyle = useMemo(
+		() => [
+			styles.contentContainer,
+			{
+				paddingHorizontal: isExpanded ? clamp(width * 0.08, spacing.s4, spacing.s8) : isMedium ? spacing.s5 : spacing.s3,
+				paddingTop: isExpanded ? spacing.s5 : spacing.s4,
+			},
+		],
+		[isExpanded, isMedium, width],
+	);
 
 	const loadHomeData = useCallback(async (): Promise<void> => {
 		setIsLoadingInitial(true);
@@ -298,7 +313,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 			<ScrollView
 				ref={scrollViewRef}
 				style={styles.scrollView}
-				contentContainerStyle={styles.contentContainer}
+				contentContainerStyle={contentContainerStyle}
 				onScroll={handleScroll}
 				scrollEventThrottle={16}
 				showsVerticalScrollIndicator={false}

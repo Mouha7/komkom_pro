@@ -5,8 +5,11 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Icon, IconOnlyButton, Text } from '../../components';
 import { useAuth } from '../../hooks/useAuth';
+import { useResponsive } from '../../hooks/useResponsive';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 import { lightColors } from '../../styles/colors';
+import { clamp } from '../../styles/responsive';
+import { spacing } from '../../styles/spacing';
 import { LoginFormCard } from './Login/LoginFormCard';
 import { LoginHeader } from './Login/LoginHeader';
 import { styles } from './Login/LoginScreen.styles';
@@ -17,10 +20,12 @@ type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 	const { isPasswordHidden, emailInputRef, passwordInputRef, togglePasswordVisibility } = useLoginForm();
 	const { signIn } = useAuth();
+	const { width, isMedium, isExpanded } = useResponsive();
+	const horizontalPadding = isExpanded ? clamp(width * 0.08, spacing.s4, spacing.s8) : isMedium ? spacing.s5 : spacing.s3;
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
-			<View style={styles.container}>
+			<View style={[styles.container, { paddingHorizontal: horizontalPadding }] }>
 				<IconOnlyButton
 					iconName="arrowLeft"
 					onPress={() => navigation.goBack()}

@@ -2,6 +2,7 @@ import { StyleSheet } from 'react-native';
 
 import { lightColors, withOpacity } from '../../../styles/colors';
 import { spacing } from '../../../styles/spacing';
+import { productCardSizes } from './productCard.sizes';
 
 export const styles = StyleSheet.create({
 	container: {
@@ -37,13 +38,13 @@ export const styles = StyleSheet.create({
 	},
 	portraitImage: {
 		width: '100%',
-		height: 150,
+		height: productCardSizes.portraitImageHeight.base,
 	},
 	portraitImageRegular: {
-		height: 170,
+		height: productCardSizes.portraitImageHeight.medium,
 	},
 	portraitImageLarge: {
-		height: 196,
+		height: productCardSizes.portraitImageHeight.expanded,
 	},
 	portraitContent: {
 		rowGap: spacing.s1,
@@ -77,18 +78,18 @@ export const styles = StyleSheet.create({
 		minWidth: 0,
 	},
 	portraitButton: {
-		width: 56,
-		height: 56,
+		width: productCardSizes.actionButton.base,
+		height: productCardSizes.actionButton.base,
 		borderRadius: 12,
 		marginLeft: 'auto',
 	},
 	portraitButtonRegular: {
-		width: 60,
-		height: 60,
+		width: productCardSizes.actionButton.medium,
+		height: productCardSizes.actionButton.medium,
 	},
 	portraitButtonLarge: {
-		width: 64,
-		height: 64,
+		width: productCardSizes.actionButton.expanded,
+		height: productCardSizes.actionButton.expanded,
 		borderRadius: 14,
 	},
 	
@@ -97,18 +98,18 @@ export const styles = StyleSheet.create({
 		columnGap: spacing.s1,
 	},
 	landscapeImage: {
-		width: 140,
-		height: 140,
+		width: productCardSizes.landscapeImage.base.width,
+		height: productCardSizes.landscapeImage.base.height,
 		borderRightWidth: 1,
 		borderColor: lightColors.border.default,
 	},
 	landscapeImageRegular: {
-		width: 156,
-		height: 170,
+		width: productCardSizes.landscapeImage.medium.width,
+		height: productCardSizes.landscapeImage.medium.height,
 	},
 	landscapeImageLarge: {
-		width: 180,
-		height: 190,
+		width: productCardSizes.landscapeImage.expanded.width,
+		height: productCardSizes.landscapeImage.expanded.height,
 	},
 	landscapeContent: {
 		flex: 1,
@@ -159,18 +160,18 @@ export const styles = StyleSheet.create({
 		minWidth: 0,
 	},
 	landscapeButton: {
-		width: 56,
-		height: 56,
+		width: productCardSizes.actionButton.base,
+		height: productCardSizes.actionButton.base,
 		borderRadius: 12,
 		marginLeft: 'auto',
 	},
 	landscapeButtonRegular: {
-		width: 60,
-		height: 60,
+		width: productCardSizes.actionButton.medium,
+		height: productCardSizes.actionButton.medium,
 	},
 	landscapeButtonLarge: {
-		width: 64,
-		height: 64,
+		width: productCardSizes.actionButton.expanded,
+		height: productCardSizes.actionButton.expanded,
 		borderRadius: 14,
 	},
 });

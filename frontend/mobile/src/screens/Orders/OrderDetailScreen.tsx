@@ -21,6 +21,7 @@ import {
 	type OrderStatus,
 } from "../../components";
 import { getOrderById } from "../../api/orders";
+import { useResponsive } from "../../hooks/useResponsive";
 import { useToast } from "../../hooks/useToast";
 import type { OrderSummaryItem } from "../../components";
 import {
@@ -30,6 +31,7 @@ import {
 } from "../../mocks/orders";
 import type { RootStackParamList } from "../../navigation/AppNavigator";
 import { lightColors, withOpacity } from "../../styles/colors";
+import { clamp } from "../../styles/responsive";
 import { spacing } from "../../styles/spacing";
 import { formatPrice } from "../../utils/formatPrice";
 
@@ -111,6 +113,7 @@ export const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({
 	route,
 }) => {
 	const { showToast } = useToast();
+	const { height, isExpanded } = useResponsive();
 	const insets = useSafeAreaInsets();
 	const [selectedOrder, setSelectedOrder] = useState<OrderSummaryItem | null>(
 		null,
@@ -180,6 +183,11 @@ export const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({
 		BOTTOM_ACTION_BAR_MIN_HEIGHT +
 		Math.max(insets.bottom, spacing.s2) +
 		spacing.s4;
+
+	const mapHeight = isExpanded ? clamp(height * 0.24, 200, 280) : clamp(height * 0.22, 170, 240);
+	const timelineDotSize = isExpanded ? 26 : 24;
+	const timelineLineLeft = Math.round((timelineDotSize - 2) / 2);
+	const timelineLineTop = timelineDotSize - 2;
 
 	const handleReload = (): void => {
 		if (isReloading) {
@@ -321,6 +329,7 @@ export const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({
 											<View
 												style={[
 													styles.timelineLine,
+													{ left: timelineLineLeft, top: timelineLineTop },
 													(index < activeStepIndex ||
 														selectedOrder.status ===
 															"delivered") &&
@@ -331,6 +340,11 @@ export const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({
 										<View
 											style={[
 												styles.timelineDot,
+												{
+													width: timelineDotSize,
+													height: timelineDotSize,
+													borderRadius: timelineDotSize / 2,
+												},
 												isCompleted &&
 													styles.timelineDotDone,
 												isActive &&
@@ -443,7 +457,7 @@ export const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({
 							<Text variant="h2" style={styles.sectionTitle}>
 								Informations de livraison
 							</Text>
-							<View style={styles.mapContainer}>
+							<View style={[styles.mapContainer, { height: mapHeight }]}>
 								<MapView
 									style={styles.mapView}
 									region={mapRegion}
@@ -777,7 +791,9 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",
+		flexWrap: "wrap",
 		columnGap: spacing.s2,
+		rowGap: spacing.s1,
 	},
 	itemTotal: {
 		fontSize: 14,

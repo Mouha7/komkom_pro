@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, useWindowDimensions } from 'react-native';
+import { View } from 'react-native';
 import type { DimensionValue, LayoutChangeEvent } from 'react-native';
 
 import { ProductCard } from '../../molecules';
+import { useResponsive } from '../../../hooks/useResponsive';
 import { spacing } from '../../../styles/spacing';
 import { styles } from './ProductCardList.styles';
 import type { ProductCardListProps } from './ProductCardList.types';
@@ -26,15 +27,15 @@ export const ProductCardList: React.FC<ProductCardListProps> = ({
 	containerStyle,
 	testID,
 }) => {
-	const { width: screenWidth } = useWindowDimensions();
+	const { width: screenWidth, isMedium, isExpanded } = useResponsive();
 	const [listWidth, setListWidth] = useState(0);
 	const isLandscape = variant === 'landscape';
 
 	const columns = isLandscape
 		? 1
-		: screenWidth >= 1024
+		: isExpanded
 			? DESKTOP_COLUMNS
-			: screenWidth >= 768
+			: isMedium
 				? TABLET_COLUMNS
 				: MOBILE_COLUMNS;
 

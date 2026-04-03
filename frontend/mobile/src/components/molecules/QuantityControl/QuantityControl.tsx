@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, useWindowDimensions } from 'react-native';
+import { View } from 'react-native';
 
 import { QuantityButton, Text } from '../../atoms';
+import { useResponsive } from '../../../hooks/useResponsive';
 import { styles } from './QuantityControl.styles';
 import type { QuantityControlProps } from './QuantityControl.types';
 
@@ -19,10 +20,8 @@ export const QuantityControl: React.FC<QuantityControlProps> = ({
 	valueVariant = 'body',
 	testID,
 }) => {
-	const { width: screenWidth } = useWindowDimensions();
-	const isCompactScreen = screenWidth < 360;
-	const isRegularScreen = screenWidth >= 768 && screenWidth < 1024;
-	const isLargeScreen = screenWidth >= 1024;
+	const { isCompactPhone: isCompactScreen, isMedium: isRegularScreen, isExpanded: isLargeScreen } =
+		useResponsive();
 	const iconSize = isCompactScreen ? 18 : isLargeScreen ? 24 : isRegularScreen ? 22 : 20;
 	const isDecreaseDisabled = disabled || quantity <= minQuantity;
 

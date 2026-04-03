@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, Easing, View, useWindowDimensions } from "react-native";
+import { Animated, Easing, View } from "react-native";
 
+import { useResponsive } from "../../../hooks/useResponsive";
 import { styles } from "./ProductCardSkeleton.styles";
 import type { ProductCardSkeletonProps } from "./ProductCardSkeleton.types";
 
@@ -31,9 +32,7 @@ export const ProductCardSkeleton: React.FC<ProductCardSkeletonProps> = ({
 	containerStyle,
 	testID,
 }) => {
-	const { width: screenWidth } = useWindowDimensions();
-	const isRegularScreen = screenWidth >= 768 && screenWidth < 1024;
-	const isLargeScreen = screenWidth >= 1024;
+	const { isMedium: isRegularScreen, isExpanded: isLargeScreen } = useResponsive();
 	const isLandscape = variant === "landscape";
 	const shimmerProgress = useRef(new Animated.Value(-1)).current;
 

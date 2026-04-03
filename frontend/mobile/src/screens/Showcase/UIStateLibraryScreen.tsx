@@ -28,6 +28,9 @@ import type { ProductListItemData } from "../../components";
 import { listProducts } from "../../api/products";
 import { useCart } from "../../hooks/useCart";
 import { useOrders } from "../../hooks/useOrders";
+import { useResponsive } from "../../hooks/useResponsive";
+import { clamp } from "../../styles/responsive";
+import { spacing } from "../../styles/spacing";
 
 type ToastItem = {
 	id: string;
@@ -115,6 +118,7 @@ const buildBottomActions = (): BottomBarAction[] => [
 export const UIStateLibraryScreen: React.FC = () => {
 	const { items: cartItems } = useCart();
 	const { orders } = useOrders();
+	const { width, isMedium, isExpanded } = useResponsive();
 	const [products, setProducts] = useState<ProductListItemData[]>([]);
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [toasts, setToasts] = useState<ToastItem[]>(initialToasts);
@@ -140,6 +144,15 @@ export const UIStateLibraryScreen: React.FC = () => {
 
 	const visibleToasts = useMemo(() => toasts, [toasts]);
 	const bottomActions = useMemo(() => buildBottomActions(), []);
+	const contentStyle = useMemo(
+		() => [
+			styles.content,
+			{
+				paddingHorizontal: isExpanded ? clamp(width * 0.08, spacing.s4, spacing.s8) : isMedium ? spacing.s5 : spacing.s3,
+			},
+		],
+		[isExpanded, isMedium, width],
+	);
 	const cartItemsPreview: CartItemData[] = cartItems;
 	const ordersPreview: OrderSummaryItem[] = orders;
 	const portraitProductsPreview = products.slice(0, 2);
@@ -176,7 +189,7 @@ export const UIStateLibraryScreen: React.FC = () => {
 					},
 				]}
 			/>
-			<ScrollView contentContainerStyle={styles.content}>
+			<ScrollView contentContainerStyle={contentStyle}>
 				<View style={styles.section}>
 					<Text variant="overline" color="secondary">
 						ICONES COMMUNES

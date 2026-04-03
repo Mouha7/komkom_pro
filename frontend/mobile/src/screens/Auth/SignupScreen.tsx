@@ -17,8 +17,11 @@ import {
 	Text,
 	useScrollToTopButton,
 } from "../../components";
+import { useResponsive } from "../../hooks/useResponsive";
 import type { RootStackParamList } from "../../navigation/AppNavigator";
 import { lightColors } from "../../styles/colors";
+import { clamp } from "../../styles/responsive";
+import { spacing } from "../../styles/spacing";
 import {
 	SENEGAL_COUNTRY_CODE,
 	SENEGAL_LOCAL_DIGITS,
@@ -37,6 +40,8 @@ type SignupScreenProps = NativeStackScreenProps<RootStackParamList, "Signup">;
 const SCROLL_TO_TOP_VISIBILITY_THRESHOLD = 200;
 
 export const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
+	const { width, isMedium, isExpanded } = useResponsive();
+	const horizontalPadding = isExpanded ? clamp(width * 0.08, spacing.s4, spacing.s8) : isMedium ? spacing.s5 : spacing.s3;
 	const [isPasswordHidden, setIsPasswordHidden] = useState(true);
 	const [password, setPassword] = useState("");
 	const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -136,7 +141,7 @@ export const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
 				onScroll={handleScroll}
 				scrollEventThrottle={16}
 			>
-				<View style={styles.container}>
+				<View style={[styles.container, { paddingHorizontal: horizontalPadding }] }>
 					<IconOnlyButton
 						iconName="arrowLeft"
 						onPress={() => navigation.goBack()}

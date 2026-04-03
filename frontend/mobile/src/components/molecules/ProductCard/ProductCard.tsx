@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Image, Pressable, View, useWindowDimensions } from "react-native";
+import { Image, Pressable, View } from "react-native";
 
 import { Button, Icon, StatusBadge, Text } from "../../atoms";
+import { useResponsive } from "../../../hooks/useResponsive";
 import { lightColors } from "../../../styles/colors";
 import { styles } from "./ProductCard.styles";
 import { ProductCardSkeleton } from "./ProductCardSkeleton";
@@ -29,9 +30,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 	testID,
 	containerStyle,
 }) => {
-	const { width: screenWidth } = useWindowDimensions();
-	const isRegularScreen = screenWidth >= 768 && screenWidth < 1024;
-	const isLargeScreen = screenWidth >= 1024;
+	const { isMedium: isRegularScreen, isExpanded: isLargeScreen } = useResponsive();
 	const actionIconSize = isLargeScreen ? 28 : isRegularScreen ? 26 : 24;
 
 	if (loading) {

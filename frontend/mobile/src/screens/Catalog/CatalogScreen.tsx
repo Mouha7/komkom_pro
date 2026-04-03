@@ -22,8 +22,11 @@ import { lightColors } from '../../styles/colors';
 import type { MainTabParamList } from '../../navigation/BottomTabNavigator';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 import { useCart } from '../../hooks/useCart';
+import { useResponsive } from '../../hooks/useResponsive';
 import { useToast } from '../../hooks/useToast';
 import { listCatalogCategories, listProducts } from '../../api/products';
+import { clamp } from '../../styles/responsive';
+import { spacing } from '../../styles/spacing';
 import { styles } from './CatalogScreen.styles';
 
 type CatalogScreenProps = CompositeScreenProps<
@@ -39,6 +42,7 @@ const SCROLL_TO_TOP_VISIBILITY_THRESHOLD = 260;
 export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation }) => {
 	// Hooks
 	const { addItem, removeItem } = useCart();
+	const { width, isMedium, isExpanded } = useResponsive();
 	const { showToast } = useToast();
 	const loadMoreTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const isLoadMoreLockedRef = useRef(false);
@@ -166,6 +170,17 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 			(filterOptions.categoryIds?.length ?? 0) > 0,
 		);
 	}, [filterOptions, selectedCategoryId]);
+
+	const contentContainerStyle = useMemo(
+		() => [
+			styles.contentContainer,
+			{
+				paddingHorizontal: isExpanded ? clamp(width * 0.08, spacing.s4, spacing.s8) : isMedium ? spacing.s5 : spacing.s3,
+				paddingTop: isExpanded ? spacing.s5 : spacing.s4,
+			},
+		],
+		[isExpanded, isMedium, width],
+	);
 
 	const hasMoreProducts = visibleCount < filteredProducts.length;
 	const displayedProducts = useMemo(
@@ -350,7 +365,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 			<ScrollView
 				ref={scrollViewRef}
 				style={styles.scrollView}
-				contentContainerStyle={styles.contentContainer}
+				contentContainerStyle={contentContainerStyle}
 				onScroll={handleScroll}
 				scrollEventThrottle={16}
 			>

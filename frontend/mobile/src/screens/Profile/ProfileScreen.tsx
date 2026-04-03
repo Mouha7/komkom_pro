@@ -4,7 +4,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AppBar, Button, Icon, Text } from "../../components";
 import { useAuth } from "../../hooks/useAuth";
+import { useResponsive } from "../../hooks/useResponsive";
 import { lightColors } from "../../styles/colors";
+import { clamp } from "../../styles/responsive";
 import { spacing } from "../../styles/spacing";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import type { MainTabParamList } from "../../navigation/BottomTabNavigator";
@@ -16,14 +18,16 @@ type RootStackNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 	const { signOut, user } = useAuth();
+	const { width, isMedium, isExpanded } = useResponsive();
 	const rootNavigation = navigation.getParent<RootStackNavigationProp>();
+	const horizontalPadding = isExpanded ? clamp(width * 0.08, spacing.s4, spacing.s8) : isMedium ? spacing.s5 : spacing.s3;
 
 	return (
 		<SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
 			<AppBar title="Profil" titleAlign="left" />
 			<ScrollView
 				style={styles.scrollView}
-				contentContainerStyle={styles.contentContainer}
+				contentContainerStyle={[styles.contentContainer, { paddingHorizontal: horizontalPadding }]}
 			>
 				<View style={styles.card}>
 					<Text

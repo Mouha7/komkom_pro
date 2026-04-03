@@ -6,8 +6,10 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button, CartAppBar, CartList, ErrorState, Icon, StatusChip } from '../../components';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 import { useCart } from '../../hooks/useCart';
+import { useResponsive } from '../../hooks/useResponsive';
 import { useToast } from '../../hooks/useToast';
 import { lightColors } from '../../styles/colors';
+import { clamp } from '../../styles/responsive';
 import { spacing } from '../../styles/spacing';
 
 type CartScreenProps = NativeStackScreenProps<RootStackParamList, 'Cart'>;
@@ -17,6 +19,7 @@ let hasShownCartSyncBadgeThisSession = false;
 
 export const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
 	const insets = useSafeAreaInsets();
+	const { width, isMedium, isExpanded } = useResponsive();
 	const { items, isLoading, errorMessage, reload, setItemQuantity, removeItem } = useCart();
 	const { showToast } = useToast();
 	const [isReloading, setIsReloading] = useState(false);
@@ -26,9 +29,14 @@ export const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
 	const [footerHeight, setFooterHeight] = useState(0);
 	const syncBadgeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+	const horizontalPadding = useMemo(
+		() => (isExpanded ? clamp(width * 0.08, spacing.s4, spacing.s8) : isMedium ? spacing.s5 : spacing.s3),
+		[isExpanded, isMedium, width],
+	);
+
 	const contentContainerStyle = useMemo(
-		() => [styles.contentContainer, { paddingBottom: footerHeight + spacing.s3 }],
-		[footerHeight],
+		() => [styles.contentContainer, { paddingBottom: footerHeight + spacing.s3, paddingHorizontal: horizontalPadding }],
+		[footerHeight, horizontalPadding],
 	);
 
 	useEffect(() => {
@@ -159,7 +167,7 @@ export const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
 			<View
 				style={[
 					styles.checkoutDock,
-					{ paddingBottom: Math.max(insets.bottom, spacing.s2) },
+					{ paddingBottom: Math.max(insets.bottom, spacing.s2), paddingHorizontal: horizontalPadding },
 				]}
 				onLayout={(event) => {
 					setFooterHeight(event.nativeEvent.layout.height);
@@ -194,14 +202,12 @@ const styles = StyleSheet.create({
 		borderRadius: 8,
 	},
 	contentContainer: {
-		paddingHorizontal: spacing.s4,
 		paddingTop: spacing.s3,
 	},
 	checkoutDock: {
 		backgroundColor: lightColors.surface.default,
 		borderTopWidth: 1,
 		borderTopColor: lightColors.border.default,
-		paddingHorizontal: spacing.s4,
 		paddingTop: spacing.s2,
 	},
 	checkoutButton: {

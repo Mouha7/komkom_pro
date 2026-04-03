@@ -11,7 +11,9 @@ import {
 import MapView, { Marker, type Region } from 'react-native-maps';
 
 import { Button, Icon, Input, Text } from '../../components';
+import { useResponsive } from '../../hooks/useResponsive';
 import { lightColors } from '../../styles/colors';
+import { clamp } from '../../styles/responsive';
 import { styles } from './location.styles';
 import type { GeoCoordinates } from './location.types';
 
@@ -73,6 +75,10 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
 	onRegionChangeComplete,
 	labels,
 }) => {
+	const { width, height, isExpanded } = useResponsive();
+	const modalMaxWidth = isExpanded ? 760 : 620;
+	const mapHeight = isExpanded ? clamp(height * 0.24, 220, 320) : clamp(height * 0.22, 180, 260);
+
 	const mergedLabels = {
 		...DEFAULT_LABELS,
 		...labels,
@@ -94,7 +100,12 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
 					behavior={Platform.OS === 'ios' ? 'padding' : undefined}
 					style={styles.modalWrapper}
 				>
-					<View style={styles.locationModalCard}>
+						<View
+							style={[
+								styles.locationModalCard,
+								{ maxWidth: Math.min(modalMaxWidth, width - 24) },
+							]}
+						>
 						<View style={styles.locationModalHeader}>
 							<Text
 								variant='h3'
@@ -165,7 +176,7 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
 							/>
 						</View>
 
-						<View style={styles.mapContainer}>
+						<View style={[styles.mapContainer, { height: mapHeight }]}>
 							<MapView
 								style={styles.map}
 								region={draftRegion}

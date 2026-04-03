@@ -2,7 +2,9 @@ import React from 'react';
 import { Animated, View } from 'react-native';
 
 import { Button, Icon, Text } from '../../../components';
+import { useResponsive } from '../../../hooks/useResponsive';
 import { lightColors } from '../../../styles/colors';
+import { clamp } from '../../../styles/responsive';
 import { styles } from './SplashScreen.styles';
 
 interface SplashCtaPanelProps {
@@ -20,6 +22,10 @@ export const SplashCtaPanel: React.FC<SplashCtaPanelProps> = ({
 	onLoginPress,
 	onSignupPress,
 }) => {
+	const { width, isExpanded } = useResponsive();
+	const titleMaxWidth = isExpanded ? clamp(width * 0.42, 320, 520) : clamp(width * 0.84, 280, 360);
+	const subtitleMaxWidth = isExpanded ? clamp(width * 0.46, 340, 560) : clamp(width * 0.86, 300, 390);
+
 	return (
 		<Animated.View
 			style={[
@@ -39,11 +45,11 @@ export const SplashCtaPanel: React.FC<SplashCtaPanelProps> = ({
 				</Text>
 			</View>
 
-			<Text variant="h1" align="center" style={styles.title} textColorOverride={lightColors.text.primary}>
+			<Text variant="h1" align="center" style={[styles.title, { maxWidth: titleMaxWidth }]} textColorOverride={lightColors.text.primary}>
 				L'approvisionnement B2B simplifie
 			</Text>
 
-			<Text variant="bodyLarge" align="center" style={styles.subtitle} textColorOverride={lightColors.text.secondary}>
+			<Text variant="bodyLarge" align="center" style={[styles.subtitle, { maxWidth: subtitleMaxWidth }]} textColorOverride={lightColors.text.secondary}>
 				Commandez vos materiaux au meilleur prix et gerez les stocks de votre quincaillerie en un clic.
 			</Text>
 

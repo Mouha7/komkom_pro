@@ -2,6 +2,7 @@ import { StyleSheet } from 'react-native';
 
 import { lightColors } from '../../../styles/colors';
 import { spacing } from '../../../styles/spacing';
+import { productCardSizes } from './productCard.sizes';
 
 export const styles = StyleSheet.create({
 	// PORTRAIT VARIANT
@@ -26,14 +27,14 @@ export const styles = StyleSheet.create({
 	},
 	portraitImage: {
 		width: '100%',
-		height: 150,
+		height: productCardSizes.portraitImageHeight.base,
 		backgroundColor: lightColors.background.subtle,
 	},
 	portraitImageRegular: {
-		height: 170,
+		height: productCardSizes.portraitImageHeight.medium,
 	},
 	portraitImageLarge: {
-		height: 196,
+		height: productCardSizes.portraitImageHeight.expanded,
 	},
 	portraitContent: {
 		rowGap: spacing.s1,
@@ -65,22 +66,22 @@ export const styles = StyleSheet.create({
 		flexShrink: 0,
 	},
 	actionButtonBase: {
-		width: 56,
-		height: 56,
-		minWidth: 56,
+		width: productCardSizes.actionButton.base,
+		height: productCardSizes.actionButton.base,
+		minWidth: productCardSizes.actionButton.base,
 		paddingHorizontal: 0,
 		paddingVertical: 0,
 		borderRadius: 12,
 	},
 	actionButtonBaseRegular: {
-		width: 60,
-		height: 60,
-		minWidth: 60,
+		width: productCardSizes.actionButton.medium,
+		height: productCardSizes.actionButton.medium,
+		minWidth: productCardSizes.actionButton.medium,
 	},
 	actionButtonBaseLarge: {
-		width: 64,
-		height: 64,
-		minWidth: 64,
+		width: productCardSizes.actionButton.expanded,
+		height: productCardSizes.actionButton.expanded,
+		minWidth: productCardSizes.actionButton.expanded,
 		borderRadius: 14,
 	},
 	actionButtonSuccess: {
@@ -94,13 +95,13 @@ export const styles = StyleSheet.create({
 		marginLeft: 'auto',
 	},
 	portraitActionButton: {
-		width: 56,
+		width: productCardSizes.actionButton.base,
 	},
 	portraitActionButtonRegular: {
-		width: 60,
+		width: productCardSizes.actionButton.medium,
 	},
 	portraitActionButtonLarge: {
-		width: 64,
+		width: productCardSizes.actionButton.expanded,
 	},
 
 	// LANDSCAPE VARIANT
@@ -121,19 +122,19 @@ export const styles = StyleSheet.create({
 		flex: 0,
 	},
 	landscapeImage: {
-		width: 140,
-		height: 160,
+		width: productCardSizes.landscapeImage.base.width,
+		height: productCardSizes.landscapeImage.base.height,
 		borderColor: lightColors.border.default,
 		borderRightWidth: 1,
 		backgroundColor: lightColors.background.subtle,
 	},
 	landscapeImageRegular: {
-		width: 156,
-		height: 170,
+		width: productCardSizes.landscapeImage.medium.width,
+		height: productCardSizes.landscapeImage.medium.height,
 	},
 	landscapeImageLarge: {
-		width: 180,
-		height: 190,
+		width: productCardSizes.landscapeImage.expanded.width,
+		height: productCardSizes.landscapeImage.expanded.height,
 	},
 	landscapeImageBadge: {
 		position: 'absolute',
@@ -187,13 +188,13 @@ export const styles = StyleSheet.create({
 		minWidth: 0,
 	},
 	landscapeActionButton: {
-		width: 56,
+		width: productCardSizes.actionButton.base,
 	},
 	landscapeActionButtonRegular: {
-		width: 60,
+		width: productCardSizes.actionButton.medium,
 	},
 	landscapeActionButtonLarge: {
-		width: 64,
+		width: productCardSizes.actionButton.expanded,
 	},
 });
 
