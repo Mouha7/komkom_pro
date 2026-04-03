@@ -81,8 +81,21 @@ export const styles = StyleSheet.create({
 		borderRadius: 12,
 		alignItems: 'center',
 		justifyContent: 'center',
+		position: 'relative',
 	},
 	actionButtonPressed: {
 		opacity: 0.72,
+	},
+	filterActiveDot: {
+		position: 'absolute',
+		right: 6,
+		top: 6,
+		alignSelf: 'center',
+		width: 14,
+		height: 14,
+		borderRadius: 999,
+		borderColor: '#FFFFFF',
+		borderWidth: 2,
+		backgroundColor: '#ED762F',
 	},
 });

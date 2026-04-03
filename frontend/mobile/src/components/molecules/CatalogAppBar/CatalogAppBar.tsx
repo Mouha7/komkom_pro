@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { FlatList, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -15,12 +15,33 @@ export const CatalogAppBar: React.FC<CatalogAppBarProps> = ({
 	viewMode,
 	onViewModeChange,
 	onFilterPress,
+	isFilterActive = false,
 	categories,
 	selectedCategoryId,
 	onCategorySelect,
 }) => {
 	const insets = useSafeAreaInsets();
 	const safeTop = Math.max(insets.top, spacing.s1);
+	const chipsListRef = useRef<FlatList<CatalogAppBarProps['categories'][number]> | null>(null);
+
+	const selectedCategoryIndex = useMemo(
+		() => categories.findIndex((item) => item.id === selectedCategoryId),
+		[categories, selectedCategoryId],
+	);
+
+	useEffect(() => {
+		if (selectedCategoryIndex < 0) {
+			return;
+		}
+
+		requestAnimationFrame(() => {
+			chipsListRef.current?.scrollToIndex({
+				index: selectedCategoryIndex,
+				animated: true,
+				viewPosition: 0.5,
+			});
+		});
+	}, [selectedCategoryIndex]);
 
 	return (
 		<View style={[styles.container, { paddingTop: safeTop }]}>
@@ -62,8 +83,10 @@ export const CatalogAppBar: React.FC<CatalogAppBarProps> = ({
 								pressed && styles.actionButtonPressed,
 							]}
 							accessibilityRole="button"
+							accessibilityState={{ selected: isFilterActive }}
 							accessibilityLabel="Ouvrir les filtres"
 						>
+							{isFilterActive ? <View style={styles.filterActiveDot} /> : null}
 							<Icon
 								name="sliderFilter"
 								size={24}
@@ -114,11 +137,18 @@ export const CatalogAppBar: React.FC<CatalogAppBarProps> = ({
 				{categories.length > 0 && (
 					<View style={styles.categoryChipsRow}>
 						<FlatList
+							ref={chipsListRef}
 							horizontal
 							scrollEnabled={categories.length > 3}
 							showsHorizontalScrollIndicator={false}
 							data={categories}
 							keyExtractor={(item) => item.id}
+							onScrollToIndexFailed={(info) => {
+								chipsListRef.current?.scrollToOffset({
+									offset: Math.max(info.averageItemLength * info.index, 0),
+									animated: true,
+								});
+							}}
 							contentContainerStyle={styles.categoryChipsContent}
 							renderItem={({ item }) => {
 								const isSelected = item.id === selectedCategoryId;

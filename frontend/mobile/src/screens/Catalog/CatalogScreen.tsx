@@ -17,6 +17,7 @@ import {
 	useScrollToTopButton,
 } from '../../components';
 import type { CatalogCategory, ViewMode, FilterOptions, ProductListItemData } from '../../components';
+import { ALL_PRODUCT_TYPES, type ProductType } from '../../constants';
 import { lightColors } from '../../styles/colors';
 import type { MainTabParamList } from '../../navigation/BottomTabNavigator';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
@@ -92,8 +93,29 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 		const initialCategoryId = route.params?.categoryId;
 		if (initialCategoryId) {
 			setSelectedCategoryId(initialCategoryId);
+			if (ALL_PRODUCT_TYPES.includes(initialCategoryId as ProductType)) {
+				setFilterOptions((prev) => ({
+					...prev,
+					categoryIds: [initialCategoryId as ProductType],
+				}));
+			}
 		}
 	}, [route.params?.categoryId]);
+
+	useEffect(() => {
+		const activeCategories = filterOptions.categoryIds;
+		if (!activeCategories || activeCategories.length === 0) {
+			setSelectedCategoryId('all');
+			return;
+		}
+
+		if (activeCategories.length === 1) {
+			setSelectedCategoryId(activeCategories[0]);
+			return;
+		}
+
+		setSelectedCategoryId('all');
+	}, [filterOptions.categoryIds]);
 
 	// Filter products based on search, category, and filter options
 	const filteredProducts = useMemo(() => {
@@ -131,6 +153,19 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 			return true;
 		});
 	}, [allProducts, searchQuery, selectedCategoryId, filterOptions]);
+
+	const hasActiveFilters = useMemo(() => {
+		const hasActiveCategoryChip =
+			selectedCategoryId !== undefined && selectedCategoryId !== 'all';
+
+		return Boolean(
+			hasActiveCategoryChip ||
+			filterOptions.priceMin !== undefined ||
+			filterOptions.priceMax !== undefined ||
+			(filterOptions.stockStatuses?.length ?? 0) > 0 ||
+			(filterOptions.categoryIds?.length ?? 0) > 0,
+		);
+	}, [filterOptions, selectedCategoryId]);
 
 	const hasMoreProducts = visibleCount < filteredProducts.length;
 	const displayedProducts = useMemo(
@@ -262,6 +297,17 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 
 	const handleCategorySelect = (categoryId: string) => {
 		setSelectedCategoryId(categoryId);
+		if (categoryId === 'all') {
+			setFilterOptions((prev) => ({ ...prev, categoryIds: undefined }));
+			return;
+		}
+
+		if (ALL_PRODUCT_TYPES.includes(categoryId as ProductType)) {
+			setFilterOptions((prev) => ({
+				...prev,
+				categoryIds: [categoryId as ProductType],
+			}));
+		}
 	};
 
 	const handleApplyFilters = () => {
@@ -287,6 +333,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 				viewMode={viewMode}
 				onViewModeChange={setViewMode}
 				onFilterPress={handleFilterPress}
+				isFilterActive={hasActiveFilters}
 				categories={categories}
 				selectedCategoryId={selectedCategoryId}
 				onCategorySelect={handleCategorySelect}

@@ -11,6 +11,7 @@ export type CatalogAppBarProps = {
 	viewMode: ViewMode;
 	onViewModeChange: (mode: ViewMode) => void;
 	onFilterPress: () => void;
+	isFilterActive?: boolean;
 	categories: CatalogCategory[];
 	selectedCategoryId?: string;
 	onCategorySelect: (categoryId: string) => void;

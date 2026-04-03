@@ -223,7 +223,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 							isRegularScreen && styles.portraitContentRegular,
 						]}
 					>
-						<Text variant="h3" maxLines={2} ellipsizeMode="tail">
+						<Text variant="h3" style={{ fontWeight: isLargeScreen ? '700' : isRegularScreen ? '600' : '500' }} maxLines={2} ellipsizeMode="tail">
 							{name}
 						</Text>
 						{description ? (
