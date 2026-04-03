@@ -209,11 +209,7 @@ export const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({
 	};
 
 	const handleInvoicePress = (): void => {
-		showToast({
-			tone: "success",
-			title: "Facture",
-			message: "La facture sera bientot disponible en telechargement.",
-		});
+		navigation.navigate("OrderInvoice", { orderId });
 	};
 
 	return (

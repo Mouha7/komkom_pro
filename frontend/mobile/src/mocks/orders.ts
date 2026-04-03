@@ -35,6 +35,51 @@ export type OrderConfirmationDataMock = {
 	currency: string;
 };
 
+export type InvoiceSourceOrderMock = {
+	id: string;
+	reference: string;
+	total: number;
+	currency?: string;
+	status: OrderStatusMock;
+	createdAt?: string;
+};
+
+export type InvoicePaymentStatusMock = 'paid' | 'pending' | 'cancelled';
+
+export type InvoiceDataMock = {
+	orderId: string;
+	orderReference: string;
+	invoiceNumber: string;
+	issuedAt: string;
+	currency: string;
+	paymentStatus: InvoicePaymentStatusMock;
+	paymentStatusLabel: string;
+	paymentLabel: string;
+	issuer: {
+		name: string;
+		address: string;
+		email: string;
+		phone: string;
+	};
+	client: {
+		name: string;
+		address: string;
+		phone: string;
+	};
+	items: Array<{
+		id: string;
+		name: string;
+		quantity: number;
+		unitPrice: number;
+		lineTotal: number;
+	}>;
+	subtotal: number;
+	deliveryFee: number;
+	taxRate: number;
+	taxAmount: number;
+	total: number;
+};
+
 export const FALLBACK_ORDER_DETAILS: OrderDetailMetaMock = {
 	items: [
 		{
@@ -184,3 +229,114 @@ export const MOCK_ORDER_CONFIRMATION_DATA: OrderConfirmationDataMock = {
 
 export const getOrderDetailById = (orderId: string): OrderDetailMetaMock =>
 	ORDER_DETAILS_BY_ID[orderId] ?? FALLBACK_ORDER_DETAILS;
+
+const INVOICE_TAX_RATE_PERCENT = 18;
+
+const formatInvoiceIssuedAt = (isoDate?: string): string => {
+	if (!isoDate) {
+		return new Intl.DateTimeFormat('fr-FR', {
+			day: '2-digit',
+			month: '2-digit',
+			year: 'numeric',
+		}).format(new Date());
+	}
+
+	const parsedDate = new Date(isoDate);
+	if (Number.isNaN(parsedDate.getTime())) {
+		return new Intl.DateTimeFormat('fr-FR', {
+			day: '2-digit',
+			month: '2-digit',
+			year: 'numeric',
+		}).format(new Date());
+	}
+
+	return new Intl.DateTimeFormat('fr-FR', {
+		day: '2-digit',
+		month: '2-digit',
+		year: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit',
+	}).format(parsedDate);
+};
+
+const mapPaymentStatus = (status: OrderStatusMock): InvoicePaymentStatusMock => {
+	if (status === 'cancelled') {
+		return 'cancelled';
+	}
+
+	if (status === 'draft' || status === 'pending') {
+		return 'pending';
+	}
+
+	return 'paid';
+};
+
+const mapPaymentStatusLabel = (status: InvoicePaymentStatusMock): string => {
+	if (status === 'paid') {
+		return 'Paiement valide';
+	}
+
+	if (status === 'cancelled') {
+		return 'Commande annulee';
+	}
+
+	return 'Paiement en attente';
+};
+
+const buildInvoiceNumber = (reference: string, orderId: string): string => {
+	const normalizedRef = reference.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+	const shortOrderId = orderId.slice(-4).toUpperCase();
+	return `FAC-${normalizedRef}-${shortOrderId}`;
+};
+
+export const getInvoiceDataByOrderId = (
+	orderId: string,
+	sourceOrder?: InvoiceSourceOrderMock | null,
+): InvoiceDataMock => {
+	const detail = getOrderDetailById(orderId);
+	const safeCurrency = sourceOrder?.currency ?? 'FCFA';
+	const safeReference = sourceOrder?.reference ?? orderId.toUpperCase();
+	const safeStatus = sourceOrder?.status ?? 'pending';
+
+	const items = detail.items.map((item) => ({
+		id: item.id,
+		name: item.name,
+		quantity: item.quantity,
+		unitPrice: item.unitPrice,
+		lineTotal: item.quantity * item.unitPrice,
+	}));
+
+	const subtotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
+	const taxAmount = Math.round((subtotal * INVOICE_TAX_RATE_PERCENT) / 100);
+	const total = subtotal + detail.deliveryFee + taxAmount;
+
+	const paymentStatus = mapPaymentStatus(safeStatus);
+
+	return {
+		orderId,
+		orderReference: safeReference,
+		invoiceNumber: buildInvoiceNumber(safeReference, orderId),
+		issuedAt: formatInvoiceIssuedAt(sourceOrder?.createdAt),
+		currency: safeCurrency,
+		paymentStatus,
+		paymentStatusLabel: mapPaymentStatusLabel(paymentStatus),
+		paymentLabel: detail.paymentLabel,
+		issuer: {
+			name: 'KomKom Pro Marketplace',
+			address: 'Dakar, Senegal',
+			email: 'billing@komkom.local',
+			phone: '+221 77 123 45 67',
+		},
+		client: {
+			name: detail.contactName,
+			address: detail.deliveryAddress,
+			phone: detail.contactPhone,
+		},
+		items,
+		subtotal,
+		deliveryFee: detail.deliveryFee,
+		taxRate: INVOICE_TAX_RATE_PERCENT,
+		taxAmount,
+		total,
+	};
+};

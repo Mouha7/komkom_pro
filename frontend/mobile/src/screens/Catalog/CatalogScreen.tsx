@@ -367,6 +367,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 				style={styles.scrollView}
 				contentContainerStyle={contentContainerStyle}
 				onScroll={handleScroll}
+				showsVerticalScrollIndicator={false}
 				scrollEventThrottle={16}
 			>
 				{apiError ? (

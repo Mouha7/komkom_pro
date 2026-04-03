@@ -341,7 +341,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 				<View style={[styles.section, styles.productsSection]}>
 					{apiError ? (
 						<ErrorState
-							title='Accueil indisponible'
+							title='Impossible de charger les produits'
 							description={apiError}
 							actionLabel={isReloading ? 'Rechargement...' : 'Reessayer'}
 							onActionPress={handleRetryHomeData}

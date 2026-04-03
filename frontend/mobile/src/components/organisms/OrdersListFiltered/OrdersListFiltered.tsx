@@ -169,6 +169,7 @@ export const OrdersListFiltered: React.FC<OrdersListFilteredProps> = ({
 				style={{ flex: 1 }}
 				contentContainerStyle={styles.listContainer}
 				scrollEventThrottle={16}
+				showsVerticalScrollIndicator={false}
 			>
 				{filteredOrders.length === 0 ? (
 					<EmptyState

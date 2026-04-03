@@ -9,7 +9,6 @@ export const styles = StyleSheet.create({
 	listContainer: {
 		paddingHorizontal: spacing.s4,
 		paddingTop: spacing.s3,
-		paddingBottom: spacing.s4,
 	},
 	emptyContainer: {
 		flex: 1,
