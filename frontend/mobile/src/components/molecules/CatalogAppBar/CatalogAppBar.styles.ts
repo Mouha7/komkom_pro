@@ -1,11 +1,9 @@
 import { StyleSheet } from 'react-native';
 
-import { lightColors, withOpacity } from '../../../styles/colors';
+import { lightColors } from '../../../styles/colors';
 import { spacing } from '../../../styles/spacing';
 
 export const ACTION_SIZE = 44;
-const CATEGORY_CHIP_WIDTH = 100;
-const CATEGORY_CHIP_HEIGHT = 40;
 
 export const styles = StyleSheet.create({
 	container: {
@@ -55,28 +53,26 @@ export const styles = StyleSheet.create({
 		paddingHorizontal: spacing.s2,
 		columnGap: spacing.s2,
 	},
-	categoryChip: {
-		width: CATEGORY_CHIP_WIDTH,
-		height: CATEGORY_CHIP_HEIGHT,
+	categoryChipContainer: {
+		paddingHorizontal: spacing.s3,
+		paddingVertical: spacing.s1,
 		borderRadius: 12,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: lightColors.border.subtle,
 		borderWidth: 1,
 		borderColor: lightColors.border.default,
+		backgroundColor: lightColors.surface.default,
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
-	categoryChipActive: {
+	categoryChipContainerActive: {
 		backgroundColor: lightColors.primary,
 		borderColor: lightColors.primary,
 	},
-	categoryChipPressed: {
-		opacity: 0.72,
+	categoryChipLabel: {
+		fontSize: 14,
+		fontWeight: '500',
+		color: lightColors.text.secondary,
 	},
-	categoryChipText: {
-		fontSize: 13,
-		fontWeight: '600',
-	},
-	categoryChipActiveText: {
+	categoryChipLabelActive: {
 		color: '#FFFFFF',
 	},
 	actionButton: {

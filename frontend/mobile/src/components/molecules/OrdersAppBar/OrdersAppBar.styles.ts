@@ -16,6 +16,7 @@ export const styles = StyleSheet.create({
 		fontSize: 24,
 		fontWeight: '700',
 		color: lightColors.text.primary,
+		marginBottom: spacing.s1,
 	},
 	searchInputContainer: {
 		backgroundColor: lightColors.neutral100,

@@ -15,3 +15,11 @@ export type CatalogAppBarProps = {
 	selectedCategoryId?: string;
 	onCategorySelect: (categoryId: string) => void;
 };
+
+export type CatalogCategoryChipProps = {
+	id: string;
+	label: string;
+	isActive: boolean;
+	onPress: () => void;
+	testID?: string;
+};

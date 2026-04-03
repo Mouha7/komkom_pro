@@ -261,7 +261,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 	};
 
 	const handleCategorySelect = (categoryId: string) => {
-		setSelectedCategoryId(categoryId === selectedCategoryId ? undefined : categoryId);
+		setSelectedCategoryId(categoryId);
 	};
 
 	const handleApplyFilters = () => {

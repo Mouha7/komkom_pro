@@ -2,9 +2,10 @@ import React from "react";
 import { FlatList, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Button, Icon, Input, Text } from "../../atoms";
+import { Icon, Input, Text } from "../../atoms";
 import { lightColors } from "../../../styles/colors";
 import { spacing } from "../../../styles/spacing";
+import { CatalogCategoryChip } from "./CatalogCategoryChip";
 import { styles } from "./CatalogAppBar.styles";
 import type { CatalogAppBarProps } from "./CatalogAppBar.types";
 
@@ -122,19 +123,11 @@ export const CatalogAppBar: React.FC<CatalogAppBarProps> = ({
 							renderItem={({ item }) => {
 								const isSelected = item.id === selectedCategoryId;
 								return (
-									<Button
-										title={item.name}
+									<CatalogCategoryChip
+										id={item.id}
+										label={item.name}
+										isActive={isSelected}
 										onPress={() => onCategorySelect(item.id)}
-										variant="secondary"
-										accessibilityLabel={`Filtrer par ${item.name}`}
-										containerStyle={
-											isSelected
-												? { backgroundColor: "#ED762F", borderColor: "#ED762F" }
-												: undefined
-										}
-										textStyle={
-											isSelected ? { color: "#FFFFFF", fontWeight: "700" } : undefined
-										}
 									/>
 								);
 							}}
