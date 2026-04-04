@@ -19,13 +19,15 @@ import {
 	type OrderSummaryItem,
 } from '../../components';
 import { getOrderById } from '../../api/orders';
-import { useToast } from '../../hooks/useToast';
+import { useInvoicePdfActions } from '../../features/invoicePdf';
+import { useResponsive } from '../../hooks/useResponsive';
 import {
 	getInvoiceDataByOrderId,
 	type InvoiceDataMock,
 } from '../../mocks/orders';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 import { lightColors, withOpacity } from '../../styles/colors';
+import { clamp } from '../../styles/responsive';
 import { spacing } from '../../styles/spacing';
 import { formatPrice } from '../../utils/formatPrice';
 
@@ -59,7 +61,7 @@ export const OrderInvoiceScreen: React.FC<OrderInvoiceScreenProps> = ({
 	route,
 }) => {
 	const insets = useSafeAreaInsets();
-	const { showToast } = useToast();
+	const { width, isCompactPhone, isMedium, isExpanded } = useResponsive();
 	const [order, setOrder] = useState<OrderSummaryItem | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -95,11 +97,24 @@ export const OrderInvoiceScreen: React.FC<OrderInvoiceScreenProps> = ({
 		() => getInvoiceDataByOrderId(orderId, order),
 		[order, orderId],
 	);
+	const pdfActions = useInvoicePdfActions(invoice);
 
 	const contentBottomPadding =
 		BOTTOM_ACTION_BAR_MIN_HEIGHT +
 		Math.max(insets.bottom, spacing.s2) +
 		spacing.s4;
+
+	const horizontalPadding = isExpanded
+		? clamp(width * 0.08, spacing.s4, spacing.s8)
+		: isMedium
+			? spacing.s5
+			: spacing.s3;
+	const contentMaxWidth = isExpanded ? clamp(width * 0.86, 760, 980) : undefined;
+	const quantityColumnWidth = isCompactPhone ? 30 : isExpanded ? 44 : 38;
+	const amountColumnWidth = isCompactPhone ? 84 : isExpanded ? 120 : 96;
+	const invoiceTitleStyle = isCompactPhone ? styles.invoiceNumberCompact : null;
+	const totalLabelStyle = isCompactPhone ? styles.totalLabelCompact : null;
+	const totalValueStyle = isCompactPhone ? styles.totalValueCompact : null;
 
 	const handleReload = (): void => {
 		if (isReloading) {
@@ -112,28 +127,8 @@ export const OrderInvoiceScreen: React.FC<OrderInvoiceScreenProps> = ({
 		});
 	};
 
-	const handleSharePress = (): void => {
-		showToast({
-			tone: 'info',
-			title: 'Partager',
-			message: `Partage de la facture ${invoice.invoiceNumber} bientot disponible.`,
-		});
-	};
-
-	const handlePrintPress = (): void => {
-		showToast({
-			tone: 'info',
-			title: 'Impression',
-			message: `Impression de ${invoice.invoiceNumber} en mode mock.`,
-		});
-	};
-
 	const handleDownloadPdfPress = (): void => {
-		showToast({
-			tone: 'success',
-			title: 'Telechargement PDF',
-			message: `Le PDF de ${invoice.invoiceNumber} sera active avec l'API facture.`,
-		});
+		navigation.navigate('OrderInvoicePdfViewer', { orderId });
 	};
 
 	const statusStyle = STATUS_STYLE_BY_PAYMENT[invoice.paymentStatus];
@@ -145,15 +140,18 @@ export const OrderInvoiceScreen: React.FC<OrderInvoiceScreenProps> = ({
 				leftIconName='arrowLeft'
 				onPressLeft={() => navigation.goBack()}
 				rightActionSlot={
-					<IconOnlyButton
-						iconName='share'
-						onPress={handleSharePress}
-						size={54}
-						borderRadius={27}
-						iconSize={24}
-						iconColor={lightColors.text.primary}
-						accessibilityLabel='Partager la facture'
-					/>
+					order != null ? (
+						<IconOnlyButton
+							iconName='share'
+							onPress={pdfActions.handleShare}
+							disabled={pdfActions.activeAction !== null}
+							size={54}
+							borderRadius={27}
+							iconSize={27}
+							iconColor={lightColors.text.primary}
+							accessibilityLabel='Partager la facture'
+						/>
+					) : undefined
 				}
 			/>
 
@@ -188,6 +186,14 @@ export const OrderInvoiceScreen: React.FC<OrderInvoiceScreenProps> = ({
 						style={styles.scrollView}
 						contentContainerStyle={[
 							styles.contentContainer,
+							{ paddingHorizontal: horizontalPadding },
+							contentMaxWidth
+								? {
+									maxWidth: contentMaxWidth,
+									alignSelf: 'center',
+									width: '100%',
+								}
+								: null,
 							{ paddingBottom: contentBottomPadding },
 						]}
 						showsVerticalScrollIndicator={false}
@@ -198,7 +204,7 @@ export const OrderInvoiceScreen: React.FC<OrderInvoiceScreenProps> = ({
 									<Text variant='overline' color='secondary'>
 										Facture
 									</Text>
-									<Text variant='h2' style={styles.invoiceNumber}>
+									<Text variant='h2' style={[styles.invoiceNumber, invoiceTitleStyle]}>
 										{invoice.invoiceNumber}
 									</Text>
 								</View>
@@ -270,10 +276,18 @@ export const OrderInvoiceScreen: React.FC<OrderInvoiceScreenProps> = ({
 								<Text variant='overline' color='secondary' style={styles.colDescription}>
 									Designation
 								</Text>
-								<Text variant='overline' color='secondary' style={styles.colQuantity}>
+								<Text
+									variant='overline'
+									color='secondary'
+									style={[styles.colQuantity, { width: quantityColumnWidth }]}
+								>
 									Qte
 								</Text>
-								<Text variant='overline' color='secondary' style={styles.colAmount}>
+								<Text
+									variant='overline'
+									color='secondary'
+									style={[styles.colAmount, { width: amountColumnWidth }]}
+								>
 									Montant
 								</Text>
 							</View>
@@ -288,10 +302,10 @@ export const OrderInvoiceScreen: React.FC<OrderInvoiceScreenProps> = ({
 											{formatPrice(item.unitPrice, invoice.currency)} / unite
 										</Text>
 									</View>
-									<Text variant='body' style={styles.colQuantity}>
+									<Text variant='body' style={[styles.colQuantity, { width: quantityColumnWidth }]}>
 										{String(item.quantity)}
 									</Text>
-									<Text variant='body' style={styles.colAmount}>
+									<Text variant='body' style={[styles.colAmount, { width: amountColumnWidth }]}>
 										{formatPrice(item.lineTotal, invoice.currency)}
 									</Text>
 								</View>
@@ -329,10 +343,10 @@ export const OrderInvoiceScreen: React.FC<OrderInvoiceScreenProps> = ({
 							</View>
 
 							<View style={styles.totalRow}>
-								<Text variant='h2' style={styles.totalLabel}>
+								<Text variant='h2' style={[styles.totalLabel, totalLabelStyle]}>
 									Total TTC
 								</Text>
-								<Text variant='h1' style={styles.totalValue}>
+								<Text variant='h1' style={[styles.totalValue, totalValueStyle]}>
 									{formatPrice(invoice.total, invoice.currency)}
 								</Text>
 							</View>
@@ -353,16 +367,17 @@ export const OrderInvoiceScreen: React.FC<OrderInvoiceScreenProps> = ({
 					<View
 						style={[
 							styles.bottomActions,
+							{ paddingHorizontal: horizontalPadding },
+							contentMaxWidth
+								? {
+									maxWidth: contentMaxWidth,
+									alignSelf: 'center',
+									width: '100%',
+								}
+								: null,
 							{ paddingBottom: Math.max(insets.bottom, spacing.s2) },
 						]}
 					>
-						<Button
-							title=''
-							variant='secondary'
-							onPress={handlePrintPress}
-							containerStyle={styles.bottomActionButtonLeft}
-							leftIcon={<Icon name='printer' size={18} color={lightColors.text.primary} />}
-						/>
 						<Button
 							title='Telecharger PDF'
 							onPress={handleDownloadPdfPress}
@@ -385,7 +400,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	contentContainer: {
-		paddingHorizontal: spacing.s3,
 		paddingTop: spacing.s2,
 		rowGap: spacing.s2,
 	},
@@ -407,13 +421,19 @@ const styles = StyleSheet.create({
 	},
 	invoiceHeaderRow: {
 		flexDirection: 'row',
+		flexWrap: 'wrap',
 		justifyContent: 'space-between',
 		columnGap: spacing.s2,
+		rowGap: spacing.s1,
 	},
 	invoiceNumber: {
 		fontSize: 20,
 		lineHeight: 26,
 		fontWeight: '700',
+	},
+	invoiceNumberCompact: {
+		fontSize: 18,
+		lineHeight: 24,
 	},
 	statusBadge: {
 		alignSelf: 'flex-start',
@@ -491,10 +511,16 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		fontWeight: '700',
 	},
+	totalLabelCompact: {
+		fontSize: 16,
+	},
 	totalValue: {
 		fontSize: 22,
 		fontWeight: '700',
 		color: lightColors.primaryDark,
+	},
+	totalValueCompact: {
+		fontSize: 20,
 	},
 	paymentRow: {
 		marginTop: spacing.s2,

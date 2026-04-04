@@ -18,6 +18,7 @@ import { OrderConfirmationScreen } from "../screens/Cart/OrderConfirmation";
 import type { MainTabParamList } from "./BottomTabNavigator";
 import { OrderDetailScreen } from "../screens/Orders/OrderDetailScreen";
 import { OrderInvoiceScreen } from "../screens/Orders/OrderInvoiceScreen";
+import { OrderInvoicePdfViewerScreen } from "../screens/Orders/OrderInvoicePdfViewerScreen";
 import { NotificationsScreen } from "../screens/Notifications/NotificationsScreen";
 import { useAuth } from "../hooks/useAuth";
 import { BottomTabNavigator } from "./BottomTabNavigator";
@@ -42,6 +43,9 @@ export type RootStackParamList = {
 		orderId: string;
 	};
 	OrderInvoice: {
+		orderId: string;
+	};
+	OrderInvoicePdfViewer: {
 		orderId: string;
 	};
 	UIStateLibrary: undefined;
@@ -96,6 +100,7 @@ export const AppNavigator: React.FC = () => {
 						<Stack.Screen name="OrderConfirmation" component={OrderConfirmationScreen} />
 						<Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
 						<Stack.Screen name="OrderInvoice" component={OrderInvoiceScreen} />
+						<Stack.Screen name="OrderInvoicePdfViewer" component={OrderInvoicePdfViewerScreen} />
 					</>
 				)}
 				<Stack.Screen
