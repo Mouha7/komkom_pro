@@ -43,6 +43,8 @@ import {
 	Smartphone,
 	Headphones,
 	FileText,
+	Download,
+	Printer
 } from 'lucide-react-native';
 
 import type { CommonIconName, IconProps } from './Icon.types';
@@ -90,6 +92,8 @@ const ICON_MAP: Record<CommonIconName, LucideIcon> = {
 	smartphone: Smartphone,
 	headphones: Headphones,
 	fileText: FileText,
+	download: Download,
+	printer: Printer,
 };
 
 export const Icon: React.FC<IconProps> = ({

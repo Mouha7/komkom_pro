@@ -14,6 +14,7 @@ import {
 	EmptyState,
 	ErrorState,
 	Icon,
+	IconOnlyButton,
 	Text,
 	type OrderSummaryItem,
 } from '../../components';
@@ -144,13 +145,14 @@ export const OrderInvoiceScreen: React.FC<OrderInvoiceScreenProps> = ({
 				leftIconName='arrowLeft'
 				onPressLeft={() => navigation.goBack()}
 				rightActionSlot={
-					<Button
-						iconOnly
-						variant='ghost'
+					<IconOnlyButton
+						iconName='share'
 						onPress={handleSharePress}
+						size={54}
+						borderRadius={27}
+						iconSize={24}
+						iconColor={lightColors.text.primary}
 						accessibilityLabel='Partager la facture'
-						leftIcon={<Icon name='share' size={20} color={lightColors.text.primary} />}
-						containerStyle={styles.shareButton}
 					/>
 				}
 			/>
@@ -355,17 +357,17 @@ export const OrderInvoiceScreen: React.FC<OrderInvoiceScreenProps> = ({
 						]}
 					>
 						<Button
-							title='Impression'
+							title=''
 							variant='secondary'
 							onPress={handlePrintPress}
-							containerStyle={styles.bottomActionButton}
-							leftIcon={<Icon name='share' size={18} color={lightColors.text.primary} />}
+							containerStyle={styles.bottomActionButtonLeft}
+							leftIcon={<Icon name='printer' size={18} color={lightColors.text.primary} />}
 						/>
 						<Button
 							title='Telecharger PDF'
 							onPress={handleDownloadPdfPress}
-							containerStyle={styles.bottomActionButton}
-							leftIcon={<Icon name='fileText' size={18} color={lightColors.text.onPrimary} />}
+							containerStyle={styles.bottomActionButtonRight}
+							leftIcon={<Icon name='download' size={18} color={lightColors.text.onPrimary} />}
 						/>
 					</View>
 				</>
@@ -378,12 +380,6 @@ const styles = StyleSheet.create({
 	screen: {
 		flex: 1,
 		backgroundColor: lightColors.background.default,
-	},
-	shareButton: {
-		minWidth: 40,
-		height: 40,
-		paddingHorizontal: 0,
-		borderRadius: 20,
 	},
 	scrollView: {
 		flex: 1,
@@ -525,7 +521,10 @@ const styles = StyleSheet.create({
 		borderTopWidth: 1,
 		borderTopColor: withOpacity(lightColors.border.default, 0.9),
 	},
-	bottomActionButton: {
+	bottomActionButtonLeft: {
+		height: BOTTOM_ACTION_BAR_MIN_HEIGHT,
+	},
+	bottomActionButtonRight: {
 		flex: 1,
 		height: BOTTOM_ACTION_BAR_MIN_HEIGHT,
 	},

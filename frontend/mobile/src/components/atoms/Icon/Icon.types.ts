@@ -41,6 +41,8 @@ export type CommonIconName =
 	| 'smartphone'
 	| 'headphones'
 	| 'fileText'
+	| 'download'
+	| 'printer'
 	;
 
 export type IconProps = {

@@ -55,7 +55,7 @@ export const AppBar: React.FC<AppBarProps> = ({
 				</View>
 
 				{rightActionSlot ? (
-					<View style={{ minWidth: APP_BAR_BUTTON_SIZE, height: APP_BAR_BUTTON_SIZE, alignItems: 'flex-end', justifyContent: 'center' }}>
+					<View style={{ width: APP_BAR_BUTTON_SIZE, height: APP_BAR_BUTTON_SIZE, alignItems: 'center', justifyContent: 'center' }}>
 						{rightActionSlot}
 					</View>
 				) : rightActions && rightActions.length > 0 ? (
