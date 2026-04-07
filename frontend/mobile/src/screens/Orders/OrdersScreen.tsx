@@ -35,7 +35,7 @@ export const OrdersScreen: React.FC<OrdersScreenProps> = ({ navigation }) => {
 	};
 
 	return (
-		<SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
+		<SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
 			<OrdersAppBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 			<View style={styles.contentContainer}>
 				{errorMessage ? (

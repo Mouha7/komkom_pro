@@ -13,7 +13,7 @@ export const OrdersAppBar: React.FC<OrdersAppBarProps> = ({
 	onSearchChange,
 }) => {
 	const insets = useSafeAreaInsets();
-	const safeTop = Math.max(insets.top, spacing.s1);
+	const safeTop = Math.max(insets.top, spacing.s2);
 
 	return (
 		<View style={[styles.container, { paddingTop: safeTop }]}>
