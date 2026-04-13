@@ -7,10 +7,10 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import Icon from "react-native-vector-icons/Feather";
 
-import styles from "./StoreProfile.style";
+import styles from "./StoreProfile.styles";
 import { StoreProfileProps, StoreInfo } from "./StoreProfile.types";
+import { Icon } from "../..";
 
 // Exemple de fetch par défaut pour Storybook ou tests
 const defaultFetchStore = async (storeId: string): Promise<StoreInfo> => {
@@ -103,7 +103,7 @@ const StoreProfile: React.FC<StoreProfileProps> = ({ storeId, onClose }) => {
           ].map((item, index) => (
             <TouchableOpacity key={index} style={styles.menuItem}>
               <Text>{item}</Text>
-              <Icon name="chevron-right" size={18} />
+              <Icon name="arrowRight" size={18} />
             </TouchableOpacity>
           ))}
         </View>
