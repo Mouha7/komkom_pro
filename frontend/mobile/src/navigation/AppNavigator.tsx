@@ -20,6 +20,7 @@ import { OrderDetailScreen } from "../screens/Orders/OrderDetailScreen";
 import { OrderInvoiceScreen } from "../screens/Orders/OrderInvoiceScreen";
 import { OrderInvoicePdfViewerScreen } from "../screens/Orders/OrderInvoicePdfViewerScreen";
 import { NotificationsScreen } from "../screens/Notifications/NotificationsScreen";
+import { EmployeeManagementScreen } from "../screens/Profile/EmployeeManagementScreen";
 import { useAuth } from "../hooks/useAuth";
 import { BottomTabNavigator } from "./BottomTabNavigator";
 
@@ -48,6 +49,7 @@ export type RootStackParamList = {
 	OrderInvoicePdfViewer: {
 		orderId: string;
 	};
+	EmployeeManagement: undefined;
 	UIStateLibrary: undefined;
 };
 
@@ -101,6 +103,7 @@ export const AppNavigator: React.FC = () => {
 						<Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
 						<Stack.Screen name="OrderInvoice" component={OrderInvoiceScreen} />
 						<Stack.Screen name="OrderInvoicePdfViewer" component={OrderInvoicePdfViewerScreen} />
+						<Stack.Screen name="EmployeeManagement" component={EmployeeManagementScreen} />
 					</>
 				)}
 				<Stack.Screen

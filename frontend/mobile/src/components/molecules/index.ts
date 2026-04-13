@@ -80,6 +80,15 @@ export type { ProfileSettingsCardProps, ProfileSettingItem } from './ProfileSett
 export { ProfileEditModal } from './ProfileEditModal';
 export type { ProfileEditModalProps, ProfileEditValues } from './ProfileEditModal';
 
+export { EmployeeManagementAppBar } from './EmployeeManagementAppBar';
+export type { EmployeeManagementAppBarProps } from './EmployeeManagementAppBar';
+
+export { EmployeeListItem } from './EmployeeListItem';
+export type { EmployeeListItemProps } from './EmployeeListItem';
+
+export { InviteEmployeeModal } from './InviteEmployeeModal';
+export type { InviteEmployeeModalProps } from './InviteEmployeeModal';
+
 export {
 	OrderConfirmationHeaderIcon,
 	OrderConfirmationSummaryCard,

@@ -8,4 +8,5 @@ export type ProfileSettingItem = {
 
 export type ProfileSettingsCardProps = {
 	items: ProfileSettingItem[];
+	onItemPress?: (itemId: string) => void;
 };

@@ -34,7 +34,7 @@ export const DEFAULT_STORE_PROFILE: StoreProfileModel = {
 	storeName: 'Quincaillerie Sow & Freres',
 	ownerName: 'Amadou Sow',
 	companyRegistration: '004218942 2B3',
-	whatsAppNumber: '+221 77 123 45 67',
+	whatsAppNumber: '+221 77 234 56 78',
 	avatarUrl: 'https://storage.googleapis.com/banani-avatars/avatar%2Fmale%2F35-50%2FAfrican%2F2',
 	isVerified: true,
 	location: {

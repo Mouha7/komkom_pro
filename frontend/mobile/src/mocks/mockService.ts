@@ -28,6 +28,12 @@ import {
 	type StoreProfileModel,
 	type StoreProfileUpdatePayload,
 } from './profile';
+import {
+	EMPLOYEES,
+	type EmployeeModel,
+	type InviteEmployeePayload,
+	type UpdateEmployeeRolePayload,
+} from './employees';
 
 /**
  * Simulated network delay (ms)
@@ -46,6 +52,91 @@ const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout
 const clone = <T>(data: T): T => JSON.parse(JSON.stringify(data));
 
 let STORE_PROFILE: StoreProfileModel = clone(DEFAULT_STORE_PROFILE);
+let STORE_EMPLOYEES: EmployeeModel[] = clone(EMPLOYEES);
+
+const getStoreEmployees = (storeId: string): EmployeeModel[] =>
+	STORE_EMPLOYEES.filter((employee) => employee.storeId === storeId);
+
+const findActor = (
+	storeId: string,
+	actorUserId?: string,
+): EmployeeModel | null => {
+	if (!actorUserId) {
+		return null;
+	}
+
+	return (
+		getStoreEmployees(storeId).find((employee) => employee.userId === actorUserId) ??
+		null
+	);
+};
+
+const isStoreOwnerActor = (
+	storeId: string,
+	actorUserId?: string,
+): boolean => {
+	if (!actorUserId) {
+		return false;
+	}
+
+	if (STORE_PROFILE.id === storeId && STORE_PROFILE.userId === actorUserId) {
+		return true;
+	}
+
+	return Boolean(findActor(storeId, actorUserId)?.isOwner);
+};
+
+const assertCanInvite = (storeId: string, actorUserId?: string): void => {
+	if (!isStoreOwnerActor(storeId, actorUserId)) {
+		throw new Error('Seul le proprietaire peut inviter des employes.');
+	}
+};
+
+const assertCanChangeRole = (
+	storeId: string,
+	targetEmployee: EmployeeModel,
+	actorUserId?: string,
+): void => {
+	if (!isStoreOwnerActor(storeId, actorUserId)) {
+		throw new Error('Seul le proprietaire peut changer les roles.');
+	}
+
+	if (targetEmployee.isOwner) {
+		throw new Error('Le proprietaire ne peut pas changer son propre role.');
+	}
+
+	if (actorUserId && targetEmployee.userId === actorUserId) {
+		throw new Error('Le proprietaire ne peut pas changer son propre role.');
+	}
+};
+
+const assertCanRevoke = (
+	storeId: string,
+	targetEmployee: EmployeeModel,
+	actorUserId?: string,
+): void => {
+	const isOwnerActor = isStoreOwnerActor(storeId, actorUserId);
+	const actorEmployee = findActor(storeId, actorUserId);
+	const isManagerActor = !isOwnerActor && actorEmployee?.role === 'manager';
+
+	if (targetEmployee.isOwner) {
+		throw new Error('Le proprietaire ne peut pas etre revoque.');
+	}
+
+	if (actorUserId && targetEmployee.userId === actorUserId) {
+		throw new Error('Vous ne pouvez pas vous revoquer vous-meme.');
+	}
+
+	if (isOwnerActor) {
+		return;
+	}
+
+	if (isManagerActor && targetEmployee.role === 'seller') {
+		return;
+	}
+
+	throw new Error('Vous ne pouvez pas revoquer cet employe.');
+};
 
 // ============ API V1 ENDPOINTS ============
 
@@ -328,6 +419,107 @@ export const mockServiceApi = {
 		};
 
 		return clone(STORE_PROFILE);
+	},
+
+	/**
+	 * GET /api/v1/stores/:storeId/employees
+	 * Returns employees list for store
+	 */
+	async getEmployees(storeId: string): Promise<EmployeeModel[]> {
+		await sleep(NETWORK_DELAY_MS);
+		return clone(
+			STORE_EMPLOYEES.filter((employee) => employee.storeId === storeId),
+		);
+	},
+
+	/**
+	 * POST /api/v1/stores/:storeId/employees
+	 * Creates a pending employee invitation
+	 */
+	async inviteEmployee(
+		storeId: string,
+		payload: InviteEmployeePayload,
+		actorUserId?: string,
+	): Promise<EmployeeModel> {
+		await sleep(NETWORK_DELAY_MS);
+		assertCanInvite(storeId, actorUserId);
+
+		const nextEmployee: EmployeeModel = {
+			id: `emp-${Date.now()}`,
+			storeId,
+			fullName: payload.fullName,
+			email: payload.email,
+			phone: payload.phone,
+			role: payload.role,
+			status: 'pending',
+			createdAt: new Date().toISOString(),
+		};
+
+		STORE_EMPLOYEES = [nextEmployee, ...STORE_EMPLOYEES];
+		return clone(nextEmployee);
+	},
+
+	/**
+	 * PUT /api/v1/stores/:storeId/employees/:employeeId/role
+	 * Updates one employee role
+	 */
+	async updateEmployeeRole(
+		storeId: string,
+		employeeId: string,
+		payload: UpdateEmployeeRolePayload,
+		actorUserId?: string,
+	): Promise<EmployeeModel | null> {
+		await sleep(NETWORK_DELAY_MS);
+
+		const employeeIndex = STORE_EMPLOYEES.findIndex(
+			(employee) =>
+				employee.id === employeeId && employee.storeId === storeId,
+		);
+
+		if (employeeIndex === -1) {
+			return null;
+		}
+
+		const targetEmployee = STORE_EMPLOYEES[employeeIndex];
+		assertCanChangeRole(storeId, targetEmployee, actorUserId);
+
+		STORE_EMPLOYEES[employeeIndex] = {
+			...targetEmployee,
+			role: payload.role,
+			status: 'active',
+		};
+
+		return clone(STORE_EMPLOYEES[employeeIndex]);
+	},
+
+	/**
+	 * DELETE /api/v1/stores/:storeId/employees/:employeeId
+	 * Revokes employee access
+	 */
+	async revokeEmployeeAccess(
+		storeId: string,
+		employeeId: string,
+		actorUserId?: string,
+	): Promise<boolean> {
+		await sleep(NETWORK_DELAY_MS);
+
+		const targetEmployee = STORE_EMPLOYEES.find(
+			(employee) => employee.id === employeeId && employee.storeId === storeId,
+		);
+
+		if (!targetEmployee) {
+			return false;
+		}
+
+		assertCanRevoke(storeId, targetEmployee, actorUserId);
+
+		const previousLength = STORE_EMPLOYEES.length;
+		STORE_EMPLOYEES = STORE_EMPLOYEES.filter(
+			(employee) =>
+				!(employee.id === employeeId && employee.storeId === storeId),
+		);
+
+		return STORE_EMPLOYEES.length !== previousLength;
 	},
 };
 

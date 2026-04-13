@@ -62,6 +62,9 @@ export const CatalogFilterModal: React.FC<CatalogFilterModalProps> = ({
 			transparent
 			animationType="slide"
 			onRequestClose={onClose}
+			presentationStyle="overFullScreen"
+			statusBarTranslucent
+			navigationBarTranslucent
 		>
 			<Pressable style={styles.overlay} onPress={onClose}>
 				<Pressable

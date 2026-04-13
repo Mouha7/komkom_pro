@@ -174,6 +174,24 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 		void signOut();
 	};
 
+	const handleSettingsItemPress = (itemId: string): void => {
+		if (itemId === 'employees') {
+			rootNavigation?.navigate('EmployeeManagement');
+			return;
+		}
+
+		if (itemId === 'notifications') {
+			rootNavigation?.navigate('Notifications');
+			return;
+		}
+
+		showToast({
+			tone: 'info',
+			title: 'Bientot disponible',
+			message: 'Cette section sera activee dans une prochaine iteration.',
+		});
+	};
+
 	return (
 		<SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
 			<AppBar
@@ -234,7 +252,10 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 							isUpdatingLocation={isResolvingLocation}
 						/>
 
-						<ProfileSettingsCard items={settingsItems} />
+						<ProfileSettingsCard
+							items={settingsItems}
+							onItemPress={handleSettingsItemPress}
+						/>
 
 						<View style={styles.logoutWrap}>
 							<Button

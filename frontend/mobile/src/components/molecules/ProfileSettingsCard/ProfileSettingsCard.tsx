@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { Icon, Text } from '../../atoms';
 import { lightColors } from '../../../styles/colors';
@@ -8,6 +8,7 @@ import type { ProfileSettingsCardProps } from './ProfileSettingsCard.types';
 
 export const ProfileSettingsCard: React.FC<ProfileSettingsCardProps> = ({
 	items,
+	onItemPress,
 }) => {
 	return (
 		<View style={styles.sectionContainer}>
@@ -22,7 +23,17 @@ export const ProfileSettingsCard: React.FC<ProfileSettingsCardProps> = ({
 			<View style={styles.card}>
 				{items.map((item, index) => (
 					<View key={item.id}>
-						<View style={styles.itemRow}>
+						<Pressable
+							onPress={
+								onItemPress
+									? () => onItemPress(item.id)
+									: undefined
+							}
+							style={styles.itemRow}
+							disabled={!onItemPress}
+							accessibilityRole='button'
+							accessibilityLabel={item.title}
+						>
 							<View style={styles.itemIconWrap}>
 								<Icon
 									name={item.iconName}
@@ -42,7 +53,7 @@ export const ProfileSettingsCard: React.FC<ProfileSettingsCardProps> = ({
 								size={18}
 								color={lightColors.text.secondary as string}
 							/>
-						</View>
+						</Pressable>
 						{index < items.length - 1 ? <View style={styles.divider} /> : null}
 					</View>
 				))}

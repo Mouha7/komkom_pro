@@ -45,6 +45,9 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
 			transparent
 			animationType='slide'
 			onRequestClose={onClose}
+			presentationStyle='overFullScreen'
+			statusBarTranslucent
+			navigationBarTranslucent
 		>
 			<Pressable style={styles.overlay} onPress={onClose}>
 				<Pressable style={styles.modal} onPress={() => undefined}>

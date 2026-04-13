@@ -44,6 +44,8 @@ export type CommonIconName =
 	| 'download'
 	| 'printer'
 	| 'logOut'
+	| 'userX'
+	| 'userPlus'
 	;
 
 export type IconProps = {
