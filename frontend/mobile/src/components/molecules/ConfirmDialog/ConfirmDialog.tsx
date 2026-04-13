@@ -57,6 +57,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 						<Button
 							title={cancelLabel}
 							variant="secondary"
+							textStyle={styles.cancelLabel}
 							onPress={onCancel}
 							containerStyle={styles.actionButton}
 						/>

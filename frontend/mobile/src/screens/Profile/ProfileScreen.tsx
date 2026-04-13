@@ -207,6 +207,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 			/>
 			<ScrollView
 				style={styles.scrollView}
+				showsVerticalScrollIndicator={false}
 				contentContainerStyle={[
 					styles.contentContainer,
 					{ paddingHorizontal: horizontalPadding },
