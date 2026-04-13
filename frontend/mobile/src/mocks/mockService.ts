@@ -23,6 +23,11 @@ import {
 	type AuthDefaultsModel,
 } from './data';
 import { NOTIFICATIONS, type NotificationModel } from './notifications';
+import {
+	DEFAULT_STORE_PROFILE,
+	type StoreProfileModel,
+	type StoreProfileUpdatePayload,
+} from './profile';
 
 /**
  * Simulated network delay (ms)
@@ -39,6 +44,8 @@ const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout
  * Helper: Clone data to prevent mutations
  */
 const clone = <T>(data: T): T => JSON.parse(JSON.stringify(data));
+
+let STORE_PROFILE: StoreProfileModel = clone(DEFAULT_STORE_PROFILE);
 
 // ============ API V1 ENDPOINTS ============
 
@@ -283,6 +290,44 @@ export const mockServiceApi = {
 	async getAuthDefaults(): Promise<AuthDefaultsModel> {
 		await sleep(NETWORK_DELAY_MS);
 		return clone(AUTH_DEFAULTS);
+	},
+
+	/**
+	 * GET /api/v1/profile/:userId
+	 * Returns store profile by user ID
+	 */
+	async getStoreProfile(userId: string): Promise<StoreProfileModel | null> {
+		await sleep(NETWORK_DELAY_MS);
+		if (STORE_PROFILE.userId !== userId) {
+			return null;
+		}
+
+		return clone(STORE_PROFILE);
+	},
+
+	/**
+	 * PUT /api/v1/profile/:userId
+	 * Updates store profile in memory
+	 */
+	async updateStoreProfile(
+		userId: string,
+		payload: StoreProfileUpdatePayload,
+	): Promise<StoreProfileModel | null> {
+		await sleep(NETWORK_DELAY_MS);
+		if (STORE_PROFILE.userId !== userId) {
+			return null;
+		}
+
+		STORE_PROFILE = {
+			...STORE_PROFILE,
+			...payload,
+			location: {
+				...STORE_PROFILE.location,
+				...(payload.location ?? {}),
+			},
+		};
+
+		return clone(STORE_PROFILE);
 	},
 };
 

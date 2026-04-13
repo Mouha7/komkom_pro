@@ -43,6 +43,7 @@ export type CommonIconName =
 	| 'fileText'
 	| 'download'
 	| 'printer'
+	| 'logOut'
 	;
 
 export type IconProps = {

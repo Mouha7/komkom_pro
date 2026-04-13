@@ -65,6 +65,21 @@ export type { OrderSummaryCardProps } from './OrderSummaryCard';
 export { NotificationCard } from './NotificationCard';
 export type { NotificationCardProps } from './NotificationCard';
 
+export { ProfileHeader } from './ProfileHeader';
+export type { ProfileHeaderProps } from './ProfileHeader';
+
+export { ProfileBusinessCard } from './ProfileBusinessCard';
+export type { ProfileBusinessCardProps } from './ProfileBusinessCard';
+
+export { ProfileLocationCard } from './ProfileLocationCard';
+export type { ProfileLocationCardProps } from './ProfileLocationCard';
+
+export { ProfileSettingsCard } from './ProfileSettingsCard';
+export type { ProfileSettingsCardProps, ProfileSettingItem } from './ProfileSettingsCard';
+
+export { ProfileEditModal } from './ProfileEditModal';
+export type { ProfileEditModalProps, ProfileEditValues } from './ProfileEditModal';
+
 export {
 	OrderConfirmationHeaderIcon,
 	OrderConfirmationSummaryCard,

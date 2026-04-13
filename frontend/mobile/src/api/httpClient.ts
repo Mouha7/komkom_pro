@@ -158,6 +158,16 @@ const getMockResponse = async <T>(path: string): Promise<T> => {
 			return order as T;
 		}
 
+		// GET /api/v1/profile/:userId
+		const profileMatch = normalizedPath.match(/^api\/v1\/profile\/([^/]+)$/);
+		if (profileMatch) {
+			const profile = await mockServiceApi.getStoreProfile(profileMatch[1]);
+			if (!profile) {
+				throw new HttpError(404, `Profile not found: ${profileMatch[1]}`);
+			}
+			return profile as T;
+		}
+
 		// GET /api/v1/auth/defaults
 		if (normalizedPath === 'api/v1/auth/defaults') {
 			return (await mockServiceApi.getAuthDefaults()) as T;
