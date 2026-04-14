@@ -23,6 +23,7 @@ import { NotificationsScreen } from "../screens/Notifications/NotificationsScree
 import { EmployeeManagementScreen } from "../screens/Profile/EmployeeManagementScreen";
 import { useAuth } from "../hooks/useAuth";
 import { BottomTabNavigator } from "./BottomTabNavigator";
+import OrderTrackingScreen from "../screens/Orders/OrderTrackingScreen";
 
 export type RootStackParamList = {
 	Splash: undefined;
@@ -41,6 +42,9 @@ export type RootStackParamList = {
 		orderId: string;
 	};
 	OrderDetail: {
+		orderId: string;
+	};
+	OrderTracking: {
 		orderId: string;
 	};
 	OrderInvoice: {
@@ -101,6 +105,7 @@ export const AppNavigator: React.FC = () => {
 						<Stack.Screen name="Notifications" component={NotificationsScreen} />
 						<Stack.Screen name="OrderConfirmation" component={OrderConfirmationScreen} />
 						<Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
+						<Stack.Screen name="OrderTracking" component={OrderTrackingScreen} />
 						<Stack.Screen name="OrderInvoice" component={OrderInvoiceScreen} />
 						<Stack.Screen name="OrderInvoicePdfViewer" component={OrderInvoicePdfViewerScreen} />
 						<Stack.Screen name="EmployeeManagement" component={EmployeeManagementScreen} />

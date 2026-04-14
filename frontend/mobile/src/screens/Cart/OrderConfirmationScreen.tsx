@@ -13,7 +13,7 @@ import { useResponsive } from '../../hooks/useResponsive';
 import { clamp } from '../../styles/responsive';
 import { spacing } from '../../styles/spacing';
 import { formatPrice } from '../../utils/formatPrice';
-import { MOCK_ORDER_CONFIRMATION_DATA } from '../../components/molecules/OrderConfirmation/OrderConfirmation.constants';
+import { getOrderConfirmationDataById } from '../../mocks/orders';
 import type { OrderConfirmationSummaryItem } from '../../components/molecules/OrderConfirmation/OrderConfirmation.types';
 import { styles } from './OrderConfirmation/OrderConfirmationScreen.styles';
 import type { OrderConfirmationScreenProps } from './OrderConfirmation/OrderConfirmationScreen.types';
@@ -26,8 +26,7 @@ export const OrderConfirmationScreen: React.FC<OrderConfirmationScreenProps> = (
 	const { width, isMedium, isExpanded } = useResponsive();
 	const { orderId: paramOrderId } = route.params;
 
-	// Use mock data for now, will be replaced with API call later
-	const data = MOCK_ORDER_CONFIRMATION_DATA;
+	const data = getOrderConfirmationDataById(paramOrderId);
 
 	const summaryItems: OrderConfirmationSummaryItem[] = useMemo(
 		() => [
@@ -45,13 +44,11 @@ export const OrderConfirmationScreen: React.FC<OrderConfirmationScreenProps> = (
 				value: data.paymentMethod,
 			},
 		],
-		[]
+		[data.deliveryTime, data.address, data.addressSubtitle, data.paymentMethod]
 	);
 
 	const handleFollowOrder = (): void => {
-		// TODO: Navigate to OrderTracking screen when available
-		// For now, just log
-		console.log('Follow order:', paramOrderId);
+		navigation.navigate('OrderTracking', { orderId: paramOrderId });
 	};
 
 	const handleReturnHome = (): void => {

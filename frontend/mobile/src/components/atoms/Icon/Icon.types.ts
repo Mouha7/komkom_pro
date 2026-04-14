@@ -46,6 +46,7 @@ export type CommonIconName =
 	| 'logOut'
 	| 'userX'
 	| 'userPlus'
+	| 'checkCircle'
 	;
 
 export type IconProps = {

@@ -14,7 +14,6 @@ import {
 	EmptyState,
 	ErrorState,
 	Icon,
-	IconOnlyButton,
 	Text,
 	type OrderSummaryItem,
 } from '../../components';

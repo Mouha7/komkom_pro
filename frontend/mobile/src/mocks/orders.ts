@@ -35,6 +35,53 @@ export type OrderConfirmationDataMock = {
 	currency: string;
 };
 
+export type TrackingStepIconNameMock =
+	| 'clock'
+	| 'check'
+	| 'package'
+	| 'truck'
+	| 'mapPin';
+
+export type OrderTrackingStepMock = {
+	id: string;
+	label: string;
+	time: string;
+	description?: string;
+	iconName: TrackingStepIconNameMock;
+	isDone?: boolean;
+	isCurrent?: boolean;
+};
+
+export type OrderTrackingDriverMock = {
+	name: string;
+	vehicleLabel: string;
+	phoneNumber: string;
+	avatarUrl?: string;
+};
+
+export type OrderTrackingDataMock = {
+	orderId: string;
+	orderReference: string;
+	status: OrderStatusMock;
+	statusLabel: string;
+	createdAtLabel: string;
+	etaLabel: string;
+	destinationLabel: string;
+	destinationSubtitle?: string;
+	deliveryAddressTitle: string;
+	deliveryAddressText: string;
+	lastUpdatedLabel: string;
+	steps: OrderTrackingStepMock[];
+	driver?: OrderTrackingDriverMock;
+	itemsCount: number;
+	totalWeightLabel?: string;
+	invoiceActionLabel?: string;
+	subtotal: number;
+	deliveryFee: number;
+	total: number;
+	currency: string;
+};
+
 export type InvoiceSourceOrderMock = {
 	id: string;
 	reference: string;
@@ -213,7 +260,7 @@ export const FALLBACK_ORDER_ITEMS_BY_STATUS: Record<
 	cancelled: [{ name: 'Commande annulee', quantity: 1 }],
 };
 
-export const MOCK_ORDER_CONFIRMATION_DATA: OrderConfirmationDataMock = {
+const DEFAULT_ORDER_CONFIRMATION_DATA: OrderConfirmationDataMock = {
 	orderId: '#KK-84920',
 	status: 'secured',
 	deliveryTime: "Aujourd'hui, 14:00 - 16:00",
@@ -225,6 +272,227 @@ export const MOCK_ORDER_CONFIRMATION_DATA: OrderConfirmationDataMock = {
 	deliveryFee: 38_000,
 	total: 127_500,
 	currency: 'FCFA',
+};
+
+export const MOCK_ORDER_CONFIRMATION_DATA: OrderConfirmationDataMock = DEFAULT_ORDER_CONFIRMATION_DATA;
+
+const ORDER_CONFIRMATION_BY_ID: Record<string, OrderConfirmationDataMock> = {
+	'cmd-1029': {
+		...DEFAULT_ORDER_CONFIRMATION_DATA,
+		orderId: 'cmd-1029',
+		status: 'secured',
+		paymentMethod: 'Mobile Money (Wave) - Paye',
+		address: 'Quincaillerie ABC, Treichville',
+		addressSubtitle: "Boulevard Giscard d'Estaing",
+	},
+	'cmd-1030': {
+		...DEFAULT_ORDER_CONFIRMATION_DATA,
+		orderId: 'cmd-1030',
+		status: 'pending',
+		deliveryTime: 'Demain, 09:00 - 12:00',
+		address: 'Depot chantier Rivera 2',
+		addressSubtitle: 'Cocody, Abidjan',
+		paymentMethod: 'Mobile Money (Orange) - Paye',
+	},
+};
+
+const ORDER_TRACKING_BY_ID: Record<string, OrderTrackingDataMock> = {
+	'cmd-1029': {
+		orderId: 'cmd-1029',
+		orderReference: 'KK-84920',
+		status: 'confirmed',
+		statusLabel: 'En route',
+		createdAtLabel: 'Passee le 24 Oct, 08:30',
+		etaLabel: "Aujourd'hui, 14:00 - 16:00",
+		destinationLabel: 'Quincaillerie ABC, Treichville',
+		destinationSubtitle: "Boulevard Giscard d'Estaing, Abidjan",
+		deliveryAddressTitle: 'Quincaillerie La Cle',
+		deliveryAddressText: "Boulevard Giscard d'Estaing, Treichville, Abidjan",
+		lastUpdatedLabel: 'Mis a jour il y a 3 min',
+		steps: [
+			{
+				id: 'validated',
+				label: 'Commande validee',
+				time: '10:02',
+				description: 'Votre commande a ete enregistree.',
+				iconName: 'check',
+				isDone: true,
+			},
+			{
+				id: 'payment',
+				label: 'Paiement confirme',
+				time: '10:05',
+				description: 'Transaction validee avec succes.',
+				iconName: 'check',
+				isDone: true,
+			},
+			{
+				id: 'preparation',
+				label: 'Preparation en cours',
+				time: '10:40',
+				description: 'Les articles sont en cours de conditionnement.',
+				iconName: 'package',
+				isDone: true,
+			},
+			{
+				id: 'delivery',
+				label: 'En cours de livraison',
+				time: "Aujourd'hui, 13:45",
+				description: 'Le livreur quittera le depot sous peu.',
+				iconName: 'truck',
+				isCurrent: true,
+			},
+			{
+				id: 'arrived',
+				label: 'Livree',
+				time: 'Prevu a 14:30',
+				iconName: 'mapPin',
+			},
+		],
+		driver: {
+			name: 'Amadou Fall',
+			vehicleLabel: 'Camionnette DK-1234-A',
+			phoneNumber: '+225 01 23 45 67 89',
+			avatarUrl: 'https://storage.googleapis.com/banani-avatars/avatar%2Fmale%2F25-35%2FAfrican%2F1',
+		},
+		itemsCount: 7,
+		totalWeightLabel: 'Poids total: 150 kg',
+		invoiceActionLabel: 'Voir la facture detaillee',
+		subtotal: 92_500,
+		deliveryFee: 5_000,
+		total: 97_500,
+		currency: 'FCFA',
+	},
+	'cmd-1030': {
+		orderId: 'cmd-1030',
+		orderReference: 'KK-84921',
+		status: 'pending',
+		statusLabel: 'Preparation',
+		createdAtLabel: 'Passee le 23 Oct, 18:15',
+		etaLabel: 'Demain, 09:00 - 12:00',
+		destinationLabel: 'Depot chantier Rivera 2',
+		destinationSubtitle: 'Cocody, Abidjan',
+		deliveryAddressTitle: 'Depot chantier Rivera 2',
+		deliveryAddressText: 'Cocody, Abidjan, Cote d\'Ivoire',
+		lastUpdatedLabel: 'Mis a jour il y a 11 min',
+		steps: [
+			{
+				id: 'validated',
+				label: 'Commande validee',
+				time: 'Hier 18:15',
+				iconName: 'check',
+				isDone: true,
+			},
+			{
+				id: 'payment',
+				label: 'Paiement confirme',
+				time: 'Hier 18:18',
+				iconName: 'check',
+				isDone: true,
+			},
+			{
+				id: 'preparation',
+				label: 'Preparation en attente',
+				time: "Aujourd'hui 08:30",
+				description: 'Le magasin prepare la sortie du stock.',
+				iconName: 'package',
+				isCurrent: true,
+			},
+			{
+				id: 'delivery',
+				label: 'En cours de livraison',
+				time: 'A venir',
+				iconName: 'truck',
+			},
+			{
+				id: 'arrived',
+				label: 'Livree',
+				time: 'A venir',
+				iconName: 'mapPin',
+			},
+		],
+		driver: {
+			name: 'Kone Yacouba',
+			vehicleLabel: 'Camionnette CI-5088-TB',
+			phoneNumber: '+225 05 11 22 33 44',
+		},
+		itemsCount: 10,
+		totalWeightLabel: 'Poids total: 320 kg',
+		invoiceActionLabel: 'Voir la facture detaillee',
+		subtotal: 35_000,
+		deliveryFee: 7_000,
+		total: 42_000,
+		currency: 'FCFA',
+	},
+};
+
+const buildFallbackTrackingData = (orderId: string): OrderTrackingDataMock => {
+	const detail = getOrderDetailById(orderId);
+	const subtotal = detail.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+	const itemsCount = detail.items.reduce((sum, item) => sum + item.quantity, 0);
+
+	return {
+		orderId,
+		orderReference: orderId.toUpperCase(),
+		status: 'pending',
+		statusLabel: 'En traitement',
+		createdAtLabel: 'Passee recemment',
+		etaLabel: 'Livraison en cours de planification',
+		destinationLabel: detail.deliveryAddress,
+		destinationSubtitle: detail.contactName,
+		deliveryAddressTitle: detail.contactName,
+		deliveryAddressText: detail.deliveryAddress,
+		lastUpdatedLabel: 'Mis a jour a l\'instant',
+		steps: [
+			{
+				id: 'validated',
+				label: 'Commande validee',
+				time: 'Confirmee',
+				iconName: 'check',
+				isDone: true,
+			},
+			{
+				id: 'preparation',
+				label: 'Preparation en cours',
+				time: 'En traitement',
+				iconName: 'package',
+				isCurrent: true,
+			},
+			{
+				id: 'delivery',
+				label: 'En cours de livraison',
+				time: 'A venir',
+				iconName: 'truck',
+			},
+		],
+		driver: {
+			name: detail.contactName,
+			vehicleLabel: 'Livreur assigne prochainement',
+			phoneNumber: detail.contactPhone,
+		},
+		itemsCount,
+		totalWeightLabel: 'Poids total: indisponible',
+		invoiceActionLabel: 'Voir la facture detaillee',
+		subtotal,
+		deliveryFee: detail.deliveryFee,
+		total: subtotal + detail.deliveryFee,
+		currency: 'FCFA',
+	};
+};
+
+export const getOrderConfirmationDataById = (orderId: string): OrderConfirmationDataMock => {
+	if (ORDER_CONFIRMATION_BY_ID[orderId]) {
+		return ORDER_CONFIRMATION_BY_ID[orderId];
+	}
+
+	return {
+		...DEFAULT_ORDER_CONFIRMATION_DATA,
+		orderId,
+	};
+};
+
+export const getOrderTrackingDataById = (orderId: string): OrderTrackingDataMock => {
+	return ORDER_TRACKING_BY_ID[orderId] ?? buildFallbackTrackingData(orderId);
 };
 
 export const getOrderDetailById = (orderId: string): OrderDetailMetaMock =>

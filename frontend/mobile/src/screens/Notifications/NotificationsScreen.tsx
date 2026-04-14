@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
 		backgroundColor: withOpacity(lightColors.primary as string, 0.08),
 	},
 	markAllText: {
-		fontWeight: '600',
+		fontWeight: '700',
 	},
 });
 

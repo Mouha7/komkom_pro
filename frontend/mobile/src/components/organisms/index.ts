@@ -15,3 +15,9 @@ export type { ProductDetailProps, ProductDetailData, ProductDetailAddToCartPaylo
 
 export { NotificationsList } from './NotificationsList';
 export type { NotificationsListProps } from './NotificationsList';
+
+export { OrderTrackingTimeline } from './OrderTrackingTimeline';
+export type {
+	OrderTrackingTimelineProps,
+	OrderTrackingStepItem,
+} from './OrderTrackingTimeline';

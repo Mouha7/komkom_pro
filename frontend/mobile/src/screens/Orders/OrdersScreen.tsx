@@ -55,14 +55,7 @@ export const OrdersScreen: React.FC<OrdersScreenProps> = ({ navigation }) => {
 							navigation.navigate('OrderDetail', { orderId });
 						}}
 						onFollowOrder={(orderId) => {
-							showToast({
-								tone: 'info',
-								title: 'Suivi commande',
-								message: `Suivi de la commande ${orderId}`,
-								actionLabel: 'Voir',
-								actionLabelA11y: 'Voir le suivi',
-								onActionPress: () => navigation.navigate('Cart'),
-							});
+							navigation.navigate('OrderTracking', { orderId });
 						}}
 						onRecommend={(orderId) => {
 							showToast({

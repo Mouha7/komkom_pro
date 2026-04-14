@@ -48,6 +48,7 @@ import {
 	LogOut,
 	UserX,
 	UserPlus,
+	CheckCircle,
 } from 'lucide-react-native';
 
 import type { CommonIconName, IconProps } from './Icon.types';
@@ -100,6 +101,7 @@ const ICON_MAP: Record<CommonIconName, LucideIcon> = {
 	logOut: LogOut,
 	userX: UserX,
 	userPlus: UserPlus,
+	checkCircle: CheckCircle,
 };
 
 export const Icon: React.FC<IconProps> = ({
