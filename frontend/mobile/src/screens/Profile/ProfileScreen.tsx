@@ -185,6 +185,11 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 			return;
 		}
 
+		if (itemId === 'support') {
+			rootNavigation?.navigate('CustomerSupport');
+			return;
+		}
+
 		showToast({
 			tone: 'info',
 			title: 'Bientot disponible',

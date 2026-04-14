@@ -7,6 +7,7 @@ import {
 	Hammer,
 	Minus,
 	Package,
+	PackageOpen,
 	Plus,
 	Search,
 	Settings,
@@ -27,6 +28,7 @@ import {
 	Zap,
 	Phone,
 	Mail,
+	MessageCircle,
 	MapPin,
 	ChevronUp,
 	Bell,
@@ -43,12 +45,14 @@ import {
 	Smartphone,
 	Headphones,
 	FileText,
+	ReceiptText,
 	Download,
 	Printer,
 	LogOut,
 	UserX,
 	UserPlus,
 	CheckCircle,
+	Undo2,
 } from 'lucide-react-native';
 
 import type { CommonIconName, IconProps } from './Icon.types';
@@ -57,6 +61,7 @@ const ICON_MAP: Record<CommonIconName, LucideIcon> = {
 	home: House,
 	cart: ShoppingCart,
 	package: Package,
+	packageOpen: PackageOpen,
 	user: User,
 	settings: Settings,
 	search: Search,
@@ -81,6 +86,7 @@ const ICON_MAP: Record<CommonIconName, LucideIcon> = {
 	zap: Zap,
 	phone: Phone,
 	mail: Mail,
+	messageCircle: MessageCircle,
 	mapPin: MapPin,
 	chevronUp: ChevronUp,
 	chevronDown: ChevronDown,
@@ -96,12 +102,14 @@ const ICON_MAP: Record<CommonIconName, LucideIcon> = {
 	smartphone: Smartphone,
 	headphones: Headphones,
 	fileText: FileText,
+	receipt: ReceiptText,
 	download: Download,
 	printer: Printer,
 	logOut: LogOut,
 	userX: UserX,
 	userPlus: UserPlus,
 	checkCircle: CheckCircle,
+	undo2: Undo2,
 };
 
 export const Icon: React.FC<IconProps> = ({

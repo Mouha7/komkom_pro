@@ -24,6 +24,7 @@ import { EmployeeManagementScreen } from "../screens/Profile/EmployeeManagementS
 import { useAuth } from "../hooks/useAuth";
 import { BottomTabNavigator } from "./BottomTabNavigator";
 import OrderTrackingScreen from "../screens/Orders/OrderTrackingScreen";
+import CustomerSupportScreen from "../screens/Support/CustomerSupportScreen";
 
 export type RootStackParamList = {
 	Splash: undefined;
@@ -53,6 +54,11 @@ export type RootStackParamList = {
 	OrderInvoicePdfViewer: {
 		orderId: string;
 	};
+	CustomerSupport:
+		| {
+				orderId?: string;
+		  }
+		| undefined;
 	EmployeeManagement: undefined;
 	UIStateLibrary: undefined;
 };
@@ -108,6 +114,7 @@ export const AppNavigator: React.FC = () => {
 						<Stack.Screen name="OrderTracking" component={OrderTrackingScreen} />
 						<Stack.Screen name="OrderInvoice" component={OrderInvoiceScreen} />
 						<Stack.Screen name="OrderInvoicePdfViewer" component={OrderInvoicePdfViewerScreen} />
+						<Stack.Screen name="CustomerSupport" component={CustomerSupportScreen} />
 						<Stack.Screen name="EmployeeManagement" component={EmployeeManagementScreen} />
 					</>
 				)}

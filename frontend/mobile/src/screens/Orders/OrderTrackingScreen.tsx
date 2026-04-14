@@ -160,11 +160,7 @@ export const OrderTrackingScreen: React.FC<OrderTrackingScreenProps> = ({
 
 			<OrderTrackingActionBar
 				onPressSupport={() => {
-					showToast({
-						tone: 'info',
-						title: 'Support commande',
-						message: 'Un conseiller va vous contacter rapidement.',
-					});
+					navigation.navigate('CustomerSupport', { orderId });
 				}}
 				onPressConfirmReception={() => {
 					showToast({

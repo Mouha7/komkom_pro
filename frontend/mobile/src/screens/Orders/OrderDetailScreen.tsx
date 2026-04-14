@@ -22,7 +22,6 @@ import {
 } from "../../components";
 import { getOrderById } from "../../api/orders";
 import { useResponsive } from "../../hooks/useResponsive";
-import { useToast } from "../../hooks/useToast";
 import type { OrderSummaryItem } from "../../components";
 import {
 	FALLBACK_ORDER_DETAILS,
@@ -112,7 +111,6 @@ export const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({
 	navigation,
 	route,
 }) => {
-	const { showToast } = useToast();
 	const { height, isExpanded } = useResponsive();
 	const insets = useSafeAreaInsets();
 	const [selectedOrder, setSelectedOrder] = useState<OrderSummaryItem | null>(
@@ -201,11 +199,7 @@ export const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({
 	};
 
 	const handleSupportPress = (): void => {
-		showToast({
-			tone: "info",
-			title: "Support commande",
-			message: `Assistance pour ${selectedOrder?.reference ?? "la commande"}`,
-		});
+		navigation.navigate("CustomerSupport", { orderId });
 	};
 
 	const handleInvoicePress = (): void => {

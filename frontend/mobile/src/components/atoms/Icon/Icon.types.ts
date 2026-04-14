@@ -2,6 +2,7 @@ export type CommonIconName =
 	| 'home'
 	| 'cart'
 	| 'package'
+	| 'packageOpen'
 	| 'user'
 	| 'settings'
 	| 'search'
@@ -26,6 +27,7 @@ export type CommonIconName =
 	| 'zap'
 	| 'phone'
 	| 'mail'
+	| 'messageCircle'
 	| 'mapPin'
 	| 'chevronUp'
 	| 'chevronDown'
@@ -41,12 +43,14 @@ export type CommonIconName =
 	| 'smartphone'
 	| 'headphones'
 	| 'fileText'
+	| 'receipt'
 	| 'download'
 	| 'printer'
 	| 'logOut'
 	| 'userX'
 	| 'userPlus'
 	| 'checkCircle'
+	| 'undo2'
 	;
 
 export type IconProps = {
