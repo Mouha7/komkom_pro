@@ -19,11 +19,16 @@ import {
 	useScrollToTopButton,
 } from "../../components";
 import { useAuth } from "../../hooks/useAuth";
+import { useCart } from "../../hooks/useCart";
+import { useNotifications } from "../../hooks/useNotifications";
+import { useResponsive } from "../../hooks/useResponsive";
 import { useToast } from "../../hooks/useToast";
 import { styles } from "./HomeScreen.styles";
 import type { MainTabParamList } from "../../navigation/BottomTabNavigator";
 import type { RootStackParamList } from "../../navigation/AppNavigator";
 import { listHomeCategories, listHomePromos, listProducts } from "../../api/products";
+import { clamp } from "../../styles/responsive";
+import { spacing } from "../../styles/spacing";
 import {
 	HomeCategoriesSection,
 	HomeProductsSection,
@@ -83,12 +88,26 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 	const isLoadMoreLockedRef = useRef(false);
 
 	const { roles, user } = useAuth();
+	const { width, isMedium, isExpanded } = useResponsive();
+	const { addItem, removeItem, totalItemsCount } = useCart();
+	const { unreadCount } = useNotifications();
 	const { showToast } = useToast();
 	const isEmployee = roles.includes("employee");
 	const userName = getDisplayNameFromEmail(user?.email);
 	const storeName = isEmployee
 		? "Magasin Partenaire KomKom"
 		: "Quincaillerie Centrale";
+
+	const contentContainerStyle = useMemo(
+		() => [
+			styles.contentContainer,
+			{
+				paddingHorizontal: isExpanded ? clamp(width * 0.08, spacing.s4, spacing.s8) : isMedium ? spacing.s5 : spacing.s3,
+				paddingTop: isExpanded ? spacing.s5 : spacing.s4,
+			},
+		],
+		[isExpanded, isMedium, width],
+	);
 
 	const loadHomeData = useCallback(async (): Promise<void> => {
 		setIsLoadingInitial(true);
@@ -226,42 +245,37 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 		navigation.navigate("ProductDetail", { productId });
 	};
 
-	const handleAddToCart = (_productId: string): void => {
-		showToast({
-			tone: "success",
-			title: "Produit ajoute",
-			message: "Article ajoute au panier",
-			actionLabel: "Voir",
-			actionLabelA11y: "Voir le panier",
-			onActionPress: () => navigation.navigate("Cart"),
-		});
-		return;
-	};
-
-	const handleCartToggle = (
-		_productId: string,
-		isSelected: boolean,
-		productName: string,
-	): void => {
-		if (isSelected) {
+	const handleAddToCart = (productId: string): void => {
+		void addItem(productId, 1).then(() => {
 			showToast({
 				tone: "success",
 				title: "Produit ajoute",
-				message: `${productName} a ete ajoute au panier`,
+				message: "Article ajoute au panier",
 				actionLabel: "Voir",
 				actionLabelA11y: "Voir le panier",
 				onActionPress: () => navigation.navigate("Cart"),
 			});
+		});
+	};
+
+	const handleCartToggle = (
+		productId: string,
+		isSelected: boolean,
+		productName: string,
+	): void => {
+		if (isSelected) {
 			return;
 		}
 
-		showToast({
-			tone: "info",
-			title: "Produit retire",
-			message: `${productName} a ete retire du panier`,
-			actionLabel: "Voir",
-			actionLabelA11y: "Voir le panier",
-			onActionPress: () => navigation.navigate("Cart"),
+		void removeItem(productId).then(() => {
+			showToast({
+				tone: "info",
+				title: "Produit retire",
+				message: `${productName} a ete retire du panier`,
+				actionLabel: "Voir",
+				actionLabelA11y: "Voir le panier",
+				onActionPress: () => navigation.navigate("Cart"),
+			});
 		});
 	};
 
@@ -289,17 +303,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 			<HomeAppBar
 				userName={userName}
 				storeName={storeName}
-				notificationCount={2}
-				cartCount={5}
+				notificationCount={unreadCount}
+				cartCount={totalItemsCount}
 				onPressProfile={() => navigation.navigate("Profile")}
-				onPressNotifications={() => navigation.navigate("Orders")}
+				onPressNotifications={() => navigation.navigate("Notifications")}
 				onPressCart={() => navigation.navigate("Cart")}
 			/>
 
 			<ScrollView
 				ref={scrollViewRef}
 				style={styles.scrollView}
-				contentContainerStyle={styles.contentContainer}
+				contentContainerStyle={contentContainerStyle}
 				onScroll={handleScroll}
 				scrollEventThrottle={16}
 				showsVerticalScrollIndicator={false}
@@ -327,7 +341,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 				<View style={[styles.section, styles.productsSection]}>
 					{apiError ? (
 						<ErrorState
-							title='Accueil indisponible'
+							title='Impossible de charger les produits'
 							description={apiError}
 							actionLabel={isReloading ? 'Rechargement...' : 'Reessayer'}
 							onActionPress={handleRetryHomeData}

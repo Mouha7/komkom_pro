@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { ScrollView, View } from 'react-native';
+import type { LayoutChangeEvent } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { Button, CartAppBar, ErrorState, Icon, Input, ScrollToTopButton, Text } from '../../components';
+import { Button, CartAppBar, ErrorState, Icon, Input, OrderSummaryCard, ScrollToTopButton, Text } from '../../components';
 import { useScrollToTopButton } from '../../components/molecules/';
 import { LocationPickerModal, useLocationPicker } from '../../features/location';
 import { useCart } from '../../hooks/useCart';
@@ -17,7 +18,6 @@ import { computeCheckoutTotals } from './Checkout/CheckoutScreen.helpers';
 import { styles } from './Checkout/CheckoutScreen.styles';
 import { CheckoutDeliverySection } from './Checkout/CheckoutDeliverySection';
 import { CheckoutPaymentSection } from './Checkout/CheckoutPaymentSection';
-import { CheckoutSummarySection } from './Checkout/CheckoutSummarySection';
 import type { CheckoutPaymentMethod } from './Checkout/CheckoutScreen.types';
 
 type CheckoutScreenProps = NativeStackScreenProps<RootStackParamList, 'Checkout'>;
@@ -31,6 +31,7 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({ navigation }) =>
 	const [selectedPaymentMethod, setSelectedPaymentMethod] =
 		useState<CheckoutPaymentMethod>('cash_on_delivery');
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [bottomBarHeight, setBottomBarHeight] = useState(0);
 
 	const {
 		pickedLocation,
@@ -58,9 +59,18 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({ navigation }) =>
 
 	const totals = useMemo(() => computeCheckoutTotals(items), [items]);
 	const bottomInsetPadding = Math.max(insets.bottom, spacing.s2);
+	const deliverySummaryText = totals.deliveryFee > 0 ? formatPrice(totals.deliveryFee) : 'A calculer';
 
 	const { scrollViewRef, isScrollTopVisible, handleScroll, handleScrollToTop } =
 		useScrollToTopButton({ visibilityThreshold: 180 });
+
+	const handleBottomBarLayout = (event: LayoutChangeEvent): void => {
+		const nextHeight = Math.round(event.nativeEvent.layout.height);
+
+		setBottomBarHeight((currentHeight) =>
+			currentHeight === nextHeight ? currentHeight : nextHeight,
+		);
+	};
 
 	const handleConfirmOrder = (): void => {
 		if (!hasPickedLocation) {
@@ -82,7 +92,8 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({ navigation }) =>
 
 		setTimeout(() => {
 			setIsSubmitting(false);
-			navigation.navigate('Cart');
+			// Mock order ID for now
+			navigation.navigate('OrderConfirmation', { orderId: 'KK-84920' });
 		}, 400);
 	};
 
@@ -99,7 +110,6 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({ navigation }) =>
 				style={styles.scrollView}
 				contentContainerStyle={[
 					styles.contentContainer,
-					{ paddingBottom: 132 + bottomInsetPadding },
 				]}
 				onScroll={handleScroll}
 				scrollEventThrottle={16}
@@ -148,12 +158,31 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({ navigation }) =>
 							</View>
 						</View>
 
-						<CheckoutSummarySection totals={totals} />
+						<View style={styles.section}>
+							<Text
+								variant='overline'
+								textColorOverride={lightColors.text.secondary}
+								style={styles.sectionTitle}
+							>
+								4. Recapitulatif
+							</Text>
+							<OrderSummaryCard
+								totalItems={totals.totalItems}
+								subtotalText={formatPrice(totals.subtotal)}
+								deliveryText={deliverySummaryText}
+								totalText={formatPrice(totals.total)}
+								deliveryLabel='Frais de livraison'
+								totalLabel='Total a payer'
+							/>
+						</View>
 					</>
 				)}
 			</ScrollView>
 
-			<View style={[styles.bottomBar, { paddingBottom: bottomInsetPadding }]}> 
+			<View
+				onLayout={handleBottomBarLayout}
+				style={[styles.bottomBar, { paddingBottom: bottomInsetPadding }]}
+			>
 				<Button
 					title=''
 					onPress={handleConfirmOrder}
@@ -178,16 +207,16 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({ navigation }) =>
 					textColorOverride={lightColors.text.secondary}
 					style={styles.idempotenceNote}
 				>
-					Paiement securise. Ne cliquez qu'une seule fois.
+					🔒 Paiement securise. Ne cliquez qu'une seule fois.
 				</Text>
 			</View>
 
-			<ScrollToTopButton
+			{/* <ScrollToTopButton
 				visible={isScrollTopVisible}
 				onPress={handleScrollToTop}
-				bottomOffset={132}
+				bottomOffset={bottomBarHeight}
 				accessibilityLabel='Retour en haut du checkout'
-			/>
+			/> */}
 
 			<LocationPickerModal
 				visible={isLocationModalVisible}

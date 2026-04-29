@@ -1,5 +1,5 @@
 import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, type NavigatorScreenParams } from "@react-navigation/native";
 import {
 	createNativeStackNavigator,
 	type NativeStackNavigationOptions,
@@ -14,8 +14,17 @@ import { PrivacyPolicyScreen } from "../screens/Legal/PrivacyPolicyScreen";
 import { ProductDetailScreen } from "../screens/Catalog/ProductDetailScreen";
 import { CartScreen } from "../screens/Cart/CartScreen";
 import { CheckoutScreen } from "../screens/Cart/CheckoutScreen";
+import { OrderConfirmationScreen } from "../screens/Cart/OrderConfirmation";
+import type { MainTabParamList } from "./BottomTabNavigator";
+import { OrderDetailScreen } from "../screens/Orders/OrderDetailScreen";
+import { OrderInvoiceScreen } from "../screens/Orders/OrderInvoiceScreen";
+import { OrderInvoicePdfViewerScreen } from "../screens/Orders/OrderInvoicePdfViewerScreen";
+import { NotificationsScreen } from "../screens/Notifications/NotificationsScreen";
+import { EmployeeManagementScreen } from "../screens/Profile/EmployeeManagementScreen";
 import { useAuth } from "../hooks/useAuth";
 import { BottomTabNavigator } from "./BottomTabNavigator";
+import OrderTrackingScreen from "../screens/Orders/OrderTrackingScreen";
+import CustomerSupportScreen from "../screens/Support/CustomerSupportScreen";
 
 export type RootStackParamList = {
 	Splash: undefined;
@@ -23,12 +32,34 @@ export type RootStackParamList = {
 	Signup: undefined;
 	TermsOfUse: undefined;
 	PrivacyPolicy: undefined;
-	MainTabs: undefined;
+	MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
 	ProductDetail: {
 		productId: string;
 	};
 	Cart: undefined;
 	Checkout: undefined;
+	Notifications: undefined;
+	OrderConfirmation: {
+		orderId: string;
+	};
+	OrderDetail: {
+		orderId: string;
+	};
+	OrderTracking: {
+		orderId: string;
+	};
+	OrderInvoice: {
+		orderId: string;
+	};
+	OrderInvoicePdfViewer: {
+		orderId: string;
+	};
+	CustomerSupport:
+		| {
+				orderId?: string;
+		  }
+		| undefined;
+	EmployeeManagement: undefined;
 	UIStateLibrary: undefined;
 };
 
@@ -77,6 +108,14 @@ export const AppNavigator: React.FC = () => {
 						<Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
 						<Stack.Screen name="Cart" component={CartScreen} />
 						<Stack.Screen name="Checkout" component={CheckoutScreen} />
+						<Stack.Screen name="Notifications" component={NotificationsScreen} />
+						<Stack.Screen name="OrderConfirmation" component={OrderConfirmationScreen} />
+						<Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
+						<Stack.Screen name="OrderTracking" component={OrderTrackingScreen} />
+						<Stack.Screen name="OrderInvoice" component={OrderInvoiceScreen} />
+						<Stack.Screen name="OrderInvoicePdfViewer" component={OrderInvoicePdfViewerScreen} />
+						<Stack.Screen name="CustomerSupport" component={CustomerSupportScreen} />
+						<Stack.Screen name="EmployeeManagement" component={EmployeeManagementScreen} />
 					</>
 				)}
 				<Stack.Screen

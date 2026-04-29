@@ -3,10 +3,12 @@ import { View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
 import { Button, Icon, Input, Text } from '../../../components';
+import { useResponsive } from '../../../hooks/useResponsive';
 import { CHECKOUT_DEFAULT_REGION } from './CheckoutScreen.constants';
 import { styles } from './CheckoutScreen.styles';
 import type { CheckoutDeliverySectionProps } from './CheckoutScreen.types';
 import { lightColors } from '../../../styles/colors';
+import { clamp } from '../../../styles/responsive';
 
 export const CheckoutDeliverySection: React.FC<CheckoutDeliverySectionProps> = ({
 	pickedLocation,
@@ -16,6 +18,9 @@ export const CheckoutDeliverySection: React.FC<CheckoutDeliverySectionProps> = (
 	onStoreOrBuildingNameChange,
 	onOpenLocationModal,
 }) => {
+	const { height, isExpanded } = useResponsive();
+	const mapHeight = isExpanded ? clamp(height * 0.2, 180, 260) : clamp(height * 0.2, 160, 220);
+
 	const mapRegion = pickedLocation
 		? {
 				latitude: pickedLocation.latitude,
@@ -35,7 +40,7 @@ export const CheckoutDeliverySection: React.FC<CheckoutDeliverySectionProps> = (
 				1. Adresse de livraison
 			</Text>
 			<View style={styles.card}>
-				<View style={styles.mapPreviewContainer}>
+				<View style={[styles.mapPreviewContainer, { height: mapHeight }]}>
 					<MapView style={styles.mapPreview} region={mapRegion} pointerEvents='none'>
 						<Marker
 							coordinate={

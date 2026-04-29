@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Image, Pressable, View } from "react-native";
 
 import { Button, Icon, StatusBadge, Text } from "../../atoms";
+import { useResponsive } from "../../../hooks/useResponsive";
 import { lightColors } from "../../../styles/colors";
 import { styles } from "./ProductCard.styles";
 import { ProductCardSkeleton } from "./ProductCardSkeleton";
@@ -29,6 +30,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 	testID,
 	containerStyle,
 }) => {
+	const { isMedium: isRegularScreen, isExpanded: isLargeScreen } = useResponsive();
+	const actionIconSize = isLargeScreen ? 28 : isRegularScreen ? 26 : 24;
+
 	if (loading) {
 		return (
 			<ProductCardSkeleton
@@ -87,32 +91,57 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 							source={{
 								uri: imageUrl || "https://via.placeholder.com/300x300?text=Produit",
 							}}
-							style={styles.landscapeImage}
+							style={[
+								styles.landscapeImage,
+								isRegularScreen && styles.landscapeImageRegular,
+								isLargeScreen && styles.landscapeImageLarge,
+							]}
 							resizeMode="cover"
 						/>
-						<View style={styles.landscapeImageBadge}>
+						<View
+							style={[
+								styles.landscapeImageBadge,
+								isLargeScreen && styles.landscapeImageBadgeLarge,
+							]}
+						>
 							<StatusBadge stockStatus={stockStatus} compact solid />
 						</View>
 					</View>
 
-					<View style={styles.landscapeContent}>
-						<View style={styles.landscapeHeader}>
-							<Text variant="h3" maxLines={2}>
+					<View
+						style={[
+							styles.landscapeContent,
+							isRegularScreen && styles.landscapeContentRegular,
+							isLargeScreen && styles.landscapeContentLarge,
+						]}
+					>
+						<View
+							style={[
+								styles.landscapeHeader,
+								isRegularScreen && styles.landscapeHeaderRegular,
+							]}
+						>
+							<Text variant="h3" style={{ fontWeight: isLargeScreen ? '700' : isRegularScreen ? '600' : '500' }} maxLines={2} ellipsizeMode="tail">
 								{name}
 							</Text>
 							{description ? (
-								<Text variant="body" color="secondary" maxLines={1}>
+								<Text variant="body" color="secondary" maxLines={1} ellipsizeMode="tail">
 									{description}
 								</Text>
 							) : null}
 						</View>
 
-						<View style={styles.landscapeBottom}>
+						<View
+							style={[
+								styles.landscapeBottom,
+								isLargeScreen && styles.landscapeBottomLarge,
+							]}
+						>
 							<View style={styles.landscapePriceWrap}>
-								<Text variant="h2" style={styles.priceAmount}>
+								<Text variant="h2" style={styles.priceAmount} maxLines={1} ellipsizeMode="tail">
 									{formatAmount(price)}
 								</Text>
-								<Text variant="small" style={styles.priceCurrency}>
+								<Text variant="small" style={styles.priceCurrency} maxLines={1} ellipsizeMode="tail">
 									{currency}
 								</Text>
 							</View>
@@ -122,7 +151,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 								leftIcon={
 									<Icon
 										name={isAddedToCart ? "check" : "plus"}
-										size={24}
+										size={actionIconSize}
 										color={lightColors.text.onPrimary}
 										accessibilityLabel={isAddedToCart ? "check" : "plus"}
 									/>
@@ -138,7 +167,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 								}
 								containerStyle={[
 									styles.actionButtonBase,
+									isRegularScreen && styles.actionButtonBaseRegular,
+									isLargeScreen && styles.actionButtonBaseLarge,
 									styles.landscapeActionButton,
+									isRegularScreen && styles.landscapeActionButtonRegular,
+									isLargeScreen && styles.landscapeActionButtonLarge,
+									styles.actionButtonAlignEnd,
 									isAddedToCart && styles.actionButtonSuccess,
 									isCartActionDisabled && styles.actionButtonDisabled,
 								]}
@@ -167,17 +201,32 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 						source={{
 							uri: imageUrl || "https://via.placeholder.com/300x200?text=Produit",
 						}}
-						style={styles.portraitImage}
+						style={[
+							styles.portraitImage,
+							isRegularScreen && styles.portraitImageRegular,
+							isLargeScreen && styles.portraitImageLarge,
+						]}
 						resizeMode="cover"
 					/>
 				</View>
-				<View style={styles.portraitTouchable}>
-					<View style={styles.portraitContent}>
-						<Text variant="h3" maxLines={2}>
+				<View
+					style={[
+						styles.portraitTouchable,
+						isRegularScreen && styles.portraitTouchableRegular,
+						isLargeScreen && styles.portraitTouchableLarge,
+					]}
+				>
+					<View
+						style={[
+							styles.portraitContent,
+							isRegularScreen && styles.portraitContentRegular,
+						]}
+					>
+						<Text variant="h3" style={{ fontWeight: isLargeScreen ? '700' : isRegularScreen ? '600' : '500' }} maxLines={2} ellipsizeMode="tail">
 							{name}
 						</Text>
 						{description ? (
-							<Text variant="body" color="secondary" maxLines={1}>
+							<Text variant="body" color="secondary" maxLines={1} ellipsizeMode="tail">
 								{description}
 							</Text>
 						) : null}
@@ -185,10 +234,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
 					<View style={styles.portraitPriceRow}>
 						<View style={styles.portraitPriceWrap}>
-							<Text variant="h2" style={styles.priceAmount}>
+							<Text variant="h2" style={styles.priceAmount} maxLines={1} ellipsizeMode="tail">
 								{formatAmount(price)}
 							</Text>
-							<Text variant="small" style={styles.priceCurrency}>
+							<Text variant="small" style={styles.priceCurrency} maxLines={1} ellipsizeMode="tail">
 								{currency}
 							</Text>
 						</View>
@@ -198,7 +247,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 							leftIcon={
 								<Icon
 									name={isAddedToCart ? "check" : "plus"}
-									size={24}
+									size={actionIconSize}
 									color={lightColors.text.onPrimary}
 									accessibilityLabel={isAddedToCart ? "check" : "plus"}
 								/>
@@ -214,7 +263,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 							}
 							containerStyle={[
 								styles.actionButtonBase,
+								isRegularScreen && styles.actionButtonBaseRegular,
+								isLargeScreen && styles.actionButtonBaseLarge,
 								styles.portraitActionButton,
+								isRegularScreen && styles.portraitActionButtonRegular,
+								isLargeScreen && styles.portraitActionButtonLarge,
+								styles.actionButtonAlignEnd,
 								isAddedToCart && styles.actionButtonSuccess,
 								isCartActionDisabled && styles.actionButtonDisabled,
 							]}

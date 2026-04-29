@@ -21,6 +21,7 @@ export const QuantityButton: React.FC<QuantityButtonProps> = ({
 		<Pressable
 			onPress={onPress}
 			disabled={disabled}
+			hitSlop={8}
 			style={({ pressed }) => [
 				styles.button,
 				pressed && styles.pressed,

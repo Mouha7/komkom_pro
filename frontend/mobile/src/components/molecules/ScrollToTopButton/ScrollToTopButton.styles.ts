@@ -13,15 +13,15 @@ export const styles = StyleSheet.create({
 	button: {
 		minHeight: 48,
 		paddingHorizontal: spacing.s2,
-		borderRadius: 24,
+		borderRadius: 999,
 		backgroundColor: withOpacity(lightColors.primary, 0.96),
 		flexDirection: 'row',
 		alignItems: 'center',
 		columnGap: spacing.s1,
-		shadowColor: withOpacity('#000000', 0.18),
+		shadowColor: '#000000',
 		shadowOffset: { width: 0, height: 4 },
 		shadowRadius: 10,
-		shadowOpacity: 1,
+		shadowOpacity: 0.18,
 		elevation: 6,
 	},
 	label: {

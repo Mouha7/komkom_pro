@@ -65,14 +65,20 @@ Open Expo DevTools to see mock service logs:
 ### Cart (Mutations)
 
 - `GET /api/v1/cart` — List cart items
-- `POST /api/v1/cart` — Add item to cart
-- `PUT /api/v1/cart/:id` — Update cart item
-- `DELETE /api/v1/cart/:id` — Remove item from cart
+- `GET /api/v1/cart/add/:productId/:quantity` — Add product to cart (or increment quantity)
+- `GET /api/v1/cart/update/:productId/:quantity` — Set an item quantity
+- `GET /api/v1/cart/remove/:productId` — Remove a product from cart
 
 ### Orders (Mutations)
 
 - `GET /api/v1/orders` — List orders
 - `POST /api/v1/orders` — Create new order
+
+### Notifications
+
+- `GET /api/v1/notifications` — List in-app notifications
+- `GET /api/v1/notifications/:id/read` — Mark one notification as read
+- `GET /api/v1/notifications/mark-all-read` — Mark all notifications as read
 
 ### Auth
 

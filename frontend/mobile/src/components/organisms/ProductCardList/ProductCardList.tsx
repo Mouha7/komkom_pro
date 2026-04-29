@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, useWindowDimensions } from 'react-native';
+import { View } from 'react-native';
 import type { DimensionValue, LayoutChangeEvent } from 'react-native';
 
 import { ProductCard } from '../../molecules';
+import { useResponsive } from '../../../hooks/useResponsive';
 import { spacing } from '../../../styles/spacing';
 import { styles } from './ProductCardList.styles';
 import type { ProductCardListProps } from './ProductCardList.types';
@@ -10,6 +11,7 @@ import type { ProductCardListProps } from './ProductCardList.types';
 const MOBILE_COLUMNS = 2;
 const TABLET_COLUMNS = 3;
 const DESKTOP_COLUMNS = 4;
+const MIN_CARD_WIDTH = 140;
 
 export const ProductCardList: React.FC<ProductCardListProps> = ({
 	items,
@@ -25,15 +27,15 @@ export const ProductCardList: React.FC<ProductCardListProps> = ({
 	containerStyle,
 	testID,
 }) => {
-	const { width: screenWidth } = useWindowDimensions();
+	const { width: screenWidth, isMedium, isExpanded } = useResponsive();
 	const [listWidth, setListWidth] = useState(0);
 	const isLandscape = variant === 'landscape';
 
 	const columns = isLandscape
 		? 1
-		: screenWidth >= 1024
+		: isExpanded
 			? DESKTOP_COLUMNS
-			: screenWidth >= 768
+			: isMedium
 				? TABLET_COLUMNS
 				: MOBILE_COLUMNS;
 
@@ -41,7 +43,7 @@ export const ProductCardList: React.FC<ProductCardListProps> = ({
 	const effectiveListWidth = listWidth > 0 ? listWidth : Math.max(screenWidth - spacing.s4 * 2, 0);
 	const cardWidthPx = Math.max(
 		(effectiveListWidth - horizontalGap * (columns - 1)) / columns,
-		0,
+		MIN_CARD_WIDTH,
 	);
 	const cardWidth: DimensionValue = cardWidthPx;
 

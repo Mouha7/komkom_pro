@@ -11,7 +11,16 @@ export type CatalogAppBarProps = {
 	viewMode: ViewMode;
 	onViewModeChange: (mode: ViewMode) => void;
 	onFilterPress: () => void;
+	isFilterActive?: boolean;
 	categories: CatalogCategory[];
 	selectedCategoryId?: string;
 	onCategorySelect: (categoryId: string) => void;
+};
+
+export type CatalogCategoryChipProps = {
+	id: string;
+	label: string;
+	isActive: boolean;
+	onPress: () => void;
+	testID?: string;
 };

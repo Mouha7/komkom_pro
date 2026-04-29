@@ -3,7 +3,9 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AppBar, Text } from "../../components";
+import { useResponsive } from "../../hooks/useResponsive";
 import { lightColors, withOpacity } from "../../styles/colors";
+import { clamp } from "../../styles/responsive";
 import { spacing } from "../../styles/spacing";
 import type { LegalDocumentContent } from "./LegalDocuments.content";
 
@@ -16,6 +18,9 @@ export const LegalDocumentScreen: React.FC<LegalDocumentScreenProps> = ({
 	document,
 	onBack,
 }) => {
+	const { width, isExpanded } = useResponsive();
+	const contentMaxWidth = isExpanded ? clamp(width * 0.84, 760, 980) : undefined;
+
 	return (
 		<SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
 			<AppBar
@@ -26,7 +31,7 @@ export const LegalDocumentScreen: React.FC<LegalDocumentScreenProps> = ({
 			/>
 			<ScrollView
 				style={styles.scrollView}
-				contentContainerStyle={styles.contentContainer}
+				contentContainerStyle={[styles.contentContainer, contentMaxWidth ? { maxWidth: contentMaxWidth, alignSelf: 'center', width: '100%' } : null]}
 				showsVerticalScrollIndicator={false}
 			>
 				<View style={styles.headerCard}>

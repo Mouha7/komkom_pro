@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, View } from 'react-native';
 
 import { Button, Icon, Input, Text } from '../../atoms';
@@ -15,6 +15,10 @@ export const CatalogFilterModal: React.FC<CatalogFilterModalProps> = ({
 	onApply,
 }) => {
 	const [tempFilters, setTempFilters] = useState<typeof filters>(filters);
+
+	useEffect(() => {
+		setTempFilters(filters);
+	}, [filters, visible]);
 
 	const handleReset = () => {
 		setTempFilters({});
@@ -58,6 +62,9 @@ export const CatalogFilterModal: React.FC<CatalogFilterModalProps> = ({
 			transparent
 			animationType="slide"
 			onRequestClose={onClose}
+			presentationStyle="overFullScreen"
+			statusBarTranslucent
+			navigationBarTranslucent
 		>
 			<Pressable style={styles.overlay} onPress={onClose}>
 				<Pressable

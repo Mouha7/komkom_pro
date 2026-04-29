@@ -1,52 +1,31 @@
 import { StyleSheet } from 'react-native';
 
-import { lightColors } from '../../../styles/colors';
 import { spacing } from '../../../styles/spacing';
 
-export const APP_BAR_ACTION_SIZE = 44;
+export const APP_BAR_BUTTON_SIZE = 54;
 
 export const styles = StyleSheet.create({
 	container: {
-		backgroundColor: lightColors.surface.default,
-		borderBottomWidth: 1,
-		borderBottomColor: lightColors.border.default,
+		backgroundColor: 'transparent',
+		paddingHorizontal: spacing.s3,
+		paddingBottom: spacing.s2,
 	},
 	content: {
-		minHeight: 56,
-		paddingHorizontal: spacing.s3,
-		paddingVertical: spacing.s1,
+		minHeight: APP_BAR_BUTTON_SIZE,
 		flexDirection: 'row',
 		alignItems: 'center',
-		columnGap: spacing.s2,
-	},
-	sideSlot: {
-		width: APP_BAR_ACTION_SIZE,
-		height: APP_BAR_ACTION_SIZE,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	sideButton: {
-		width: APP_BAR_ACTION_SIZE,
-		height: APP_BAR_ACTION_SIZE,
-		borderRadius: 12,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	sideButtonPressed: {
-		opacity: 0.7,
+		justifyContent: 'space-between',
 	},
 	titleWrap: {
-		flex: 1,
-	},
-	titleCenter: {
-		textAlign: 'center',
-	},
-	titleLeft: {
-		textAlign: 'left',
-	},
-	rightActions: {
-		flexDirection: 'row',
+		position: 'absolute',
+		left: APP_BAR_BUTTON_SIZE + spacing.s3,
+		right: APP_BAR_BUTTON_SIZE + spacing.s3,
 		alignItems: 'center',
-		columnGap: spacing.s1,
+		justifyContent: 'center',
+		pointerEvents: 'none',
+	},
+	title: {
+		fontSize: 18,
+		fontWeight: '700',
 	},
 });

@@ -18,6 +18,9 @@ export const styles = StyleSheet.create({
 		padding: spacing.s4,
 		rowGap: spacing.s3,
 	},
+	cancelLabel: {
+		fontWeight: '700',
+	},
 	header: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -52,5 +55,6 @@ export const styles = StyleSheet.create({
 	},
 	confirmLabelDanger: {
 		color: lightColors.text.onPrimary,
+		fontWeight: '700',
 	},
 });

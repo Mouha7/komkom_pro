@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { FlatList, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Button, Icon, Input, Text } from "../../atoms";
+import { Icon, Input, Text } from "../../atoms";
 import { lightColors } from "../../../styles/colors";
 import { spacing } from "../../../styles/spacing";
+import { CatalogCategoryChip } from "./CatalogCategoryChip";
 import { styles } from "./CatalogAppBar.styles";
 import type { CatalogAppBarProps } from "./CatalogAppBar.types";
 
@@ -14,12 +15,33 @@ export const CatalogAppBar: React.FC<CatalogAppBarProps> = ({
 	viewMode,
 	onViewModeChange,
 	onFilterPress,
+	isFilterActive = false,
 	categories,
 	selectedCategoryId,
 	onCategorySelect,
 }) => {
 	const insets = useSafeAreaInsets();
 	const safeTop = Math.max(insets.top, spacing.s1);
+	const chipsListRef = useRef<FlatList<CatalogAppBarProps['categories'][number]> | null>(null);
+
+	const selectedCategoryIndex = useMemo(
+		() => categories.findIndex((item) => item.id === selectedCategoryId),
+		[categories, selectedCategoryId],
+	);
+
+	useEffect(() => {
+		if (selectedCategoryIndex < 0) {
+			return;
+		}
+
+		requestAnimationFrame(() => {
+			chipsListRef.current?.scrollToIndex({
+				index: selectedCategoryIndex,
+				animated: true,
+				viewPosition: 0.5,
+			});
+		});
+	}, [selectedCategoryIndex]);
 
 	return (
 		<View style={[styles.container, { paddingTop: safeTop }]}>
@@ -61,8 +83,10 @@ export const CatalogAppBar: React.FC<CatalogAppBarProps> = ({
 								pressed && styles.actionButtonPressed,
 							]}
 							accessibilityRole="button"
+							accessibilityState={{ selected: isFilterActive }}
 							accessibilityLabel="Ouvrir les filtres"
 						>
+							{isFilterActive ? <View style={styles.filterActiveDot} /> : null}
 							<Icon
 								name="sliderFilter"
 								size={24}
@@ -85,7 +109,7 @@ export const CatalogAppBar: React.FC<CatalogAppBarProps> = ({
 							leftElement={
 								<Icon
 									name="search"
-									size={20}
+									size={22}
 									color={lightColors.text.secondary}
 								/>
 							}
@@ -113,28 +137,27 @@ export const CatalogAppBar: React.FC<CatalogAppBarProps> = ({
 				{categories.length > 0 && (
 					<View style={styles.categoryChipsRow}>
 						<FlatList
+							ref={chipsListRef}
 							horizontal
 							scrollEnabled={categories.length > 3}
 							showsHorizontalScrollIndicator={false}
 							data={categories}
 							keyExtractor={(item) => item.id}
+							onScrollToIndexFailed={(info) => {
+								chipsListRef.current?.scrollToOffset({
+									offset: Math.max(info.averageItemLength * info.index, 0),
+									animated: true,
+								});
+							}}
 							contentContainerStyle={styles.categoryChipsContent}
 							renderItem={({ item }) => {
 								const isSelected = item.id === selectedCategoryId;
 								return (
-									<Button
-										title={item.name}
+									<CatalogCategoryChip
+										id={item.id}
+										label={item.name}
+										isActive={isSelected}
 										onPress={() => onCategorySelect(item.id)}
-										variant="secondary"
-										accessibilityLabel={`Filtrer par ${item.name}`}
-										containerStyle={
-											isSelected
-												? { backgroundColor: "#ED762F", borderColor: "#ED762F" }
-												: undefined
-										}
-										textStyle={
-											isSelected ? { color: "#FFFFFF", fontWeight: "700" } : undefined
-										}
 									/>
 								);
 							}}

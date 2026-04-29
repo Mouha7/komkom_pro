@@ -63,7 +63,7 @@ export interface OrderModel {
 	reference: string;
 	total: number;
 	currency: string;
-	status: 'pending' | 'confirmed' | 'delivered';
+	status: 'pending' | 'confirmed' | 'delivered' | 'cancelled';
 	createdAt: string;
 }
 
@@ -324,6 +324,22 @@ export const ORDERS: OrderModel[] = [
 		status: 'delivered',
 		createdAt: '2026-03-15T09:45:00.000Z',
 	},
+	{
+		id: 'cmd-1032',
+		reference: 'CMD-1032',
+		total: 4500,
+		currency: 'FCFA',
+		status: 'cancelled',
+		createdAt: '2026-03-16T11:20:00.000Z',
+	},
+	{
+		id: 'cmd-1033',
+		reference: 'CMD-1033',
+		total: 12500,
+		currency: 'FCFA',
+		status: 'cancelled',
+		createdAt: '2026-03-17T14:10:00.000Z',
+	}
 ];
 
 // ============ AUTH DEFAULTS ============

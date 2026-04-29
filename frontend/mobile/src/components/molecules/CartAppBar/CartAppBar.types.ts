@@ -1,3 +1,5 @@
+import type { CommonIconName } from '../../atoms';
+
 export type CartAppBarProps = {
 	title?: string;
 	itemCount?: number;
@@ -5,5 +7,9 @@ export type CartAppBarProps = {
 	onPressClear?: () => void;
 	isClearDisabled?: boolean;
 	hideRightButton?: boolean;
+	hideLeftButton?: boolean;
+	rightIconName?: CommonIconName;
+	onPressRight?: () => void;
+	rightButtonAccessibilityLabel?: string;
 	testID?: string;
 };

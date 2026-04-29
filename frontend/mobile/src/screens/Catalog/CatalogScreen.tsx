@@ -17,11 +17,16 @@ import {
 	useScrollToTopButton,
 } from '../../components';
 import type { CatalogCategory, ViewMode, FilterOptions, ProductListItemData } from '../../components';
+import { ALL_PRODUCT_TYPES, type ProductType } from '../../constants';
 import { lightColors } from '../../styles/colors';
 import type { MainTabParamList } from '../../navigation/BottomTabNavigator';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
+import { useCart } from '../../hooks/useCart';
+import { useResponsive } from '../../hooks/useResponsive';
 import { useToast } from '../../hooks/useToast';
 import { listCatalogCategories, listProducts } from '../../api/products';
+import { clamp } from '../../styles/responsive';
+import { spacing } from '../../styles/spacing';
 import { styles } from './CatalogScreen.styles';
 
 type CatalogScreenProps = CompositeScreenProps<
@@ -36,6 +41,8 @@ const SCROLL_TO_TOP_VISIBILITY_THRESHOLD = 260;
 
 export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation }) => {
 	// Hooks
+	const { addItem, removeItem } = useCart();
+	const { width, isMedium, isExpanded } = useResponsive();
 	const { showToast } = useToast();
 	const loadMoreTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const isLoadMoreLockedRef = useRef(false);
@@ -90,8 +97,29 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 		const initialCategoryId = route.params?.categoryId;
 		if (initialCategoryId) {
 			setSelectedCategoryId(initialCategoryId);
+			if (ALL_PRODUCT_TYPES.includes(initialCategoryId as ProductType)) {
+				setFilterOptions((prev) => ({
+					...prev,
+					categoryIds: [initialCategoryId as ProductType],
+				}));
+			}
 		}
 	}, [route.params?.categoryId]);
+
+	useEffect(() => {
+		const activeCategories = filterOptions.categoryIds;
+		if (!activeCategories || activeCategories.length === 0) {
+			setSelectedCategoryId('all');
+			return;
+		}
+
+		if (activeCategories.length === 1) {
+			setSelectedCategoryId(activeCategories[0]);
+			return;
+		}
+
+		setSelectedCategoryId('all');
+	}, [filterOptions.categoryIds]);
 
 	// Filter products based on search, category, and filter options
 	const filteredProducts = useMemo(() => {
@@ -129,6 +157,30 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 			return true;
 		});
 	}, [allProducts, searchQuery, selectedCategoryId, filterOptions]);
+
+	const hasActiveFilters = useMemo(() => {
+		const hasActiveCategoryChip =
+			selectedCategoryId !== undefined && selectedCategoryId !== 'all';
+
+		return Boolean(
+			hasActiveCategoryChip ||
+			filterOptions.priceMin !== undefined ||
+			filterOptions.priceMax !== undefined ||
+			(filterOptions.stockStatuses?.length ?? 0) > 0 ||
+			(filterOptions.categoryIds?.length ?? 0) > 0,
+		);
+	}, [filterOptions, selectedCategoryId]);
+
+	const contentContainerStyle = useMemo(
+		() => [
+			styles.contentContainer,
+			{
+				paddingHorizontal: isExpanded ? clamp(width * 0.08, spacing.s4, spacing.s8) : isMedium ? spacing.s5 : spacing.s3,
+				paddingTop: isExpanded ? spacing.s5 : spacing.s4,
+			},
+		],
+		[isExpanded, isMedium, width],
+	);
 
 	const hasMoreProducts = visibleCount < filteredProducts.length;
 	const displayedProducts = useMemo(
@@ -217,38 +269,34 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 	}, [navigation]);
 
 	const handleAddToCart = useCallback((productId: string) => {
-		showToast({
-			tone: 'success',
-			title: 'Produit ajoute',
-			message: `Produit ${productId} ajoute au panier`,
-			actionLabel: 'Voir',
-			actionLabelA11y: 'Voir le panier',
-			onActionPress: () => navigation.navigate('Cart'),
-		});
-	}, [navigation, showToast]);
-
-	const handleCartToggle = useCallback((productId: string, isSelected: boolean, productName: string) => {
-		if (isSelected) {
+		void addItem(productId, 1).then(() => {
 			showToast({
 				tone: 'success',
 				title: 'Produit ajoute',
-				message: `${productName} a ete ajoute au panier`,
+				message: `Produit ${productId} ajoute au panier`,
 				actionLabel: 'Voir',
 				actionLabelA11y: 'Voir le panier',
 				onActionPress: () => navigation.navigate('Cart'),
 			});
+		});
+	}, [addItem, navigation, showToast]);
+
+	const handleCartToggle = useCallback((productId: string, isSelected: boolean, productName: string) => {
+		if (isSelected) {
 			return;
 		}
 
-		showToast({
-			tone: 'info',
-			title: 'Produit retire',
-			message: `${productName} a ete retire du panier`,
-			actionLabel: 'Voir',
-			actionLabelA11y: 'Voir le panier',
-			onActionPress: () => navigation.navigate('Cart'),
+		void removeItem(productId).then(() => {
+			showToast({
+				tone: 'info',
+				title: 'Produit retire',
+				message: `${productName} a ete retire du panier`,
+				actionLabel: 'Voir',
+				actionLabelA11y: 'Voir le panier',
+				onActionPress: () => navigation.navigate('Cart'),
+			});
 		});
-	}, [navigation, showToast]);
+	}, [navigation, removeItem, showToast]);
 
 	const handleOutOfStockPress = useCallback((productName: string) => {
 		showToast({
@@ -263,7 +311,18 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 	};
 
 	const handleCategorySelect = (categoryId: string) => {
-		setSelectedCategoryId(categoryId === selectedCategoryId ? undefined : categoryId);
+		setSelectedCategoryId(categoryId);
+		if (categoryId === 'all') {
+			setFilterOptions((prev) => ({ ...prev, categoryIds: undefined }));
+			return;
+		}
+
+		if (ALL_PRODUCT_TYPES.includes(categoryId as ProductType)) {
+			setFilterOptions((prev) => ({
+				...prev,
+				categoryIds: [categoryId as ProductType],
+			}));
+		}
 	};
 
 	const handleApplyFilters = () => {
@@ -289,6 +348,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 				viewMode={viewMode}
 				onViewModeChange={setViewMode}
 				onFilterPress={handleFilterPress}
+				isFilterActive={hasActiveFilters}
 				categories={categories}
 				selectedCategoryId={selectedCategoryId}
 				onCategorySelect={handleCategorySelect}
@@ -305,8 +365,9 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ route, navigation 
 			<ScrollView
 				ref={scrollViewRef}
 				style={styles.scrollView}
-				contentContainerStyle={styles.contentContainer}
+				contentContainerStyle={contentContainerStyle}
 				onScroll={handleScroll}
+				showsVerticalScrollIndicator={false}
 				scrollEventThrottle={16}
 			>
 				{apiError ? (

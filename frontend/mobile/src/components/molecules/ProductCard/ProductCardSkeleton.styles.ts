@@ -2,6 +2,7 @@ import { StyleSheet } from 'react-native';
 
 import { lightColors, withOpacity } from '../../../styles/colors';
 import { spacing } from '../../../styles/spacing';
+import { productCardSizes } from './productCard.sizes';
 
 export const styles = StyleSheet.create({
 	container: {
@@ -28,12 +29,28 @@ export const styles = StyleSheet.create({
 		padding: spacing.s2,
 		rowGap: spacing.s2,
 	},
+	portraitWrapRegular: {
+		padding: spacing.s3,
+	},
+	portraitWrapLarge: {
+		padding: spacing.s3,
+		rowGap: spacing.s3,
+	},
 	portraitImage: {
 		width: '100%',
-		height: 150,
+		height: productCardSizes.portraitImageHeight.base,
+	},
+	portraitImageRegular: {
+		height: productCardSizes.portraitImageHeight.medium,
+	},
+	portraitImageLarge: {
+		height: productCardSizes.portraitImageHeight.expanded,
 	},
 	portraitContent: {
 		rowGap: spacing.s1,
+	},
+	portraitContentRegular: {
+		rowGap: spacing.s2,
 	},
 	portraitTitle: {
 		height: 20,
@@ -47,19 +64,33 @@ export const styles = StyleSheet.create({
 	},
 	portraitPriceRow: {
 		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
+		alignItems: 'flex-end',
+		flexWrap: 'wrap',
 		columnGap: spacing.s2,
+		rowGap: spacing.s1,
 	},
 	portraitPrice: {
 		height: 22,
 		borderRadius: 6,
 		width: '36%',
+		flexGrow: 1,
+		flexShrink: 1,
+		minWidth: 0,
 	},
 	portraitButton: {
-		width: 56,
-		height: 56,
+		width: productCardSizes.actionButton.base,
+		height: productCardSizes.actionButton.base,
 		borderRadius: 12,
+		marginLeft: 'auto',
+	},
+	portraitButtonRegular: {
+		width: productCardSizes.actionButton.medium,
+		height: productCardSizes.actionButton.medium,
+	},
+	portraitButtonLarge: {
+		width: productCardSizes.actionButton.expanded,
+		height: productCardSizes.actionButton.expanded,
+		borderRadius: 14,
 	},
 	
 	landscapeWrap: {
@@ -67,10 +98,18 @@ export const styles = StyleSheet.create({
 		columnGap: spacing.s1,
 	},
 	landscapeImage: {
-		width: 140,
-		height: 140,
+		width: productCardSizes.landscapeImage.base.width,
+		height: productCardSizes.landscapeImage.base.height,
 		borderRightWidth: 1,
 		borderColor: lightColors.border.default,
+	},
+	landscapeImageRegular: {
+		width: productCardSizes.landscapeImage.medium.width,
+		height: productCardSizes.landscapeImage.medium.height,
+	},
+	landscapeImageLarge: {
+		width: productCardSizes.landscapeImage.expanded.width,
+		height: productCardSizes.landscapeImage.expanded.height,
 	},
 	landscapeContent: {
 		flex: 1,
@@ -79,8 +118,21 @@ export const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		rowGap: spacing.s1,
 	},
+	landscapeContentRegular: {
+		paddingVertical: spacing.s3,
+		paddingRight: spacing.s3,
+		rowGap: spacing.s2,
+	},
+	landscapeContentLarge: {
+		paddingVertical: spacing.s3,
+		paddingRight: spacing.s4,
+		rowGap: spacing.s3,
+	},
 	landscapeHeader: {
 		rowGap: spacing.s1,
+	},
+	landscapeHeaderRegular: {
+		rowGap: spacing.s2,
 	},
 	landscapeTitle: {
 		height: 20,
@@ -94,18 +146,32 @@ export const styles = StyleSheet.create({
 	},
 	landscapeBottom: {
 		flexDirection: 'row',
-		justifyContent: 'space-between',
 		alignItems: 'flex-end',
+		flexWrap: 'wrap',
 		columnGap: spacing.s2,
+		rowGap: spacing.s1,
 	},
 	landscapePrice: {
 		height: 22,
 		borderRadius: 6,
 		width: '42%',
+		flexGrow: 1,
+		flexShrink: 1,
+		minWidth: 0,
 	},
 	landscapeButton: {
-		width: 56,
-		height: 56,
+		width: productCardSizes.actionButton.base,
+		height: productCardSizes.actionButton.base,
 		borderRadius: 12,
+		marginLeft: 'auto',
+	},
+	landscapeButtonRegular: {
+		width: productCardSizes.actionButton.medium,
+		height: productCardSizes.actionButton.medium,
+	},
+	landscapeButtonLarge: {
+		width: productCardSizes.actionButton.expanded,
+		height: productCardSizes.actionButton.expanded,
+		borderRadius: 14,
 	},
 });

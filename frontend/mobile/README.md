@@ -312,3 +312,52 @@ npm run start:tunnel:clear  # Terminal 1
 npm run mock:server:tunnel  # Terminal 2 (nouveau ngrok)
 # Relancer Expo Go sur le téléphone
 ```
+
+## Responsivite Mobile (Checklist Operationnelle)
+
+Cette application suit une approche responsive basee sur les window size classes Material:
+
+- `compact`: largeur `< 600`
+- `medium`: largeur `600-839`
+- `expanded`: largeur `>= 840`
+
+Reference implementation:
+
+- Hook central: `src/hooks/useResponsive.ts`
+- Breakpoints/tokens: `src/styles/responsive.ts`
+
+### Regles a respecter
+
+1. Ne pas dupliquer de breakpoints dans les composants (`useWindowDimensions` + seuils locaux).
+2. Utiliser `useResponsive()` pour les decisions de layout (compact/medium/expanded).
+3. Eviter les hauteurs/largeurs fixes pour les zones critiques (map, carrousel, cartes): preferer des valeurs dynamiques bornees (`clamp`).
+4. Garder des cibles tactiles minimales confortables (>= 44pt iOS, >= 48dp Android).
+5. Verifier le comportement avec `fontScale` eleve (pas de clipping/overflow de CTA).
+6. Respecter les safe areas sur les ecrans avec barres d'action fixes.
+
+### Checklist pre-PR responsive
+
+1. Tester au minimum en portrait + paysage.
+2. Valider les largeurs: `320`, `375`, `390/412`, `768`, `834`, `1024`.
+3. Verifier l'absence d'overflow horizontal sur tous les ecrans critiques.
+4. Verifier que les CTA principaux restent visibles et actionnables.
+5. Verifier maps/modales/carrousels sur `compact` et `expanded`.
+6. Verifier que les listes imbriquees conservent un scroll fluide.
+
+### Commandes de verification
+
+```bash
+# TypeScript (source de verite pour erreurs TS)
+npx tsc --noEmit -p tsconfig.json
+
+# Demarrage Expo (cache propre recommande apres changements layout)
+npm run start:clear
+```
+
+### Bonnes pratiques de reference (sources officielles)
+
+- React Native: `useWindowDimensions` prefere a `Dimensions` pour le rendu reactif
+- React Native: tenir compte de `fontScale` et `scale` (PixelRatio)
+- Apple HIG: adaptation orientation, safe areas, densite d'information
+- Android: layouts flexibles, pas de dimensions hardcodees pour l'UI critique
+- Material: window size classes pour structurer les adaptations multi-ecrans

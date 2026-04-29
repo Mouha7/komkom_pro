@@ -3,6 +3,7 @@ import { FlatList, Pressable, StyleSheet, View, type LayoutChangeEvent } from 'r
 
 import { Icon, Text } from '../../../components';
 import { lightColors } from '../../../styles/colors';
+import { clamp } from '../../../styles/responsive';
 import { spacing } from '../../../styles/spacing';
 import type { HomeCategoryItem } from './HomeSections.types';
 
@@ -20,17 +21,25 @@ export const HomeCategoriesSection: React.FC<HomeCategoriesSectionProps> = ({
 }) => {
 	const [containerWidth, setContainerWidth] = useState(0);
 
+	const categoryItemWidth = useMemo(() => {
+		if (containerWidth <= 0) {
+			return CATEGORY_ITEM_WIDTH;
+		}
+
+		return clamp(containerWidth * 0.22, 80, 112);
+	}, [containerWidth]);
+
 	const canScrollHorizontally = useMemo(() => {
 		if (containerWidth === 0) {
 			return true;
 		}
 
-		const totalItemsWidth = items.length * CATEGORY_ITEM_WIDTH;
+		const totalItemsWidth = items.length * categoryItemWidth;
 		const totalGapsWidth = Math.max(items.length - 1, 0) * CATEGORY_ITEM_GAP;
 		const totalContentWidth = totalItemsWidth + totalGapsWidth + spacing.s2;
 
 		return totalContentWidth > containerWidth;
-	}, [containerWidth, items.length]);
+	}, [categoryItemWidth, containerWidth, items.length]);
 
 	const handleLayout = (event: LayoutChangeEvent): void => {
 		const nextWidth = event.nativeEvent.layout.width;
@@ -54,7 +63,7 @@ export const HomeCategoriesSection: React.FC<HomeCategoriesSectionProps> = ({
 				renderItem={({ item }) => (
 					<Pressable
 						onPress={() => onPressCategory(item)}
-						style={styles.categoryButton}
+						style={[styles.categoryButton, { width: categoryItemWidth }]}
 						accessibilityRole='button'
 						accessibilityLabel={`Ouvrir la categorie ${item.label}`}
 					>

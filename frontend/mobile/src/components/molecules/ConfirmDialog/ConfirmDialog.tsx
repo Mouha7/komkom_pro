@@ -27,6 +27,9 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 			transparent
 			animationType="fade"
 			onRequestClose={onCancel}
+			presentationStyle="overFullScreen"
+			statusBarTranslucent
+			navigationBarTranslucent
 			testID={testID}
 		>
 			<Pressable style={styles.overlay} onPress={onCancel} accessibilityRole="button">
@@ -54,6 +57,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 						<Button
 							title={cancelLabel}
 							variant="secondary"
+							textStyle={styles.cancelLabel}
 							onPress={onCancel}
 							containerStyle={styles.actionButton}
 						/>

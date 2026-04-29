@@ -3,6 +3,7 @@ import { ActivityIndicator, FlatList, View } from "react-native";
 
 import { Text } from "../../atoms";
 import { CartItem } from "../../molecules/CartItem";
+import { OrderSummaryCard } from "../../molecules";
 import { styles } from "./CartList.styles";
 import type { CartListProps } from "./CartList.types";
 
@@ -68,8 +69,6 @@ export const CartList: React.FC<CartListProps> = ({
 		[onDecreaseQty],
 	);
 
-	const DIVIDER_SEGMENTS = Array.from({ length: 46 }, (_, index) => String(index));
-
 	if (isLoading) {
 		return (
 			<View style={[styles.loader, containerStyle]} testID={testID}>
@@ -107,37 +106,12 @@ export const CartList: React.FC<CartListProps> = ({
 					</View>
 				)}
 			/>
-			<View style={styles.summary}>
-				<View style={styles.totalRow}>
-					<Text variant="body" color="secondary">
-						Sous-total ({String(totalItems)} articles)
-					</Text>
-					<Text variant="h2" style={styles.priceRow}>
-						{formatPrice(subtotal, currency)}
-					</Text>
-				</View>
-				<View style={styles.totalRow}>
-					<Text variant="body" color="secondary">
-						Frais de livraison estimes
-					</Text>
-					<Text variant="h2" style={styles.priceRow}>
-						À calculer
-					</Text>
-				</View>
-				<View style={styles.divider} pointerEvents="none">
-					{DIVIDER_SEGMENTS.map((segment) => (
-						<View key={segment} style={styles.dividerSegment} />
-					))}
-				</View>
-				<View style={styles.totalRow}>
-					<Text variant="h1" style={styles.totalLabel}>
-						Total estime
-					</Text>
-					<Text variant="h1" style={styles.totalAmount}>
-						{formatPrice(subtotal, currency)}
-					</Text>
-				</View>
-			</View>
+			<OrderSummaryCard
+				totalItems={totalItems}
+				subtotalText={formatPrice(subtotal, currency)}
+				deliveryText='À calculer'
+				totalText={formatPrice(subtotal, currency)}
+			/>
 		</View>
 	);
 };

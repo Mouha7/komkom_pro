@@ -9,16 +9,19 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import {
+	AppBar,
 	Button,
 	Icon,
-	IconOnlyButton,
 	Input,
 	ScrollToTopButton,
 	Text,
 	useScrollToTopButton,
 } from "../../components";
+import { useResponsive } from "../../hooks/useResponsive";
 import type { RootStackParamList } from "../../navigation/AppNavigator";
 import { lightColors } from "../../styles/colors";
+import { clamp } from "../../styles/responsive";
+import { spacing } from "../../styles/spacing";
 import {
 	SENEGAL_COUNTRY_CODE,
 	SENEGAL_LOCAL_DIGITS,
@@ -37,6 +40,8 @@ type SignupScreenProps = NativeStackScreenProps<RootStackParamList, "Signup">;
 const SCROLL_TO_TOP_VISIBILITY_THRESHOLD = 200;
 
 export const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
+	const { width, isMedium, isExpanded } = useResponsive();
+	const horizontalPadding = isExpanded ? clamp(width * 0.08, spacing.s4, spacing.s8) : isMedium ? spacing.s5 : spacing.s3;
 	const [isPasswordHidden, setIsPasswordHidden] = useState(true);
 	const [password, setPassword] = useState("");
 	const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -128,7 +133,12 @@ export const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
 	}, [navigation]);
 
 	return (
-		<SafeAreaView style={styles.safeArea}>
+		<SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
+			<AppBar
+				title=""
+				leftIconName="arrowLeft"
+				onPressLeft={() => navigation.goBack()}
+			/>
 			<ScrollView
 				ref={scrollViewRef}
 				style={styles.scrollView}
@@ -136,14 +146,7 @@ export const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
 				onScroll={handleScroll}
 				scrollEventThrottle={16}
 			>
-				<View style={styles.container}>
-					<IconOnlyButton
-						iconName="arrowLeft"
-						onPress={() => navigation.goBack()}
-						accessibilityLabel="Retour"
-						containerStyle={styles.backButton}
-					/>
-
+				<View style={[styles.container, { paddingHorizontal: horizontalPadding }]}>
 					<View style={styles.headerBlock}>
 						<View style={styles.brandMark}>
 							<Icon

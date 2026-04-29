@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
 	},
 	backgroundImage: {
 		...StyleSheet.absoluteFillObject,
-		width: '110%',
+		width: '120%',
 		height: '100%',
 	},
 	loaderContainer: {
@@ -28,6 +28,7 @@ export const styles = StyleSheet.create({
 		borderColor: withOpacity('#FFFFFF', 0),
 		alignItems: 'center',
 		justifyContent: 'center',
+		marginLeft: 20,
 	},
 	loaderIconSpin: {
 		width: 34,
