@@ -1,5 +1,7 @@
+import type { StyleProp, ViewStyle } from 'react-native';
+
 export interface OrderConfirmationHeaderIconProps {
-	containerStyle?: any;
+	containerStyle?: StyleProp<ViewStyle>;
 }
 
 export type OrderConfirmationStatusType = 'secured' | 'pending' | 'completed';
@@ -15,13 +17,13 @@ export interface OrderConfirmationSummaryCardProps {
 	status: OrderConfirmationStatusType;
 	items: OrderConfirmationSummaryItem[];
 	totalAmount: string;
-	containerStyle?: any;
+	containerStyle?: StyleProp<ViewStyle>;
 }
 
 export interface OrderConfirmationActionBarProps {
 	onFollowOrder: () => void;
 	onReturnHome: () => void;
-	containerStyle?: any;
+	containerStyle?: StyleProp<ViewStyle>;
 }
 
 export interface OrderConfirmationScreenData {

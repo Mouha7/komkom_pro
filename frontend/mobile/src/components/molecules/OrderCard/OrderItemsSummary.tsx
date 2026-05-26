@@ -1,12 +1,13 @@
 import React from 'react';
 import { View } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 
 import { Text } from '../../atoms';
 import { styles } from './OrderCard.styles';
 
 interface OrderItemsSummaryProps {
 	summary: string;
-	containerStyle?: any;
+	containerStyle?: StyleProp<ViewStyle>;
 }
 
 export const OrderItemsSummary: React.FC<OrderItemsSummaryProps> = ({

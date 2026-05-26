@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"Screen\\\\.\\(tsx|ts\\)$\")",
+      "Bash(npx expo-doctor *)",
+      "Bash(grep -rn \"catch.*{$\" /Users/smrs/Documents/Freelance/komkom_pro/frontend/mobile/src)"
+    ]
+  }
+}

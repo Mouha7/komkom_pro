@@ -1,4 +1,5 @@
 import React from 'react';
+import type { StyleProp, ViewStyle } from 'react-native';
 
 import { Button } from '../../atoms';
 import { styles } from './OrderCard.styles';
@@ -8,7 +9,7 @@ interface OrderCardActionProps {
 	variant?: 'primary' | 'secondary';
 	onPress?: () => void;
 	disabled?: boolean;
-	containerStyle?: any;
+	containerStyle?: StyleProp<ViewStyle>;
 }
 
 export const OrderCardAction: React.FC<OrderCardActionProps> = ({
