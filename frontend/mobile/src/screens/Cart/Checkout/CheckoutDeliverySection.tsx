@@ -1,8 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
 
-import { Button, Icon, Input, Text } from '../../../components';
+import { AddressPreviewCard, Button, Icon, Input, Text } from '../../../components';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { CHECKOUT_DEFAULT_REGION } from './CheckoutScreen.constants';
 import { styles } from './CheckoutScreen.styles';
@@ -21,14 +20,9 @@ export const CheckoutDeliverySection: React.FC<CheckoutDeliverySectionProps> = (
 	const { height, isExpanded } = useResponsive();
 	const mapHeight = isExpanded ? clamp(height * 0.2, 180, 260) : clamp(height * 0.2, 160, 220);
 
-	const mapRegion = pickedLocation
-		? {
-				latitude: pickedLocation.latitude,
-				longitude: pickedLocation.longitude,
-				latitudeDelta: CHECKOUT_DEFAULT_REGION.latitudeDelta,
-				longitudeDelta: CHECKOUT_DEFAULT_REGION.longitudeDelta,
-			}
-		: CHECKOUT_DEFAULT_REGION;
+	const previewLatitude = pickedLocation?.latitude ?? CHECKOUT_DEFAULT_REGION.latitude;
+	const previewLongitude = pickedLocation?.longitude ?? CHECKOUT_DEFAULT_REGION.longitude;
+	const previewAddress = pickedLocation?.address ?? 'Position non sélectionnée';
 
 	return (
 		<View style={styles.section}>
@@ -41,16 +35,13 @@ export const CheckoutDeliverySection: React.FC<CheckoutDeliverySectionProps> = (
 			</Text>
 			<View style={styles.card}>
 				<View style={[styles.mapPreviewContainer, { height: mapHeight }]}>
-					<MapView style={styles.mapPreview} region={mapRegion} pointerEvents='none'>
-						<Marker
-							coordinate={
-								pickedLocation ?? {
-									latitude: mapRegion.latitude,
-									longitude: mapRegion.longitude,
-								}
-							}
-						/>
-					</MapView>
+					<AddressPreviewCard
+						address={previewAddress}
+						latitude={previewLatitude}
+						longitude={previewLongitude}
+						height={mapHeight}
+						showOpenInMapsButton={Boolean(pickedLocation)}
+					/>
 				</View>
 
 				<Button

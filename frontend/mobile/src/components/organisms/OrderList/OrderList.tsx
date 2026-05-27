@@ -2,22 +2,21 @@ import React from 'react';
 import { ActivityIndicator, FlatList, Pressable, View } from 'react-native';
 
 import { StatusBadge, Text } from '../../atoms';
+import { formatAmount } from '../../../utils/formatPrice';
+import { formatDateSafe, parseDateSafe } from '../../../utils/formatDate';
 import { styles } from './OrderList.styles';
 import type { OrderListProps, OrderSummaryItem } from './OrderList.types';
 
 const formatPrice = (price: number, currency: string): string => {
-	return new Intl.NumberFormat('fr-FR').format(price) + ' ' + currency;
+	return formatAmount(price) + ' ' + currency;
 };
 
 const renderDate = (isoDate?: string): string => {
-	if (!isoDate) {
+	const date = parseDateSafe(isoDate);
+	if (!date) {
 		return 'Date non disponible';
 	}
-	const date = new Date(isoDate);
-	if (Number.isNaN(date.getTime())) {
-		return 'Date non disponible';
-	}
-	return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(date);
+	return formatDateSafe(date, { day: '2-digit', month: 'short', year: 'numeric' });
 };
 
 const Row: React.FC<{

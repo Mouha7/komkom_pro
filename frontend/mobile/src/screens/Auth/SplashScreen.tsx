@@ -9,6 +9,9 @@ import { Text } from '../../components';
 
 const warehouseImage = require('../../../assets/warehouse_shelves.png') as ImageSourcePropType;
 
+const isDemoBypassEnabled =
+	__DEV__ || process.env.EXPO_PUBLIC_ENABLE_DEMO_BYPASS === 'true';
+
 export const SplashScreen: React.FC<SplashScreenProps> = ({ 
 	onLoginPress, 
 	onSignupPress,
@@ -49,7 +52,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
 				onSignupPress={onSignupPress}
 			/>
 
-			{__DEV__ && onDevBypassPress && (
+			{isDemoBypassEnabled && onDevBypassPress && (
 				<Pressable 
 					onPress={onDevBypassPress}
 					style={{ 

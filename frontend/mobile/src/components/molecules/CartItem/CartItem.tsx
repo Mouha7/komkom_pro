@@ -3,12 +3,13 @@ import { Image, Pressable, View } from 'react-native';
 
 import { Icon, Text } from '../../atoms';
 import { useResponsive } from '../../../hooks/useResponsive';
+import { formatAmount } from '../../../utils/formatPrice';
 import { QuantityControl } from '../QuantityControl';
 import { styles } from './CartItem.styles';
 import type { CartItemProps } from './CartItem.types';
 
 const formatPrice = (price: number, currency: string): string => {
-	return new Intl.NumberFormat('fr-FR').format(price) + ' ' + currency;
+	return formatAmount(price) + ' ' + currency;
 };
 
 const deriveBrand = (name: string): string => {

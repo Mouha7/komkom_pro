@@ -8,9 +8,9 @@ import {
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import MapView, { Marker } from "react-native-maps";
 
 import {
+	AddressPreviewCard,
 	Button,
 	CartAppBar,
 	EmptyState,
@@ -57,13 +57,21 @@ const formatOrderDateTime = (isoDate?: string): string => {
 		return "Date non disponible";
 	}
 
-	return new Intl.DateTimeFormat("fr-FR", {
-		day: "2-digit",
-		month: "short",
-		year: "numeric",
-		hour: "2-digit",
-		minute: "2-digit",
-	}).format(date);
+	try {
+		return new Intl.DateTimeFormat("fr-FR", {
+			day: "2-digit",
+			month: "short",
+			year: "numeric",
+			hour: "2-digit",
+			minute: "2-digit",
+		}).format(date);
+	} catch {
+		try {
+			return date.toLocaleString("fr-FR");
+		} catch {
+			return date.toISOString();
+		}
+	}
 };
 
 const getActiveStepIndex = (status: OrderStatus): number => {
@@ -448,18 +456,13 @@ export const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({
 								Informations de livraison
 							</Text>
 							<View style={[styles.mapContainer, { height: mapHeight }]}>
-								<MapView
-									style={styles.mapView}
-									region={mapRegion}
-									scrollEnabled={false}
-									zoomEnabled={false}
-									pitchEnabled={false}
-									rotateEnabled={false}
-									toolbarEnabled={false}
-									pointerEvents="none"
-								>
-									<Marker coordinate={detail.coordinates} />
-								</MapView>
+								<AddressPreviewCard
+									address={detail.deliveryAddress}
+									latitude={mapRegion.latitude}
+									longitude={mapRegion.longitude}
+									height={mapHeight}
+									showOpenInMapsButton
+								/>
 							</View>
 
 							<View style={styles.infoRow}>

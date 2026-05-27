@@ -4,11 +4,12 @@ import { ActivityIndicator, FlatList, View } from "react-native";
 import { Text } from "../../atoms";
 import { CartItem } from "../../molecules/CartItem";
 import { OrderSummaryCard } from "../../molecules";
+import { formatAmount } from "../../../utils/formatPrice";
 import { styles } from "./CartList.styles";
 import type { CartListProps } from "./CartList.types";
 
 const formatPrice = (price: number, currency: string): string => {
-	return new Intl.NumberFormat("fr-FR").format(price) + " " + currency;
+	return formatAmount(price) + " " + currency;
 };
 
 export const CartList: React.FC<CartListProps> = ({

@@ -3,7 +3,10 @@
     "allow": [
       "Bash(grep -E \"Screen\\\\.\\(tsx|ts\\)$\")",
       "Bash(npx expo-doctor *)",
-      "Bash(grep -rn \"catch.*{$\" /Users/smrs/Documents/Freelance/komkom_pro/frontend/mobile/src)"
+      "Bash(grep -rn \"catch.*{$\" /Users/smrs/Documents/Freelance/komkom_pro/frontend/mobile/src)",
+      "Bash(grep -r \"require\\(\\\\`\\\\|require\\(\\\\$\" /Users/smrs/Documents/Freelance/komkom_pro/frontend/mobile/src --include=\"*.ts\" --include=\"*.tsx\" --include=\"*.js\" -n)",
+      "Bash(grep -E \"\\\\.tsx?$\")",
+      "Bash(adb devices *)"
     ]
   }
 }

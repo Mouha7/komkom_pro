@@ -7,6 +7,7 @@ import { OrderFiltersBar } from '../../molecules/OrderFilters';
 import { ORDER_FILTERS } from '../../molecules/OrderFilters/OrderFilters.constants';
 import type { OrderFilterType } from '../../molecules/OrderFilters/OrderFilters.types';
 import { FALLBACK_ORDER_ITEMS_BY_STATUS } from '../../../mocks/orders';
+import { formatDateSafe, parseDateSafe } from '../../../utils/formatDate';
 import { styles } from './OrdersListFiltered.styles';
 import type { OrdersListFilteredProps, OrderSummaryItem } from './OrdersListFiltered.types';
 
@@ -25,12 +26,8 @@ const mapStatusToFilter = (status: string): OrderFilterType => {
 };
 
 const formatOrderDate = (isoDate?: string): string => {
-	if (!isoDate) {
-		return 'Date non disponible';
-	}
-
-	const date = new Date(isoDate);
-	if (Number.isNaN(date.getTime())) {
+	const date = parseDateSafe(isoDate);
+	if (!date) {
 		return 'Date non disponible';
 	}
 
@@ -40,20 +37,20 @@ const formatOrderDate = (isoDate?: string): string => {
 		date.getMonth() === today.getMonth() &&
 		date.getFullYear() === today.getFullYear();
 
-	const timeLabel = new Intl.DateTimeFormat('fr-FR', {
+	const timeLabel = formatDateSafe(date, {
 		hour: '2-digit',
 		minute: '2-digit',
-	}).format(date);
+	});
 
 	if (isToday) {
 		return `Aujourd'hui, ${timeLabel}`;
 	}
 
-	const dayLabel = new Intl.DateTimeFormat('fr-FR', {
+	const dayLabel = formatDateSafe(date, {
 		day: '2-digit',
 		month: 'short',
 		year: 'numeric',
-	}).format(date);
+	});
 
 	return `${dayLabel}, ${timeLabel}`;
 };

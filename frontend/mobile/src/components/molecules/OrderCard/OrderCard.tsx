@@ -3,13 +3,14 @@ import { View } from 'react-native';
 
 import { Icon, Text } from '../../atoms';
 import type { CommonIconName } from '../../atoms/Icon';
+import { formatAmount } from '../../../utils/formatPrice';
 import { OrderCardAction } from './OrderCardAction';
 import { OrderItemsSummary } from './OrderItemsSummary';
 import { styles } from './OrderCard.styles';
 import type { OrderCardProps } from './OrderCard.types';
 
 const formatPrice = (price: number, currency: string): string => {
-	return new Intl.NumberFormat('fr-FR').format(price) + ' ' + currency;
+	return formatAmount(price) + ' ' + currency;
 };
 
 const getStatusMeta = (

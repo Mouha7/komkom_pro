@@ -1,8 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
 
 import { Button, Icon, Text } from '../../atoms';
+import { AddressPreviewCard } from '../AddressPreviewCard';
 import { lightColors } from '../../../styles/colors';
 import { styles } from './ProfileLocationCard.styles';
 import type { ProfileLocationCardProps } from './ProfileLocationCard.types';
@@ -47,34 +47,16 @@ export const ProfileLocationCard: React.FC<ProfileLocationCardProps> = ({
 			</Text>
 
 			<View style={styles.card}>
-				<MapView
-					style={styles.map}
-					pointerEvents='none'
-					region={{
-						latitude,
-						longitude,
-						latitudeDelta: 0.012,
-						longitudeDelta: 0.012,
-					}}
-					scrollEnabled={false}
-					zoomEnabled={false}
-					rotateEnabled={false}
-					pitchEnabled={false}
-				>
-					<Marker coordinate={{ latitude, longitude }}>
-						<Icon
-							name='mapPin'
-							size={26}
-							color={lightColors.primary}
-						/>
-					</Marker>
-				</MapView>
+				<AddressPreviewCard
+					address={address}
+					latitude={latitude}
+					longitude={longitude}
+					height={140}
+					showOpenInMapsButton={false}
+				/>
 
 				<View style={styles.content}>
 					<View style={styles.addressWrap}>
-						<Text variant='body' textColorOverride={lightColors.text.primary}>
-							{address}
-						</Text>
 						<Text variant='small' textColorOverride={lightColors.text.secondary}>
 							{formatLastUpdated(lastUpdatedAt)}
 						</Text>

@@ -1,0 +1,64 @@
+import type { ExpoConfig } from 'expo/config';
+
+const googleMapsApiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY?.trim() || undefined;
+
+const config: ExpoConfig = {
+	name: 'mobile',
+	slug: 'mobile',
+	scheme: 'mobile',
+	version: '1.0.0',
+	orientation: 'portrait',
+	icon: './assets/icon.png',
+	userInterfaceStyle: 'light',
+	splash: {
+		image: './assets/splash-icon.png',
+		resizeMode: 'contain',
+		backgroundColor: '#ffffff',
+	},
+	ios: {
+		bundleIdentifier: 'com.komkom.mobile',
+		infoPlist: {
+			ITSAppUsesNonExemptEncryption: false,
+			NSLocationWhenInUseUsageDescription:
+				'KomKom utilise votre position pour calculer les frais et delais de livraison.',
+		},
+		supportsTablet: true,
+		...(googleMapsApiKey
+			? { config: { googleMapsApiKey } }
+			: {}),
+	},
+	android: {
+		package: 'com.komkom.mobile',
+		versionCode: 1,
+		softwareKeyboardLayoutMode: 'pan',
+		adaptiveIcon: {
+			backgroundColor: '#E6F4FE',
+			foregroundImage: './assets/android-icon-foreground.png',
+			backgroundImage: './assets/android-icon-background.png',
+			monochromeImage: './assets/android-icon-monochrome.png',
+		},
+		predictiveBackGestureEnabled: false,
+		...(googleMapsApiKey
+			? { config: { googleMaps: { apiKey: googleMapsApiKey } } }
+			: {}),
+	},
+	web: {
+		favicon: './assets/favicon.png',
+	},
+	plugins: [
+		[
+			'expo-location',
+			{
+				locationWhenInUsePermission:
+					'KomKom utilise votre position pour calculer les frais et delais de livraison.',
+			},
+		],
+	],
+	extra: {
+		eas: {
+			projectId: 'e31768db-cd4b-45f2-9675-af04e4f7ca39',
+		},
+	},
+};
+
+export default config;

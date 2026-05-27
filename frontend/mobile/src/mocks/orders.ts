@@ -500,31 +500,33 @@ export const getOrderDetailById = (orderId: string): OrderDetailMetaMock =>
 
 const INVOICE_TAX_RATE_PERCENT = 18;
 
+const SHORT_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
+	day: '2-digit',
+	month: '2-digit',
+	year: 'numeric',
+};
+
+const LONG_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
+	...SHORT_DATE_OPTIONS,
+	hour: '2-digit',
+	minute: '2-digit',
+};
+
 const formatInvoiceIssuedAt = (isoDate?: string): string => {
-	if (!isoDate) {
-		return new Intl.DateTimeFormat('fr-FR', {
-			day: '2-digit',
-			month: '2-digit',
-			year: 'numeric',
-		}).format(new Date());
-	}
+	const fallbackDate = new Date();
+	const parsedDate = isoDate ? new Date(isoDate) : fallbackDate;
+	const dateToFormat = Number.isNaN(parsedDate.getTime()) ? fallbackDate : parsedDate;
+	const options = isoDate && !Number.isNaN(parsedDate.getTime()) ? LONG_DATE_OPTIONS : SHORT_DATE_OPTIONS;
 
-	const parsedDate = new Date(isoDate);
-	if (Number.isNaN(parsedDate.getTime())) {
-		return new Intl.DateTimeFormat('fr-FR', {
-			day: '2-digit',
-			month: '2-digit',
-			year: 'numeric',
-		}).format(new Date());
+	try {
+		return new Intl.DateTimeFormat('fr-FR', options).format(dateToFormat);
+	} catch {
+		try {
+			return dateToFormat.toLocaleString('fr-FR');
+		} catch {
+			return dateToFormat.toISOString();
+		}
 	}
-
-	return new Intl.DateTimeFormat('fr-FR', {
-		day: '2-digit',
-		month: '2-digit',
-		year: 'numeric',
-		hour: '2-digit',
-		minute: '2-digit',
-	}).format(parsedDate);
 };
 
 const mapPaymentStatus = (status: OrderStatusMock): InvoicePaymentStatusMock => {

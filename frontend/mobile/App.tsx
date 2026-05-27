@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Image } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { ErrorBoundary } from './src/components';
 import { AuthProvider } from './src/context/AuthContext';
 import { ToastProvider } from './src/context/ToastContext';
 import { useAuth } from './src/hooks/useAuth';
@@ -70,11 +71,13 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <StatusBar style="dark" animated />
-      <AuthProvider>
-        <ToastProvider>
-          <AppBootstrappedNavigator />
-        </ToastProvider>
-      </AuthProvider>
+      <ErrorBoundary>
+        <AuthProvider>
+          <ToastProvider>
+            <AppBootstrappedNavigator />
+          </ToastProvider>
+        </AuthProvider>
+      </ErrorBoundary>
     </SafeAreaProvider>
   );
 }

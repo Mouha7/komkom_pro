@@ -4,13 +4,10 @@ import { Image, Pressable, View } from "react-native";
 import { Button, Icon, StatusBadge, Text } from "../../atoms";
 import { useResponsive } from "../../../hooks/useResponsive";
 import { lightColors } from "../../../styles/colors";
+import { formatAmount } from "../../../utils/formatPrice";
 import { styles } from "./ProductCard.styles";
 import { ProductCardSkeleton } from "./ProductCardSkeleton";
 import type { ProductCardProps } from "./ProductCard.types";
-
-const formatAmount = (price: number): string => {
-	return new Intl.NumberFormat("fr-FR").format(price);
-};
 
 export const ProductCard: React.FC<ProductCardProps> = ({
 	productId,

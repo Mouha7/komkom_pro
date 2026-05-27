@@ -1,4 +1,7 @@
 
+export { AddressPreviewCard } from './AddressPreviewCard';
+export type { AddressPreviewCardProps } from './AddressPreviewCard';
+
 export { OrderCard, OrderCardAction, OrderItemsSummary } from './OrderCard';
 export type { OrderCardProps } from './OrderCard';
 

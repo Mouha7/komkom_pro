@@ -10,7 +10,7 @@ import {
 
 import MapView, { Marker, type Region } from 'react-native-maps';
 
-import { Button, Icon, Input, Text } from '../../components';
+import { AddressPreviewCard, Button, ErrorBoundary, Icon, Input, Text } from '../../components';
 import { useResponsive } from '../../hooks/useResponsive';
 import { lightColors } from '../../styles/colors';
 import { clamp } from '../../styles/responsive';
@@ -45,6 +45,9 @@ interface LocationPickerModalProps {
 	onRegionChangeComplete: (region: Region) => void;
 	labels?: LocationPickerModalLabels;
 }
+
+const HAS_GOOGLE_MAPS_KEY =
+	(process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? '').trim().length > 0;
 
 const DEFAULT_LABELS: Required<LocationPickerModalLabels> = {
 	title: 'Position du magasin',
@@ -177,28 +180,48 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
 						</View>
 
 						<View style={[styles.mapContainer, { height: mapHeight }]}>
-							<MapView
-								style={styles.map}
-								region={draftRegion}
-								onRegionChangeComplete={onRegionChangeComplete}
-								onPress={(event) => {
-									void onMapPress(
-										event.nativeEvent.coordinate.latitude,
-										event.nativeEvent.coordinate.longitude,
-									);
-								}}
-							>
-								<Marker
-									coordinate={draftCoordinates}
-									draggable
-									onDragEnd={(event) => {
-										void onMapPress(
-											event.nativeEvent.coordinate.latitude,
-											event.nativeEvent.coordinate.longitude,
-										);
-									}}
+							{HAS_GOOGLE_MAPS_KEY ? (
+								<ErrorBoundary
+									fallbackTitle='Carte indisponible'
+									fallbackMessage='La carte interactive ne peut pas être affichée. Vous pouvez utiliser la recherche d&apos;adresse ou votre position actuelle.'
+									resetLabel='Réessayer'
+								>
+									<MapView
+										style={styles.map}
+										region={draftRegion}
+										onRegionChangeComplete={onRegionChangeComplete}
+										onPress={(event) => {
+											void onMapPress(
+												event.nativeEvent.coordinate.latitude,
+												event.nativeEvent.coordinate.longitude,
+											);
+										}}
+									>
+										<Marker
+											coordinate={draftCoordinates}
+											draggable
+											onDragEnd={(event) => {
+												void onMapPress(
+													event.nativeEvent.coordinate.latitude,
+													event.nativeEvent.coordinate.longitude,
+												);
+											}}
+										/>
+									</MapView>
+								</ErrorBoundary>
+							) : (
+								<AddressPreviewCard
+									address={
+										draftAddress.trim().length > 0
+											? draftAddress
+											: 'Aucune adresse sélectionnée'
+									}
+									latitude={draftCoordinates.latitude}
+									longitude={draftCoordinates.longitude}
+									height={mapHeight}
+									showOpenInMapsButton={false}
 								/>
-							</MapView>
+							)}
 							{isResolvingLocation ? (
 								<View style={styles.mapLoadingOverlay}>
 									<ActivityIndicator
